@@ -1,0 +1,22 @@
+{
+  "name": "ranklint-monorepo",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "packageManager": "pnpm@10.33.2",
+  "scripts": {
+    "build": "pnpm -r --filter './packages/*' build",
+    "dev:prepare": "pnpm -r --filter './packages/*' dev:prepare && nuxt prepare playground",
+    "test": "vitest run",
+    "lint": "eslint .",
+    "typecheck": "pnpm -r --filter './packages/*' typecheck"
+  },
+  "devDependencies": {
+    "@nuxt/eslint-config": "^1.16.0",
+    "eslint": "^10.6.0",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.10"
+  }
+}
