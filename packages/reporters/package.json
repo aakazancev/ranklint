@@ -1,0 +1,29 @@
+{
+  "name": "@ranklint/reporters",
+  "version": "0.0.0",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.mts",
+      "import": "./dist/index.mjs"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "unbuild",
+    "dev:prepare": "unbuild --stub",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "unbuild": "^3.6.1"
+  },
+  "dependencies": {
+    "@ranklint/core": "workspace:*"
+  }
+}
