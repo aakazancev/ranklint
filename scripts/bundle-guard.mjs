@@ -2,7 +2,7 @@ import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 import { gzipSync } from 'node:zlib'
 
-const LIMIT = 5 * 1024 // 5 KB gzip — принцип zero prod impact (ТЗ §2)
+const LIMIT = 5 * 1024
 const runtimeDir = new URL('../packages/nuxt/dist/runtime', import.meta.url).pathname
 
 function collect(dir) {
@@ -10,7 +10,6 @@ function collect(dir) {
   return readdirSync(dir).flatMap((name) => {
     const path = join(dir, name)
     if (statSync(path).isDirectory()) {
-      // server/ и devtools/ не попадают в клиентский бандл
       if (name === 'server' || name === 'devtools') return []
       return collect(path)
     }
