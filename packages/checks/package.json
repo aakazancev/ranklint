@@ -24,6 +24,8 @@
     "unbuild": "^3.6.1"
   },
   "dependencies": {
-    "@ranklint/core": "workspace:*"
+    "@ranklint/core": "workspace:*",
+    "linkedom": "^0.18.12",
+    "zod": "^4.4.3"
   }
 }
