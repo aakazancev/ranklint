@@ -1,0 +1,15 @@
+{
+  "/": [],
+  "/bugs/title-short": ["meta:title-length"],
+  "/bugs/title-missing": ["meta:title-required"],
+  "/bugs/description-missing": ["meta:description-required"],
+  "/bugs/description-short": ["meta:description-length"],
+  "/bugs/canonical-missing": ["canonical:required"],
+  "/bugs/canonical-relative": ["canonical:valid"],
+  "/bugs/h1-multiple": ["headings:single-h1"],
+  "/bugs/h1-missing": ["headings:single-h1"],
+  "/bugs/h1-short": ["headings:h1-length"],
+  "/bugs/heading-jump": ["headings:hierarchy"],
+  "/bugs/heading-empty": ["headings:no-empty"],
+  "/bugs/broken-link": ["links:no-broken"]
+}

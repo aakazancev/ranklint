@@ -15,10 +15,8 @@ export function fakeHeadFetcher(
     head: async (url) => {
       const res = responses[url] ?? responses[new URL(url).pathname]
       if (!res) return { statusCode: 404, headers: {} }
-      return {
-        statusCode: res.status,
-        headers: res.location ? { location: res.location } : {},
-      }
+      const headers: Record<string, string> = res.location ? { location: res.location } : {}
+      return { statusCode: res.status, headers }
     },
   }
 }
