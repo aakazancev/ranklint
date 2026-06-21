@@ -15,6 +15,9 @@
   "files": [
     "dist"
   ],
+  "bin": {
+    "ranklint": "./dist/cli.mjs"
+  },
   "scripts": {
     "build": "unbuild",
     "dev:prepare": "unbuild --stub",
@@ -26,6 +29,8 @@
   "dependencies": {
     "@ranklint/checks": "workspace:*",
     "@ranklint/core": "workspace:*",
-    "@ranklint/reporters": "workspace:*"
+    "@ranklint/reporters": "workspace:*",
+    "citty": "^0.2.2",
+    "playwright": "^1.61.1"
   }
 }
