@@ -19,6 +19,11 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm dev:prepare
+      - uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+      - run: pnpm --filter @ranklint/cli exec playwright install --with-deps chromium
       - run: pnpm lint
       - run: pnpm typecheck
       - run: pnpm test
