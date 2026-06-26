@@ -10,6 +10,10 @@
     ".": {
       "types": "./dist/index.d.mts",
       "import": "./dist/index.mjs"
+    },
+    "./schema-org": {
+      "types": "./dist/schema-org.d.mts",
+      "import": "./dist/schema-org.mjs"
     }
   },
   "files": [

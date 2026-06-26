@@ -1,6 +1,7 @@
 export * from './define'
 export * from './net'
 export * from './registry'
+export * from './schema-org'
 export * from './checks/meta/title'
 export * from './checks/meta/description'
 export * from './checks/canonical/canonical'

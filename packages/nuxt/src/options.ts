@@ -33,6 +33,16 @@ export interface ResolvedRanklintOptions {
   devtools: boolean
 }
 
+export function pageFilesToRoutes(files: string[]): string[] {
+  return files
+    .filter(file => file.endsWith('.vue') && !file.includes('['))
+    .map((file) => {
+      const route = `/${file.replace(/\.vue$/, '')}`
+      return route === '/index' ? '/' : route.replace(/\/index$/, '')
+    })
+    .sort()
+}
+
 export function resolveRanklintOptions(options: ModuleOptions): ResolvedRanklintOptions {
   const sitemapInput = options.sitemap ?? true
   const sitemapEnabled = sitemapInput !== false
