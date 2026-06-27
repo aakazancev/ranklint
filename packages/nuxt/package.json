@@ -30,6 +30,7 @@
   },
   "dependencies": {
     "@nuxt/kit": "^4.4.8",
-    "@ranklint/checks": "workspace:*"
+    "@ranklint/checks": "workspace:*",
+    "linkedom": "^0.18.12"
   }
 }

@@ -1,0 +1,43 @@
+.ranklint-base:
+  image: node:22
+  variables:
+    PLAYWRIGHT_BROWSERS_PATH: $CI_PROJECT_DIR/.cache/ms-playwright
+  cache:
+    key: ranklint-playwright
+    paths:
+      - .cache/ms-playwright
+  before_script:
+    - corepack enable
+    - npx --yes @ranklint/cli --version || npm i -g @ranklint/cli
+    - npx playwright install --with-deps chromium
+
+.ranklint-audit:
+  extends: .ranklint-base
+  script:
+    - >
+      ranklint audit
+      --url "$RANKLINT_URL"
+      --reporter junit
+      --output ranklint-report.xml
+  artifacts:
+    when: always
+    reports:
+      junit: ranklint-report.xml
+    paths:
+      - ranklint-report.xml
+
+.ranklint-monitor:
+  extends: .ranklint-base
+  allow_failure: true
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+  script:
+    - >
+      ranklint audit
+      --url "$RANKLINT_URL"
+      --reporter json
+      --output ranklint-report.json
+  artifacts:
+    when: always
+    paths:
+      - ranklint-report.json

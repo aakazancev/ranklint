@@ -14,6 +14,7 @@
     "typecheck": "pnpm -r --filter './packages/*' typecheck"
   },
   "devDependencies": {
+    "@changesets/cli": "^2.31.0",
     "@nuxt/eslint-config": "^1.16.0",
     "eslint": "^10.6.0",
     "typescript": "^6.0.3",

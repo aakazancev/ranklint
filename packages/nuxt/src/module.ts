@@ -34,6 +34,11 @@ export default defineNuxtModule<ModuleOptions>({
         route: resolved.sitemap.path,
         handler: resolver.resolve('./runtime/server/routes/sitemap.xml.get'),
       })
+      const nuxtOptions = nuxt.options as unknown as { nitro?: { prerender?: { routes?: string[] } } }
+      nuxtOptions.nitro ??= {}
+      nuxtOptions.nitro.prerender ??= {}
+      nuxtOptions.nitro.prerender.routes ??= []
+      nuxtOptions.nitro.prerender.routes.push(resolved.sitemap.path)
     }
 
     if (resolved.robots !== false && resolved.robots.mode === 'owner') {
@@ -47,5 +52,24 @@ export default defineNuxtModule<ModuleOptions>({
       addImports({ name: 'useJsonLd', from: resolver.resolve('./runtime/composables/use-json-ld') })
     }
     addImports({ name: 'useRanklintIgnore', from: resolver.resolve('./runtime/composables/use-ranklint-ignore') })
+
+    if (resolved.devtools && nuxt.options.dev) {
+      addServerHandler({
+        route: '/__ranklint/page-report',
+        handler: resolver.resolve('./runtime/server/routes/ranklint-page-report.get'),
+      })
+      addServerHandler({
+        route: '/__ranklint/devtools',
+        handler: resolver.resolve('./runtime/server/routes/ranklint-devtools.get'),
+      })
+      nuxt.hook('devtools:customTabs' as never, ((tabs: unknown[]) => {
+        tabs.push({
+          name: 'ranklint',
+          title: 'SEO',
+          icon: 'carbon:search-locate',
+          view: { type: 'iframe', src: '/__ranklint/devtools' },
+        })
+      }) as never)
+    }
   },
 })
