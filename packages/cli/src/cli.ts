@@ -1,5 +1,6 @@
 import { defineCommand, runMain } from 'citty'
 import { audit } from './commands/audit'
+import { diff } from './commands/diff'
 
 const main = defineCommand({
   meta: {
@@ -8,6 +9,7 @@ const main = defineCommand({
   },
   subCommands: {
     audit,
+    diff,
   },
 })
 

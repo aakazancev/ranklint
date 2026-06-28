@@ -6,5 +6,7 @@ export * from './http-fetcher'
 export * from './crawler'
 export * from './runner'
 export * from './config'
+export * from './diff'
+export * from './storage'
 
 export const packageName = '@ranklint/core'

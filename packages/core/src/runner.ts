@@ -101,6 +101,13 @@ export async function runChecks(input: RunnerInput): Promise<Report> {
       truncated: input.truncated,
     },
     issues,
+    pages: input.snapshots.map((s) => {
+      try {
+        return new URL(s.url).pathname
+      } catch {
+        return s.url
+      }
+    }),
     crawlStats: { ...input.crawlStats, ignored: input.crawlStats.ignored + ignoredCount },
   }
 }

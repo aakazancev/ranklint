@@ -16,6 +16,7 @@ export const audit = defineCommand({
     profile: { type: 'string', description: 'Profile from seo.config to apply' },
     reporter: { type: 'string', default: 'markdown', description: 'Output format: markdown | json | junit' },
     output: { type: 'string', description: 'Write the report to a file instead of stdout' },
+    jsonOutput: { type: 'string', description: 'Additionally write the raw json report to a file (input for ranklint diff)' },
     cwd: { type: 'string', description: 'Directory to look up seo.config in' },
   },
   async run({ args }) {
@@ -36,6 +37,7 @@ export const audit = defineCommand({
         profile: args.profile,
       })
       const output = reporter(report)
+      if (args.jsonOutput) await writeFile(args.jsonOutput, reporters.json(report))
       if (args.output) await writeFile(args.output, output)
       else process.stdout.write(output)
       process.exitCode = exitCodeFor(report)

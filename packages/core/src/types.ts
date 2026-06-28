@@ -89,6 +89,7 @@ export interface Report {
     truncated?: boolean
   }
   issues: Issue[]
+  pages?: string[]
   lighthouse?: unknown
   crawlStats: CrawlStats
 }

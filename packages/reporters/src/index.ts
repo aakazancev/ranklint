@@ -3,6 +3,8 @@ import { json } from './json'
 import { junit } from './junit'
 import { markdown } from './markdown'
 
+export { markdownDiff } from './markdown-diff'
+
 export type Reporter = (report: Report) => string
 export type ReporterName = 'json' | 'markdown' | 'junit'
 
