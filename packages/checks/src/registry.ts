@@ -27,3 +27,5 @@ export const ruleRegistry = new Map<string, RuleRegistryEntry>(
     schema: check.optionsSchema,
   }]),
 )
+
+ruleRegistry.set('links:reachable', { defaultSeverity: 'error' })
