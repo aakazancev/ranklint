@@ -14,6 +14,10 @@ const bugs = [
   'heading-jump',
   'heading-empty',
   'broken-link',
+  'duplicate-title-a',
+  'duplicate-title-b',
+  'jsonld-broken',
+  'images-bad',
 ]
 </script>
 
@@ -24,6 +28,9 @@ const bugs = [
     <ul>
       <li v-for="bug in bugs" :key="bug">
         <NuxtLink :to="`/bugs/${bug}`">{{ bug }}</NuxtLink>
+      </li>
+      <li>
+        <NuxtLink to="/jsonld">jsonld (clean)</NuxtLink>
       </li>
     </ul>
   </main>

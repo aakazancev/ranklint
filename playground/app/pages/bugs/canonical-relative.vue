@@ -4,7 +4,7 @@ useFixtureSeo({ canonical: '/bugs/canonical-relative' })
 
 <template>
   <main>
-    <h1>This heading is long enough for the fixture</h1>
+    <h1>Relative canonical fixture heading here</h1>
     <p>Canonical is intentionally relative.</p>
   </main>
 </template>

@@ -4,7 +4,7 @@ useFixtureSeo({ title: 'Tiny title' })
 
 <template>
   <main>
-    <h1>This heading is long enough for the fixture</h1>
+    <h1>Short title fixture heading for checks</h1>
     <p>Title is intentionally too short.</p>
   </main>
 </template>

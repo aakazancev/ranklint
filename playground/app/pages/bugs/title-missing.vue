@@ -4,7 +4,7 @@ useFixtureSeo({ title: null })
 
 <template>
   <main>
-    <h1>This heading is long enough for the fixture</h1>
+    <h1>Missing title fixture heading for checks</h1>
     <p>Title is intentionally missing.</p>
   </main>
 </template>

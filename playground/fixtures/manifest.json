@@ -1,5 +1,6 @@
 {
   "/": [],
+  "/jsonld": [],
   "/bugs/title-short": ["meta:title-length"],
   "/bugs/title-missing": ["meta:title-required"],
   "/bugs/description-missing": ["meta:description-required"],
@@ -11,5 +12,10 @@
   "/bugs/h1-short": ["headings:h1-length"],
   "/bugs/heading-jump": ["headings:hierarchy"],
   "/bugs/heading-empty": ["headings:no-empty"],
-  "/bugs/broken-link": ["links:no-broken"]
+  "/bugs/broken-link": ["links:no-broken"],
+  "/bugs/duplicate-title-a": ["meta:no-duplicate-title"],
+  "/bugs/duplicate-title-b": ["meta:no-duplicate-title"],
+  "/bugs/orphan": ["links:no-orphans"],
+  "/bugs/jsonld-broken": ["jsonld:parseable", "jsonld:valid-schema"],
+  "/bugs/images-bad": ["images:alt-required", "images:dimensions-required", "images:no-lazy-above-fold"]
 }

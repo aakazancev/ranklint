@@ -4,7 +4,7 @@ useFixtureSeo()
 
 <template>
   <main>
-    <h1>This heading is long enough for the fixture</h1>
+    <h1>Empty heading fixture main heading here</h1>
     <h2/>
     <p>Empty h2 on purpose.</p>
   </main>

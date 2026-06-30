@@ -7,10 +7,10 @@ export interface FixtureSeoOverrides {
 export function useFixtureSeo(overrides: FixtureSeoOverrides = {}) {
   const url = useRequestURL()
   const title = overrides.title === undefined
-    ? 'Fixture page with a perfectly sized title tag'
+    ? `Fixture ${url.pathname} — long enough title tag`
     : overrides.title
   const description = overrides.description === undefined
-    ? 'This fixture description is intentionally long enough to pass the default seventy character minimum with ease.'
+    ? `This fixture page at ${url.pathname} carries a description long enough to pass the seventy character minimum.`
     : overrides.description
   const canonical = overrides.canonical === undefined
     ? `${url.origin}${url.pathname}`

@@ -4,7 +4,7 @@ useFixtureSeo({ description: 'Too short.' })
 
 <template>
   <main>
-    <h1>This heading is long enough for the fixture</h1>
+    <h1>Short description fixture heading here</h1>
     <p>Description is intentionally too short.</p>
   </main>
 </template>

@@ -4,8 +4,12 @@ import { canonicalRequired, canonicalValid } from './checks/canonical/canonical'
 import { h1Length, hierarchy, noEmpty, singleH1 } from './checks/headings/headings'
 import { hreflangSymmetric, hreflangValidTargets } from './checks/i18n/hreflang'
 import { noLocaleLeak } from './checks/i18n/locale-leak'
+import { altRequired, dimensionsRequired, noLazyAboveFold } from './checks/images/images'
+import { jsonldParseable, jsonldValidSchema } from './checks/jsonld/jsonld'
 import { noBroken, noRedirectChain } from './checks/links/links'
+import { noOrphans } from './checks/links/orphans'
 import { descriptionLength, descriptionRequired } from './checks/meta/description'
+import { noDuplicateDescription, noDuplicateTitle, uniqueH1 } from './checks/meta/duplicates'
 import { titleLength, titleRequired } from './checks/meta/title'
 import { robotsEnvPolicy, robotsExpectedDisallow, robotsReachable, robotsSitemapDeclared, robotsZoneNotBlocked } from './checks/robots/robots'
 
@@ -30,6 +34,15 @@ export const allChecks: CheckDefinition[] = [
   hreflangValidTargets,
   hreflangSymmetric,
   noLocaleLeak,
+  noDuplicateTitle,
+  noDuplicateDescription,
+  uniqueH1,
+  noOrphans,
+  jsonldParseable,
+  jsonldValidSchema,
+  altRequired,
+  dimensionsRequired,
+  noLazyAboveFold,
 ]
 
 export const ruleRegistry = new Map<string, RuleRegistryEntry>(
