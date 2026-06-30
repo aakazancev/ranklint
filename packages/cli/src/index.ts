@@ -1,4 +1,5 @@
 export { exitCodeFor } from './exit-code'
+export { buildRobotsFragment } from './robots-fragment'
 export { GitlabArtifactsStorage, type GitlabStorageOptions } from './gitlab-storage'
 export { PlaywrightFetcher } from './playwright-fetcher'
 export { runAudit, type RunAuditOptions } from './run-audit'

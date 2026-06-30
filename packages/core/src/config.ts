@@ -24,7 +24,15 @@ const configSchema = z.object({
     ignore: z.array(z.string()).optional(),
     strategy: z.enum(['full', 'sitemap+sample']).optional(),
   }).optional(),
-  robots: z.unknown().optional(),
+  robots: z.object({
+    mode: z.enum(['owner', 'external']).optional(),
+    expect: z.object({
+      allow: z.array(z.string()).optional(),
+      disallow: z.array(z.string()).optional(),
+      sitemaps: z.array(z.string()).optional(),
+      indexable: z.boolean().optional(),
+    }).optional(),
+  }).optional(),
   lighthouse: z.unknown().optional(),
   profiles: z.record(z.string(), z.unknown()).optional(),
 })

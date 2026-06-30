@@ -32,10 +32,23 @@ export interface AppZone {
   checks?: string[]
 }
 
+export interface RobotsExpectations {
+  allow?: string[]
+  disallow?: string[]
+  sitemaps?: string[]
+  indexable?: boolean
+}
+
+export interface RobotsSiteConfig {
+  mode?: 'owner' | 'external'
+  expect?: RobotsExpectations
+}
+
 export interface SiteConfig {
   url: string
   name?: string
   apps?: Record<string, AppZone>
+  robots?: RobotsSiteConfig
 }
 
 export interface ResolvedRuleOptions {

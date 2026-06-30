@@ -55,7 +55,7 @@ export async function runAudit(opts: RunAuditOptions): Promise<Report> {
       snapshots: crawlResult.snapshots,
       checks: allChecks,
       rules,
-      site: { url: config.site.url, apps: config.apps },
+      site: { url: config.site.url, apps: config.apps, robots: config.robots },
       fetcher,
       crawlStats: crawlResult.stats,
       crawlIssues,

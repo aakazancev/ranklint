@@ -3,9 +3,9 @@ import { describe, expect, it } from 'vitest'
 import { allChecks, ruleRegistry } from '../src/registry'
 
 describe('registry', () => {
-  it('contains the 12 v0.1 checks with unique ids', () => {
-    expect(allChecks).toHaveLength(12)
-    expect(new Set(allChecks.map(c => c.id)).size).toBe(12)
+  it('contains all registered checks with unique ids', () => {
+    expect(allChecks).toHaveLength(20)
+    expect(new Set(allChecks.map(c => c.id)).size).toBe(20)
   })
 
   it('every check carries docs and suggestion-producing run', () => {
