@@ -1,6 +1,7 @@
 import type { PageFetcher, RanklintUserConfig, Report } from '@ranklint/core'
 import { crawl, loadRanklintConfig, resolveRules, runChecks } from '@ranklint/core'
 import { allChecks, ruleRegistry } from '@ranklint/checks'
+import { checkThresholds, collectLighthouse, type LighthouseRunner } from './lighthouse'
 import { PlaywrightFetcher } from './playwright-fetcher'
 
 export interface RunAuditOptions {
@@ -9,6 +10,7 @@ export interface RunAuditOptions {
   profile?: string
   fetcher?: PageFetcher
   config?: RanklintUserConfig
+  lighthouseRunner?: LighthouseRunner
 }
 
 const REACHABLE_DOCS = 'https://ranklint.dev/rules/links-reachable'
@@ -51,7 +53,7 @@ export async function runAudit(opts: RunAuditOptions): Promise<Report> {
         })
       }
     }
-    return await runChecks({
+    const report = await runChecks({
       snapshots: crawlResult.snapshots,
       checks: allChecks,
       rules,
@@ -61,6 +63,17 @@ export async function runAudit(opts: RunAuditOptions): Promise<Report> {
       crawlIssues,
       truncated: crawlResult.truncated,
     })
+    if (config.lighthouse?.enabled) {
+      const { realLighthouseRunner } = await import('./real-lighthouse')
+      const runner = opts.lighthouseRunner ?? realLighthouseRunner
+      const urls = crawlResult.snapshots
+        .filter(s => s.statusCode === 200)
+        .map(s => s.url)
+        .slice(0, config.lighthouse.maxUrls ?? 5)
+      report.lighthouse = await collectLighthouse(urls, config.lighthouse, runner)
+      report.issues.push(...checkThresholds(report.lighthouse, config.lighthouse.thresholds))
+    }
+    return report
   } finally {
     await fetcher.close()
   }

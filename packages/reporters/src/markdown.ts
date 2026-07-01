@@ -22,6 +22,19 @@ export function markdown(report: Report): string {
   lines.push(`**${counts.error} errors, ${counts.warn} warnings, ${counts.info} info**`)
   lines.push('')
 
+  if (report.lighthouse && report.lighthouse.length > 0) {
+    lines.push('### Lighthouse')
+    lines.push('')
+    lines.push('| URL | Perf | SEO | A11y | BP | LCP | CLS |')
+    lines.push('| --- | --- | --- | --- | --- | --- | --- |')
+    for (const r of report.lighthouse) {
+      const m = r.metrics
+      const cell = (v: number | undefined) => v === undefined ? '—' : String(v)
+      lines.push(`| ${r.url} | ${cell(m.performance)} | ${cell(m.seo)} | ${cell(m.accessibility)} | ${cell(m.bestPractices)} | ${cell(m.lcp)} | ${cell(m.cls)} |`)
+    }
+    lines.push('')
+  }
+
   if (report.issues.length === 0) {
     lines.push('No issues found.')
     lines.push('')

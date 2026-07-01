@@ -53,6 +53,18 @@
     paths:
       - ranklint-diff.md
 
+.ranklint-lighthouse:
+  extends: .ranklint-base
+  script:
+    - >
+      ranklint lighthouse
+      --url "$RANKLINT_URL"
+      --output ranklint-lighthouse.json
+  artifacts:
+    when: always
+    paths:
+      - ranklint-lighthouse.json
+
 .ranklint-monitor:
   extends: .ranklint-base
   allow_failure: true

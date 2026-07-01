@@ -31,7 +31,9 @@
     "@ranklint/checks": "workspace:*",
     "@ranklint/core": "workspace:*",
     "@ranklint/reporters": "workspace:*",
+    "chrome-launcher": "^1.2.1",
     "citty": "^0.2.2",
+    "lighthouse": "^13.4.0",
     "playwright": "^1.61.1"
   }
 }

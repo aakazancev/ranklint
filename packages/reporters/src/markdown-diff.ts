@@ -36,6 +36,20 @@ export function markdownDiff(diff: DiffResult): string {
     lines.push('')
   }
 
+  if (diff.lighthouse && diff.lighthouse.length > 0) {
+    lines.push('### Lighthouse deltas')
+    lines.push('')
+    lines.push('| URL | Metric | Base | Current |')
+    lines.push('| --- | --- | --- | --- |')
+    for (const delta of diff.lighthouse) {
+      const worse = delta.metric === 'lcp' || delta.metric === 'cls' || delta.metric === 'tbt'
+        ? delta.current > delta.base
+        : delta.current < delta.base
+      lines.push(`| ${delta.url} | ${delta.metric} | ${delta.base} | ${delta.current} ${worse ? '🔻' : '🟢'} |`)
+    }
+    lines.push('')
+  }
+
   const { added, removed } = diff.pagesDelta
   if (added.length > 0 || removed.length > 0) {
     lines.push('### Pages')

@@ -103,8 +103,32 @@ export interface Report {
   }
   issues: Issue[]
   pages?: string[]
-  lighthouse?: unknown
+  lighthouse?: LighthouseResult[]
   crawlStats: CrawlStats
+}
+
+export type LighthouseAggregation = 'median' | 'p75' | 'best'
+
+export interface LighthouseMetrics {
+  performance?: number
+  seo?: number
+  accessibility?: number
+  bestPractices?: number
+  lcp?: number
+  cls?: number
+  tbt?: number
+}
+
+export interface LighthouseResult {
+  url: string
+  runs: number
+  aggregation: LighthouseAggregation
+  metrics: LighthouseMetrics
+  lcpElement?: {
+    type: 'image' | 'text'
+    snippet?: string
+    suggestion?: string
+  }
 }
 
 export interface DiffResult {

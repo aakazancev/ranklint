@@ -33,7 +33,14 @@ const configSchema = z.object({
       indexable: z.boolean().optional(),
     }).optional(),
   }).optional(),
-  lighthouse: z.unknown().optional(),
+  lighthouse: z.object({
+    enabled: z.boolean().optional(),
+    runs: z.number().int().positive().optional(),
+    aggregation: z.enum(['median', 'p75', 'best']).optional(),
+    formFactor: z.enum(['mobile', 'desktop']).optional(),
+    maxUrls: z.number().int().positive().optional(),
+    thresholds: z.record(z.string(), z.record(z.string(), z.number())).optional(),
+  }).optional(),
   profiles: z.record(z.string(), z.unknown()).optional(),
 })
 

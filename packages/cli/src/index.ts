@@ -1,4 +1,5 @@
 export { exitCodeFor } from './exit-code'
+export { aggregate, checkThresholds, collectLighthouse, type LighthouseConfig, type LighthouseRunner } from './lighthouse'
 export { buildRobotsFragment } from './robots-fragment'
 export { GitlabArtifactsStorage, type GitlabStorageOptions } from './gitlab-storage'
 export { PlaywrightFetcher } from './playwright-fetcher'
