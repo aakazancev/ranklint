@@ -37,6 +37,7 @@ export async function runAudit(opts: RunAuditOptions): Promise<Report> {
       concurrency: config.crawl?.concurrency,
       maxPages: config.crawl?.maxPages,
       delay: config.crawl?.delay,
+      userAgent: config.crawl?.userAgent,
     })
     const crawlIssues = [...crawlResult.issues]
     const reachableRule = rules.get('links:reachable')

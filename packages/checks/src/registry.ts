@@ -3,6 +3,7 @@ import type { CheckDefinition } from './define'
 import { canonicalRequired, canonicalValid } from './checks/canonical/canonical'
 import { h1Length, hierarchy, noEmpty, singleH1 } from './checks/headings/headings'
 import { hreflangSymmetric, hreflangValidTargets } from './checks/i18n/hreflang'
+import { ssrContent } from './checks/indexability/ssr-content'
 import { noLocaleLeak } from './checks/i18n/locale-leak'
 import { altRequired, dimensionsRequired, noLazyAboveFold } from './checks/images/images'
 import { jsonldParseable, jsonldValidSchema } from './checks/jsonld/jsonld'
@@ -43,6 +44,7 @@ export const allChecks: CheckDefinition[] = [
   altRequired,
   dimensionsRequired,
   noLazyAboveFold,
+  ssrContent,
 ]
 
 export const ruleRegistry = new Map<string, RuleRegistryEntry>(

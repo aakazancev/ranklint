@@ -23,6 +23,7 @@ const configSchema = z.object({
     maxPages: z.number().int().positive().optional(),
     ignore: z.array(z.string()).optional(),
     strategy: z.enum(['full', 'sitemap+sample']).optional(),
+    userAgent: z.string().optional(),
   }).optional(),
   robots: z.object({
     mode: z.enum(['owner', 'external']).optional(),
