@@ -18,6 +18,7 @@ export const audit = defineCommand({
     output: { type: 'string', description: 'Write the report to a file instead of stdout' },
     jsonOutput: { type: 'string', description: 'Additionally write the raw json report to a file (input for ranklint diff)' },
     cwd: { type: 'string', description: 'Directory to look up seo.config in' },
+    mode: { type: 'string', description: 'Set to "monitor" for scheduled prod runs: exit 0, diff against last stored report, alert on new issues only' },
   },
   async run({ args }) {
     if (!args.url && !args.start) {
@@ -31,8 +32,20 @@ export const audit = defineCommand({
     let server: Awaited<ReturnType<typeof startServer>> | undefined
     try {
       if (args.start) server = await startServer(args.start)
+      const url = server?.url ?? args.url!
+      if (args.mode === 'monitor') {
+        const { runMonitor } = await import('../run-monitor')
+        const { markdownDiff } = await import('@ranklint/reporters')
+        const result = await runMonitor({ url, cwd: args.cwd, profile: args.profile })
+        const output = result.diff ? markdownDiff(result.diff) : reporter(result.report)
+        if (args.output) await writeFile(args.output, output)
+        else process.stdout.write(output)
+        if (result.notified.length > 0) process.stdout.write(`\nnotified: ${result.notified.join(', ')}\n`)
+        process.exitCode = 0
+        return
+      }
       const report = await runAudit({
-        url: server?.url ?? args.url!,
+        url,
         cwd: args.cwd,
         profile: args.profile,
       })

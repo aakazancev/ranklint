@@ -4,6 +4,7 @@ import { junit } from './junit'
 import { markdown } from './markdown'
 
 export { markdownDiff } from './markdown-diff'
+export { slackPayload, telegramText } from './notifications'
 
 export type Reporter = (report: Report) => string
 export type ReporterName = 'json' | 'markdown' | 'junit'

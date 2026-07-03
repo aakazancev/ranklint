@@ -42,6 +42,14 @@ const configSchema = z.object({
     maxUrls: z.number().int().positive().optional(),
     thresholds: z.record(z.string(), z.record(z.string(), z.number())).optional(),
   }).optional(),
+  monitor: z.object({
+    storage: z.enum(['fs', 's3']).optional(),
+    dir: z.string().optional(),
+    bucket: z.string().optional(),
+    prefix: z.string().optional(),
+    endpoint: z.string().optional(),
+    region: z.string().optional(),
+  }).optional(),
   profiles: z.record(z.string(), z.unknown()).optional(),
 })
 

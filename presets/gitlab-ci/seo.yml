@@ -74,9 +74,16 @@
     - >
       ranklint audit
       --url "$RANKLINT_URL"
-      --reporter json
-      --output ranklint-report.json
+      --mode monitor
+      --output ranklint-monitor.md
+  cache:
+    - key: ranklint-playwright
+      paths:
+        - .cache/ms-playwright
+    - key: ranklint-monitor-reports
+      paths:
+        - .ranklint/reports
   artifacts:
     when: always
     paths:
-      - ranklint-report.json
+      - ranklint-monitor.md

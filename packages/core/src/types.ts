@@ -104,7 +104,14 @@ export interface Report {
   issues: Issue[]
   pages?: string[]
   lighthouse?: LighthouseResult[]
+  crux?: CruxFieldData
   crawlStats: CrawlStats
+}
+
+export interface CruxFieldData {
+  lcp?: number
+  cls?: number
+  inp?: number
 }
 
 export type LighthouseAggregation = 'median' | 'p75' | 'best'

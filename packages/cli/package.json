@@ -24,8 +24,15 @@
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
+    "@aws-sdk/client-s3": "^3.1080.0",
     "@types/node": "^26.1.0",
     "unbuild": "^3.6.1"
+  },
+  "peerDependencies": {
+    "@aws-sdk/client-s3": ">=3"
+  },
+  "peerDependenciesMeta": {
+    "@aws-sdk/client-s3": { "optional": true }
   },
   "dependencies": {
     "@ranklint/checks": "workspace:*",
