@@ -3,7 +3,9 @@ import type { CheckDefinition } from './define'
 import { canonicalRequired, canonicalValid } from './checks/canonical/canonical'
 import { h1Length, hierarchy, noEmpty, singleH1 } from './checks/headings/headings'
 import { hreflangSymmetric, hreflangValidTargets } from './checks/i18n/hreflang'
+import { noSoft404, ttfbBudget, viewport, xRobotsConsistent } from './checks/http/http'
 import { ssrContent } from './checks/indexability/ssr-content'
+import { permanentRedirects, trailingSlashConsistent } from './checks/links/redirects'
 import { noLocaleLeak } from './checks/i18n/locale-leak'
 import { altRequired, dimensionsRequired, noLazyAboveFold } from './checks/images/images'
 import { jsonldParseable, jsonldValidSchema } from './checks/jsonld/jsonld'
@@ -45,6 +47,12 @@ export const allChecks: CheckDefinition[] = [
   dimensionsRequired,
   noLazyAboveFold,
   ssrContent,
+  noSoft404,
+  xRobotsConsistent,
+  ttfbBudget,
+  viewport,
+  permanentRedirects,
+  trailingSlashConsistent,
 ]
 
 export const ruleRegistry = new Map<string, RuleRegistryEntry>(

@@ -9,8 +9,8 @@ describe('resolveUrl', () => {
       'https://x.com/b': { status: 302, location: '/c' },
       'https://x.com/c': { status: 200 },
     })
-    expect(await resolveUrl(fetcher, 'https://x.com/a')).toEqual({ status: 200, hops: 2 })
-    expect(await resolveUrl(fetcher, 'https://x.com/c')).toEqual({ status: 200, hops: 0 })
+    expect(await resolveUrl(fetcher, 'https://x.com/a')).toEqual({ status: 200, hops: 2, firstStatus: 301 })
+    expect(await resolveUrl(fetcher, 'https://x.com/c')).toEqual({ status: 200, hops: 0, firstStatus: 200 })
   })
 
   it('caches per fetcher instance', async () => {
@@ -34,7 +34,7 @@ describe('resolveUrl', () => {
         throw new Error('down')
       },
     }
-    expect(await resolveUrl(fetcher, 'https://x.com/a')).toEqual({ status: 0, hops: 0 })
+    expect(await resolveUrl(fetcher, 'https://x.com/a')).toEqual({ status: 0, hops: 0, firstStatus: 0 })
   })
 
   it('stops following after maxFollow hops', async () => {

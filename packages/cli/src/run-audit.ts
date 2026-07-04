@@ -1,5 +1,5 @@
 import type { PageFetcher, RanklintUserConfig, Report } from '@ranklint/core'
-import { crawl, loadRanklintConfig, resolveRules, runChecks } from '@ranklint/core'
+import { crawl, loadRanklintConfig, resolveRules, runChecks, sampleUrls } from '@ranklint/core'
 import { allChecks, ruleRegistry } from '@ranklint/checks'
 import { checkThresholds, collectLighthouse, type LighthouseRunner } from './lighthouse'
 import { PlaywrightFetcher } from './playwright-fetcher'
@@ -30,7 +30,20 @@ export async function runAudit(opts: RunAuditOptions): Promise<Report> {
   const rules = resolveRules(config.rules, ruleRegistry)
   const fetcher = opts.fetcher ?? new PlaywrightFetcher()
   try {
-    const crawlResult = await crawl(fetcher, [opts.url], {
+    let seeds = [opts.url]
+    if (config.crawl?.strategy === 'sitemap+sample') {
+      try {
+        const res = await fetch(`${new URL(config.site.url).origin}/sitemap.xml`)
+        if (res.ok) {
+          const locs = [...(await res.text()).matchAll(/<loc>([^<]+)<\/loc>/g)].map(m => m[1]!)
+          const sampled = sampleUrls(locs)
+          if (sampled.length > 0) seeds = [...new Set([opts.url, ...sampled])]
+        }
+      } catch {
+        seeds = [opts.url]
+      }
+    }
+    const crawlResult = await crawl(fetcher, seeds, {
       siteUrl: config.site.url,
       apps: config.apps,
       ignore: config.crawl?.ignore,
