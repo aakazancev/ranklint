@@ -1,4 +1,4 @@
-import type { PageFetcher, RanklintUserConfig, Report } from '@ranklint/core'
+import type { Check, PageFetcher, RanklintUserConfig, Report } from '@ranklint/core'
 import { crawl, loadRanklintConfig, resolveRules, runChecks, sampleUrls } from '@ranklint/core'
 import { allChecks, ruleRegistry } from '@ranklint/checks'
 import { checkThresholds, collectLighthouse, type LighthouseRunner } from './lighthouse'
@@ -27,7 +27,16 @@ export async function runAudit(opts: RunAuditOptions): Promise<Report> {
       config = { site: { url: new URL(opts.url).origin } }
     }
   }
-  const rules = resolveRules(config.rules, ruleRegistry)
+  const checks: Check[] = [...allChecks]
+  const registry = new Map(ruleRegistry)
+  for (const custom of config.customChecks ?? []) {
+    if (registry.has(custom.id)) {
+      throw new Error(`Custom check "${custom.id}" clashes with a built-in rule — pick a namespaced id like "myteam:${custom.id.split(':').pop()}"`)
+    }
+    checks.push(custom)
+    registry.set(custom.id, { defaultSeverity: custom.severity })
+  }
+  const rules = resolveRules(config.rules, registry)
   const fetcher = opts.fetcher ?? new PlaywrightFetcher()
   try {
     let seeds = [opts.url]
@@ -69,7 +78,7 @@ export async function runAudit(opts: RunAuditOptions): Promise<Report> {
     }
     const report = await runChecks({
       snapshots: crawlResult.snapshots,
-      checks: allChecks,
+      checks,
       rules,
       site: { url: config.site.url, apps: config.apps, robots: config.robots },
       fetcher,

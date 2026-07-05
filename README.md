@@ -108,6 +108,43 @@ seo:audit:
 
 Любое правило: `'error' | 'warn' | 'off'` или `[severity, options]`. Инлайн-отключение на странице — `useRanklintIgnore([...])`.
 
+## Кастомные правила
+
+```ts
+// seo.config.ts
+import { defineCheck } from '@ranklint/checks'
+import { defineRanklintConfig } from '@ranklint/core'
+
+export default defineRanklintConfig({
+  site: { url: 'https://example.com' },
+  customChecks: [
+    defineCheck({
+      id: 'myteam:no-lorem',
+      category: 'meta',
+      severity: 'warn',
+      scope: 'page',
+      docs: 'https://wiki.myteam.dev/seo/no-lorem',
+      async run(ctx) {
+        const text = ctx.document?.body?.textContent ?? ''
+        if (!/lorem ipsum/i.test(text)) return []
+        return [{
+          checkId: 'myteam:no-lorem',
+          severity: 'warn',
+          message: 'Placeholder text found',
+          url: ctx.page!.url,
+          suggestion: 'Replace lorem ipsum with real content',
+        }]
+      },
+    }),
+  ],
+  rules: {
+    'myteam:no-lorem': 'error',
+  },
+})
+```
+
+Кастомные правила равноправны со встроенными: настраиваются через `rules`, отключаются `'off'` и `useRanklintIgnore`. Сторонние пресеты подключаются через `extends` (нативно c12). Контракт `CheckContext` стабилен в рамках мажорной версии.
+
 ## Пакеты
 
 | Пакет | Назначение |

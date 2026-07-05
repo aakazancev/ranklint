@@ -1,7 +1,16 @@
 import { loadConfig } from 'c12'
 import { defu } from 'defu'
 import { z } from 'zod'
-import type { RuleSetting, Severity } from './types'
+import type { Check, RuleSetting, Severity } from './types'
+
+const customCheckSchema = z.custom<Check>((value) => {
+  if (typeof value !== 'object' || value === null) return false
+  const check = value as Partial<Check>
+  return typeof check.id === 'string'
+    && typeof check.run === 'function'
+    && (check.scope === 'page' || check.scope === 'site')
+    && ['error', 'warn', 'info'].includes(check.severity as string)
+}, 'custom check must have id, severity, scope ("page"|"site") and a run() function')
 
 const severitySchema = z.enum(['error', 'warn', 'info'])
 const ruleValueSchema = z.union([
@@ -42,6 +51,7 @@ const configSchema = z.object({
     maxUrls: z.number().int().positive().optional(),
     thresholds: z.record(z.string(), z.record(z.string(), z.number())).optional(),
   }).optional(),
+  customChecks: z.array(customCheckSchema).optional(),
   monitor: z.object({
     storage: z.enum(['fs', 's3']).optional(),
     dir: z.string().optional(),
