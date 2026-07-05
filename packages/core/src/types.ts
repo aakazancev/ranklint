@@ -105,7 +105,23 @@ export interface Report {
   pages?: string[]
   lighthouse?: LighthouseResult[]
   crux?: CruxFieldData
+  crawlBudget?: CrawlBudgetReport
   crawlStats: CrawlStats
+}
+
+export interface CrawlBudgetGroup {
+  pattern: string
+  params: string[]
+  count: number
+  withCanonical: number
+  withNoindex: number
+  sample: string[]
+}
+
+export interface CrawlBudgetReport {
+  parametricUrls: number
+  junkUrls: number
+  groups: CrawlBudgetGroup[]
 }
 
 export interface CruxFieldData {

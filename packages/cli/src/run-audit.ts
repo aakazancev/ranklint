@@ -1,5 +1,5 @@
 import type { Check, PageFetcher, RanklintUserConfig, Report } from '@ranklint/core'
-import { crawl, loadRanklintConfig, resolveRules, runChecks, sampleUrls } from '@ranklint/core'
+import { analyzeCrawlBudget, crawl, loadRanklintConfig, resolveRules, runChecks, sampleUrls } from '@ranklint/core'
 import { allChecks, ruleRegistry } from '@ranklint/checks'
 import { checkThresholds, collectLighthouse, type LighthouseRunner } from './lighthouse'
 import { PlaywrightFetcher } from './playwright-fetcher'
@@ -86,6 +86,7 @@ export async function runAudit(opts: RunAuditOptions): Promise<Report> {
       crawlIssues,
       truncated: crawlResult.truncated,
     })
+    report.crawlBudget = analyzeCrawlBudget(crawlResult.snapshots)
     if (config.lighthouse?.enabled) {
       const { realLighthouseRunner } = await import('./real-lighthouse')
       const runner = opts.lighthouseRunner ?? realLighthouseRunner

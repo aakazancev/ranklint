@@ -35,6 +35,20 @@ export function markdown(report: Report): string {
     lines.push('')
   }
 
+  if (report.crawlBudget) {
+    const cb = report.crawlBudget
+    lines.push('### Crawl budget')
+    lines.push('')
+    lines.push(`${cb.parametricUrls} parametric URLs crawled, **${cb.junkUrls} look like junk** (no canonical, no noindex).`)
+    lines.push('')
+    lines.push('| Pattern | Params | URLs | Canonical | Noindex |')
+    lines.push('| --- | --- | --- | --- | --- |')
+    for (const group of cb.groups) {
+      lines.push(`| ${group.pattern} | ${group.params.join(', ')} | ${group.count} | ${group.withCanonical} | ${group.withNoindex} |`)
+    }
+    lines.push('')
+  }
+
   if (report.issues.length === 0) {
     lines.push('No issues found.')
     lines.push('')
