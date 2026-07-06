@@ -106,6 +106,7 @@ export interface Report {
   lighthouse?: LighthouseResult[]
   crux?: CruxFieldData
   crawlBudget?: CrawlBudgetReport
+  searchConsole?: SearchConsoleData
   crawlStats: CrawlStats
 }
 
@@ -128,6 +129,19 @@ export interface CruxFieldData {
   lcp?: number
   cls?: number
   inp?: number
+}
+
+export interface SearchConsolePage {
+  url: string
+  verdict?: string
+  coverageState?: string
+  indexingState?: string
+  richResultsIssues: string[]
+}
+
+export interface SearchConsoleData {
+  property: string
+  inspected: SearchConsolePage[]
 }
 
 export type LighthouseAggregation = 'median' | 'p75' | 'best'

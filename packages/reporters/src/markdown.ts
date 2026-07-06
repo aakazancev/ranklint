@@ -35,6 +35,24 @@ export function markdown(report: Report): string {
     lines.push('')
   }
 
+  if (report.searchConsole && report.searchConsole.inspected.length > 0) {
+    lines.push('### Search Console (index coverage)')
+    lines.push('')
+    lines.push('| URL | Verdict | Coverage | Rich results issues |')
+    lines.push('| --- | --- | --- | --- |')
+    for (const page of report.searchConsole.inspected) {
+      lines.push(`| ${page.url} | ${page.verdict ?? '—'} | ${page.coverageState ?? '—'} | ${page.richResultsIssues.join('; ') || '—'} |`)
+    }
+    lines.push('')
+  }
+
+  if (report.crux) {
+    lines.push('### Field data (CrUX p75)')
+    lines.push('')
+    lines.push(`LCP: ${report.crux.lcp ?? '—'}ms · CLS: ${report.crux.cls ?? '—'} · INP: ${report.crux.inp ?? '—'}ms`)
+    lines.push('')
+  }
+
   if (report.crawlBudget) {
     const cb = report.crawlBudget
     lines.push('### Crawl budget')

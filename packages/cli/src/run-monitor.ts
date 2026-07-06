@@ -10,6 +10,9 @@ export interface RunMonitorOptions extends RunAuditOptions {
   notifyEnv?: NotifyEnv
   cruxApiKey?: string
   cruxApiUrl?: string
+  gscToken?: string
+  gscProperty?: string
+  gscApiUrl?: string
 }
 
 export interface MonitorResult {
@@ -49,6 +52,18 @@ export async function runMonitor(opts: RunMonitorOptions): Promise<MonitorResult
       report.crux = await fetchCruxField(new URL(config.site.url).origin, cruxKey, opts.cruxApiUrl) ?? undefined
     } catch (e) {
       console.warn(`[ranklint] CrUX fetch failed: ${e instanceof Error ? e.message : String(e)}`)
+    }
+  }
+
+  const gscToken = opts.gscToken ?? process.env.RANKLINT_GSC_TOKEN
+  if (gscToken) {
+    try {
+      const { inspectUrls } = await import('./gsc')
+      const property = opts.gscProperty ?? process.env.RANKLINT_GSC_PROPERTY ?? config.site.url
+      const urls = (report.pages ?? []).slice(0, 10).map(path => new URL(path, config.site.url).toString())
+      report.searchConsole = await inspectUrls(property, urls, gscToken, opts.gscApiUrl)
+    } catch (e) {
+      console.warn(`[ranklint] Search Console inspection failed: ${e instanceof Error ? e.message : String(e)}`)
     }
   }
 
