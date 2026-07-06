@@ -89,24 +89,13 @@ seo:audit:
     RANKLINT_URL: $CI_ENVIRONMENT_URL
 ```
 
-## Правила v0.1
+## Правила
 
-| Правило | Default | Что проверяет |
-| --- | --- | --- |
-| `meta:title-required` | error | `<title>` присутствует и не пуст |
-| `meta:title-length` | warn | длина title 30–60 |
-| `meta:description-required` | error | meta description присутствует |
-| `meta:description-length` | warn | длина description 70–160 |
-| `canonical:required` | error | canonical присутствует |
-| `canonical:valid` | error | абсолютный URL, отвечает 200, не редирект |
-| `headings:single-h1` | error | ровно один H1 |
-| `headings:no-empty` | warn | нет пустых заголовков |
-| `headings:hierarchy` | warn | без прыжков уровней (H1→H3) |
-| `headings:h1-length` | warn | длина H1 20–70 |
-| `links:no-broken` | error | внутренние ссылки не 4xx/5xx |
-| `links:no-redirect-chain` | warn | максимум 1 редирект-хоп |
+36 правил в категориях meta, headings, canonical, links, i18n, structured-data, images, robots, indexability, http — полный справочник в [docs/rules.md](docs/rules.md).
 
 Любое правило: `'error' | 'warn' | 'off'` или `[severity, options]`. Инлайн-отключение на странице — `useRanklintIgnore([...])`.
+
+Дополнительно: SEO Diff между ветками (`ranklint diff`), multi-app зоны, Lighthouse-пороги per-route, watch mode, прод-мониторинг с алертами (slack/telegram), CrUX и Search Console данные, crawl-budget анализ, кастомные правила.
 
 ## Кастомные правила
 
