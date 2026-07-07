@@ -1,4 +1,5 @@
 import type { DiffResult, RanklintUserConfig, Report, ReportStorage } from '@ranklint/core'
+import type { ServiceAccountKey } from './gsc'
 import { diffReports, FsReportStorage, loadRanklintConfig } from '@ranklint/core'
 import { fetchCruxField } from './crux'
 import { notify, notifyEnvFromProcess, type NotifyEnv } from './notify'
@@ -11,6 +12,8 @@ export interface RunMonitorOptions extends RunAuditOptions {
   cruxApiKey?: string
   cruxApiUrl?: string
   gscToken?: string
+  gscKeyFile?: string
+  gscTokenUrl?: string
   gscProperty?: string
   gscApiUrl?: string
 }
@@ -55,7 +58,20 @@ export async function runMonitor(opts: RunMonitorOptions): Promise<MonitorResult
     }
   }
 
-  const gscToken = opts.gscToken ?? process.env.RANKLINT_GSC_TOKEN
+  let gscToken = opts.gscToken ?? process.env.RANKLINT_GSC_TOKEN
+  const gscKeyFile = opts.gscKeyFile ?? process.env.RANKLINT_GSC_KEY_FILE
+  if (!gscToken && gscKeyFile) {
+    try {
+      const [{ serviceAccountToken }, { readFile }] = await Promise.all([
+        import('./gsc'),
+        import('node:fs/promises'),
+      ])
+      const key = JSON.parse(await readFile(gscKeyFile, 'utf8')) as ServiceAccountKey
+      gscToken = await serviceAccountToken(key, opts.gscTokenUrl)
+    } catch (e) {
+      console.warn(`[ranklint] GSC service account auth failed: ${e instanceof Error ? e.message : String(e)}`)
+    }
+  }
   if (gscToken) {
     try {
       const { inspectUrls } = await import('./gsc')

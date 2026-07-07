@@ -1,10 +1,6 @@
 import type { Issue, PageFetcher, PageSnapshot } from '@ranklint/core'
-import {
-  allChecks,
-  validateSchemaOrg,
-  type SchemaOrgIssue,
-} from '@ranklint/checks'
-import { parseHTML } from 'linkedom'
+import { level1Checks } from '@ranklint/checks/level1'
+import { validateSchemaOrg, type SchemaOrgIssue } from '@ranklint/checks/schema-org'
 
 export interface OutlineNode {
   level: number
@@ -26,7 +22,10 @@ export interface PageReport {
   issues: Issue[]
 }
 
-const NETWORK_CHECKS = new Set(['canonical:valid', 'links:no-broken', 'links:no-redirect-chain'])
+export interface LinkTarget {
+  href: string
+  count: number
+}
 
 const stubFetcher: PageFetcher = {
   fetch: async url => ({ url, html: '', statusCode: 200, headers: {}, ttfb: 0, links: [] }),
@@ -84,17 +83,40 @@ function extractJsonLd(document: Document): JsonLdBlock[] {
   })
 }
 
-export async function buildPageReport(html: string, url: string): Promise<PageReport> {
-  const { document } = parseHTML(html)
-  const doc = document as unknown as Document
-  const snapshot: PageSnapshot = { url, html, statusCode: 200, headers: {}, ttfb: 0, links: [] }
+export function collectInternalLinks(document: Document, pageUrl: string): LinkTarget[] {
+  const origin = new URL(pageUrl).origin
+  const counts = new Map<string, number>()
+  for (const el of document.querySelectorAll('a[href]')) {
+    const href = el.getAttribute('href') ?? ''
+    if (href.startsWith('#')) continue
+    let resolved: URL
+    try {
+      resolved = new URL(href, pageUrl)
+    } catch {
+      continue
+    }
+    if (resolved.origin !== origin || !resolved.protocol.startsWith('http')) continue
+    const key = resolved.pathname + resolved.search
+    counts.set(key, (counts.get(key) ?? 0) + 1)
+  }
+  return [...counts.entries()].map(([href, count]) => ({ href, count }))
+}
+
+export async function buildPageReport(document: Document, url: string): Promise<PageReport> {
+  const snapshot: PageSnapshot = {
+    url,
+    html: document.documentElement?.outerHTML ?? '',
+    statusCode: 200,
+    headers: {},
+    ttfb: 0,
+    links: [],
+  }
   const issues: Issue[] = []
-  for (const check of allChecks) {
-    if (check.scope !== 'page' || NETWORK_CHECKS.has(check.id)) continue
+  for (const check of level1Checks) {
     try {
       issues.push(...await check.run({
         page: snapshot,
-        document: doc,
+        document,
         config: { severity: check.severity, options: {} },
         site: { url: new URL(url).origin },
         fetcher: stubFetcher,
@@ -104,9 +126,9 @@ export async function buildPageReport(html: string, url: string): Promise<PageRe
     }
   }
   return {
-    outline: extractOutline(doc),
-    meta: extractMeta(doc),
-    jsonLd: extractJsonLd(doc),
+    outline: extractOutline(document),
+    meta: extractMeta(document),
+    jsonLd: extractJsonLd(document),
     issues,
   }
 }

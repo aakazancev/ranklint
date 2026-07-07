@@ -15,6 +15,41 @@ export function fileToRoute(relativePath: string): string | null {
   return route === '/index' ? '/' : route.replace(/\/index$/, '')
 }
 
+export interface DynamicRoute {
+  pattern: string
+  regex: RegExp
+}
+
+function escapeRegExp(text: string): string {
+  return text.replace(/[.*+?^${}()|\\]/g, String.raw`\$&`)
+}
+
+export function fileToDynamicRoute(relativePath: string): DynamicRoute | null {
+  if (!relativePath.endsWith('.vue') || !relativePath.includes('[')) return null
+  let route = `/${relativePath.replace(/\.vue$/, '')}`
+  route = route === '/index' ? '/' : route.replace(/\/index$/, '')
+  const source = route
+    .split('/')
+    .map(segment => segment.replace(/\[\.\.\.[^\]]*\]|\[[^\]]*\]|[^[\]]+/g, part =>
+      part.startsWith('[...') ? '.+' : part.startsWith('[') ? '[^/]+' : escapeRegExp(part)))
+    .join('/')
+  return { pattern: route, regex: new RegExp(`^${source}/?$`) }
+}
+
+export async function sitemapPaths(baseUrl: string, fetcher: PageFetcher): Promise<string[]> {
+  const snapshot = await fetcher.fetch(new URL('/sitemap.xml', baseUrl).toString())
+  if (snapshot.statusCode !== 200) return []
+  return [...snapshot.html.matchAll(/<loc>([^<]+)<\/loc>/g)]
+    .map((match) => {
+      try {
+        return new URL(match[1]!).pathname
+      } catch {
+        return ''
+      }
+    })
+    .filter(Boolean)
+}
+
 export async function runFastChecks(route: string, baseUrl: string, fetcher: PageFetcher): Promise<Issue[]> {
   const url = new URL(route, baseUrl).toString()
   const snapshot = await fetcher.fetch(url)
@@ -71,15 +106,40 @@ export function startWatch(options: WatchOptions): { close: () => Promise<void> 
   const report = options.onReport
     ?? ((route: string, issues: Issue[]) => process.stdout.write(formatIssues(route, issues)))
 
+  let sitemapCache: Promise<string[]> | undefined
+  const resolveDynamic = async (dynamic: DynamicRoute): Promise<string[]> => {
+    sitemapCache ??= sitemapPaths(options.baseUrl, fetcher).catch(() => [])
+    return (await sitemapCache).filter(path => dynamic.regex.test(path)).slice(0, 3)
+  }
+
+  const checkRoutes = async (label: string, routes: string[]) => {
+    if (routes.length === 0) {
+      report(label, [{
+        checkId: 'watch:no-sample-url',
+        severity: 'warn',
+        message: `No sitemap URL matches "${label}" — cannot check the dynamic route`,
+        url: label,
+        suggestion: 'Add the route to the sitemap (e.g. via an async source) so watch can sample it',
+      }])
+      return
+    }
+    for (const route of routes) {
+      report(route, await runFastChecks(route, options.baseUrl, fetcher))
+    }
+  }
+
   const watcher = chokidarWatch('.', { cwd: options.pagesDir, ignoreInitial: true })
   watcher.on('all', (_event, relativePath) => {
     const route = fileToRoute(relativePath)
-    if (!route) return
-    clearTimeout(timers.get(route))
-    timers.set(route, setTimeout(() => {
-      runFastChecks(route, options.baseUrl, fetcher)
-        .then(issues => report(route, issues))
-        .catch(() => report(route, []))
+    const dynamic = route === null ? fileToDynamicRoute(relativePath) : null
+    if (route === null && dynamic === null) return
+    const key = route ?? dynamic!.pattern
+    clearTimeout(timers.get(key))
+    timers.set(key, setTimeout(() => {
+      const run = route === null
+        ? resolveDynamic(dynamic!).then(routes => checkRoutes(dynamic!.pattern, routes))
+        : runFastChecks(route, options.baseUrl, fetcher).then(issues => report(route, issues))
+      run.catch(() => report(key, []))
     }, debounceMs))
   })
 

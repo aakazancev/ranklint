@@ -64,13 +64,18 @@ export const noLazyAboveFold = defineCheck({
   }),
   async run(ctx) {
     const { firstImages = 3 } = ctx.config.options as { firstImages?: number }
-    return images(ctx.document!)
-      .slice(0, firstImages)
+    const aboveFold = ctx.page!.aboveFoldImages
+    const candidates = aboveFold
+      ? images(ctx.document!).filter(img => aboveFold.includes(img.getAttribute('src') ?? ''))
+      : images(ctx.document!).slice(0, firstImages)
+    return candidates
       .filter(img => img.getAttribute('loading') === 'lazy')
       .map((img): Issue => ({
         checkId: 'images:no-lazy-above-fold',
         severity: 'warn',
-        message: `One of the first ${firstImages} images uses loading="lazy"`,
+        message: aboveFold
+          ? 'Image in the viewport uses loading="lazy"'
+          : `One of the first ${firstImages} images uses loading="lazy"`,
         url: ctx.page!.url,
         selector: selectorFor(img),
         suggestion: 'Above-the-fold images should load eagerly; lazy-loading them delays LCP',

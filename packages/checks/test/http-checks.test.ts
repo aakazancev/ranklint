@@ -121,3 +121,16 @@ describe('links:trailing-slash-consistent', () => {
     expect(await trailingSlashConsistent.run(siteCtx([snap('/a'), snap('/b')]))).toEqual([])
   })
 })
+
+describe('http:ttfb-budget auto route groups', () => {
+  it('groups pages by inferred route pattern when no budgets configured', async () => {
+    const pages = [
+      snap('/listing/1', { ttfb: 900 }),
+      snap('/listing/2', { ttfb: 1000 }),
+      snap('/', { ttfb: 100 }),
+    ]
+    const issues = await ttfbBudget.run(siteCtx(pages))
+    expect(issues).toHaveLength(1)
+    expect(issues[0]?.message).toContain('/listing/*')
+  })
+})

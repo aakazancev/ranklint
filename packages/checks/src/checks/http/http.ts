@@ -1,5 +1,5 @@
 import type { Issue } from '@ranklint/core'
-import { getDocument, mostSpecific } from '@ranklint/core'
+import { getDocument, mostSpecific, routePatternOf } from '@ranklint/core'
 import { z } from 'zod'
 import { defineCheck, docsUrl } from '../../define'
 
@@ -105,7 +105,7 @@ export const ttfbBudget = defineCheck({
         continue
       }
       const pattern = budgets ? mostSpecific(Object.keys(budgets), path) : undefined
-      const key = pattern ?? '(site)'
+      const key = pattern ?? routePatternOf(path)
       const budget = pattern ? budgets![pattern]! : defaultBudget
       const group = groups.get(key) ?? { budget, values: [] }
       group.values.push(page.ttfb)

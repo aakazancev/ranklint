@@ -1,6 +1,41 @@
+import { createSign } from 'node:crypto'
 import type { SearchConsoleData, SearchConsolePage } from '@ranklint/core'
 
 const GSC_API = 'https://searchconsole.googleapis.com/v1/urlInspection/index:inspect'
+const GSC_SCOPE = 'https://www.googleapis.com/auth/webmasters.readonly'
+const GOOGLE_TOKEN_URL = 'https://oauth2.googleapis.com/token'
+
+export interface ServiceAccountKey {
+  client_email: string
+  private_key: string
+  token_uri?: string
+}
+
+export async function serviceAccountToken(key: ServiceAccountKey, tokenUrl?: string): Promise<string> {
+  const url = tokenUrl ?? key.token_uri ?? GOOGLE_TOKEN_URL
+  const now = Math.floor(Date.now() / 1000)
+  const encode = (part: object) => Buffer.from(JSON.stringify(part)).toString('base64url')
+  const unsigned = `${encode({ alg: 'RS256', typ: 'JWT' })}.${encode({
+    iss: key.client_email,
+    scope: GSC_SCOPE,
+    aud: url,
+    iat: now,
+    exp: now + 3600,
+  })}`
+  const signature = createSign('RSA-SHA256').update(unsigned).sign(key.private_key, 'base64url')
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { 'content-type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({
+      grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+      assertion: `${unsigned}.${signature}`,
+    }),
+  })
+  if (!res.ok) throw new Error(`GSC token exchange failed with ${res.status}`)
+  const data = await res.json() as { access_token?: string }
+  if (!data.access_token) throw new Error('GSC token exchange returned no access_token')
+  return data.access_token
+}
 
 interface InspectResponse {
   inspectionResult?: {

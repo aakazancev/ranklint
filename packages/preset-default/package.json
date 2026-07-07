@@ -1,5 +1,5 @@
 {
-  "name": "@ranklint/checks",
+  "name": "@ranklint/preset-default",
   "version": "0.0.0",
   "license": "MIT",
   "type": "module",
@@ -10,14 +10,6 @@
     ".": {
       "types": "./dist/index.d.mts",
       "import": "./dist/index.mjs"
-    },
-    "./schema-org": {
-      "types": "./dist/schema-org.d.mts",
-      "import": "./dist/schema-org.mjs"
-    },
-    "./level1": {
-      "types": "./dist/level1.d.mts",
-      "import": "./dist/level1.mjs"
     }
   },
   "files": [
@@ -28,12 +20,11 @@
     "dev:prepare": "unbuild --stub",
     "typecheck": "tsc --noEmit"
   },
+  "dependencies": {
+    "@ranklint/checks": "workspace:*",
+    "@ranklint/core": "workspace:*"
+  },
   "devDependencies": {
     "unbuild": "^3.6.1"
-  },
-  "dependencies": {
-    "@ranklint/core": "workspace:*",
-    "linkedom": "^0.18.12",
-    "zod": "^4.4.3"
   }
 }

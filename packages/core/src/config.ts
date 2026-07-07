@@ -19,6 +19,7 @@ const ruleValueSchema = z.union([
 ])
 
 const configSchema = z.object({
+  extends: z.array(z.string()).optional(),
   site: z.object({ url: z.string(), name: z.string().optional() }),
   apps: z.record(z.string(), z.object({
     paths: z.array(z.string()),

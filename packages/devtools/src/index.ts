@@ -1,1 +1,1 @@
-export const packageName = '@ranklint/devtools'
+export * from './report'

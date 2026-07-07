@@ -89,6 +89,8 @@ seo:audit:
     RANKLINT_URL: $CI_ENVIRONMENT_URL
 ```
 
+`ranklint diff --base main` резолвит базовый отчёт из артефактов CI: в GitLab — по job-артефакту ветки, в GitHub Actions — по артефакту `ranklint-report` (распаковка zip встроена). Base не найден — не ошибка: diff деградирует в полный отчёт.
+
 ## Правила
 
 36 правил в категориях meta, headings, canonical, links, i18n, structured-data, images, robots, indexability, http — полный справочник в [docs/rules.md](docs/rules.md).
@@ -132,7 +134,17 @@ export default defineRanklintConfig({
 })
 ```
 
-Кастомные правила равноправны со встроенными: настраиваются через `rules`, отключаются `'off'` и `useRanklintIgnore`. Сторонние пресеты подключаются через `extends` (нативно c12). Контракт `CheckContext` стабилен в рамках мажорной версии.
+Кастомные правила равноправны со встроенными: настраиваются через `rules`, отключаются `'off'` и `useRanklintIgnore`. Контракт `CheckContext` стабилен в рамках мажорной версии.
+
+Пресеты подключаются через `extends` (нативно c12): `@ranklint/preset-default` фиксирует все встроенные правила на дефолтных severity. Ранние слои приоритетнее поздних, сам `seo.config` переопределяет все слои:
+
+```ts
+export default defineRanklintConfig({
+  extends: ['./agency-preset.ts', '@ranklint/preset-default'],
+  site: { url: 'https://example.com' },
+  rules: { 'images:alt-required': 'error' },
+})
+```
 
 ## Пакеты
 
@@ -143,5 +155,7 @@ export default defineRanklintConfig({
 | `@ranklint/core` | Движок: crawler, runner, config (без Nuxt-зависимостей) |
 | `@ranklint/checks` | Правила + Schema.org-схемы |
 | `@ranklint/reporters` | markdown / junit / json |
+| `@ranklint/devtools` | Vue-панель для Nuxt DevTools: live-чеки текущей страницы |
+| `@ranklint/preset-default` | Пресет со встроенными правилами для `extends` |
 
 Требования: Nuxt `^4.0.0`, Node.js `>= 20`. Лицензия MIT.

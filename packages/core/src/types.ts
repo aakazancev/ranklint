@@ -18,6 +18,7 @@ export interface PageSnapshot {
   headers: Record<string, string>
   ttfb: number
   links: PageLink[]
+  aboveFoldImages?: string[]
 }
 
 export interface PageFetcher {

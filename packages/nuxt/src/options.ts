@@ -5,12 +5,14 @@ export interface SitemapSourceEntry {
   priority?: number
 }
 
+export type SitemapSource = () => SitemapSourceEntry[] | Promise<SitemapSourceEntry[]>
+
 export interface ModuleOptions {
   site?: { url?: string, name?: string }
   sitemap?: boolean | {
     enabled?: boolean
     path?: string
-    sources?: (string | SitemapSourceEntry)[]
+    sources?: (string | SitemapSourceEntry | SitemapSource)[]
     cacheTtl?: number
   }
   robots?: false | { mode?: 'owner' | 'external' }
@@ -25,6 +27,7 @@ export interface ResolvedRanklintOptions {
     path: string
     urlSources: string[]
     staticEntries: SitemapSourceEntry[]
+    fnSources: SitemapSource[]
     cacheTtl: number
     routes: string[]
   }
@@ -58,7 +61,8 @@ export function resolveRanklintOptions(options: ModuleOptions): ResolvedRanklint
       ? {
           path: sitemapObj.path ?? '/sitemap.xml',
           urlSources: sources.filter((s): s is string => typeof s === 'string'),
-          staticEntries: sources.filter((s): s is SitemapSourceEntry => typeof s !== 'string'),
+          staticEntries: sources.filter((s): s is SitemapSourceEntry => typeof s === 'object'),
+          fnSources: sources.filter((s): s is SitemapSource => typeof s === 'function'),
           cacheTtl: sitemapObj.cacheTtl ?? 3600,
           routes: [],
         }

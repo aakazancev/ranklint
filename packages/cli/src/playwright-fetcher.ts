@@ -24,6 +24,13 @@ export class PlaywrightFetcher implements PageFetcher {
         text: a.textContent?.trim() ?? '',
         rel: a.getAttribute('rel') ?? undefined,
       })))
+      const aboveFoldImages = await page.$$eval('img', imgs => imgs
+        .filter((img) => {
+          const rect = img.getBoundingClientRect()
+          return rect.top < window.innerHeight && rect.bottom > 0 && rect.width > 0
+        })
+        .map(img => img.getAttribute('src') ?? '')
+        .filter(src => src !== ''))
       return {
         url,
         html,
@@ -32,6 +39,7 @@ export class PlaywrightFetcher implements PageFetcher {
         headers: response.headers(),
         ttfb,
         links,
+        aboveFoldImages,
       }
     } finally {
       await context.close()

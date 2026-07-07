@@ -8,6 +8,7 @@ describe('resolveRanklintOptions', () => {
       path: '/sitemap.xml',
       urlSources: [],
       staticEntries: [],
+      fnSources: [],
       cacheTtl: 3600,
       routes: [],
     })
@@ -17,14 +18,16 @@ describe('resolveRanklintOptions', () => {
   })
 
   it('strips trailing slash from site url and splits sources', () => {
+    const asyncSource = async () => [{ loc: '/from-fn' }]
     const resolved = resolveRanklintOptions({
       site: { url: 'https://example.com/' },
-      sitemap: { sources: ['/api/urls', { loc: '/static-page' }], cacheTtl: 60 },
+      sitemap: { sources: ['/api/urls', { loc: '/static-page' }, asyncSource], cacheTtl: 60 },
     })
     expect(resolved.siteUrl).toBe('https://example.com')
     if (resolved.sitemap === false) throw new Error('sitemap disabled')
     expect(resolved.sitemap.urlSources).toEqual(['/api/urls'])
     expect(resolved.sitemap.staticEntries).toEqual([{ loc: '/static-page' }])
+    expect(resolved.sitemap.fnSources).toEqual([asyncSource])
     expect(resolved.sitemap.cacheTtl).toBe(60)
   })
 

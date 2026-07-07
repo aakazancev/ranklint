@@ -16,6 +16,12 @@ describe('sitemap.xml', () => {
     expect(xml).toContain('<loc>http://localhost:3000/bugs/title-short</loc>')
     expect(xml).toContain('<loc>http://localhost:3000/jsonld</loc>')
   })
+
+  it('includes entries from async function sources', async () => {
+    const xml = await $fetch<string>('/sitemap.xml')
+    expect(xml).toContain('<loc>http://localhost:3000/from-async-source</loc>')
+    expect(xml).toContain('<changefreq>weekly</changefreq>')
+  })
 })
 
 describe('robots.txt', () => {

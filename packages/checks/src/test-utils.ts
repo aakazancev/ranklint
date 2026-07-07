@@ -27,6 +27,7 @@ export interface RunCheckOptions {
   options?: Record<string, unknown>
   links?: PageLink[]
   fetcher?: PageFetcher
+  aboveFoldImages?: string[]
 }
 
 export async function runCheckOnHtml(
@@ -42,6 +43,7 @@ export async function runCheckOnHtml(
     headers: {},
     ttfb: 1,
     links: opts.links ?? [],
+    aboveFoldImages: opts.aboveFoldImages,
   }
   const { document } = parseHTML(html)
   return check.run({

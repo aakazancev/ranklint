@@ -1,5 +1,6 @@
 import type { ResolvedRanklintOptions, SitemapSourceEntry } from '../../../options'
 import { defineEventHandler, setHeader, useRuntimeConfig } from '#imports'
+import { fnSources } from '#ranklint/sitemap-sources'
 import { buildSitemapXml } from '../utils/sitemap'
 
 let cache: { body: string, expires: number } | undefined
@@ -18,6 +19,13 @@ export default defineEventHandler(async (event) => {
       if (Array.isArray(fetched)) entries.push(...fetched)
     } catch (e) {
       console.warn(`[ranklint] sitemap source "${source}" failed:`, e)
+    }
+  }
+  for (const [i, source] of fnSources.entries()) {
+    try {
+      entries.push(...await source())
+    } catch (e) {
+      console.warn(`[ranklint] sitemap function source #${i} failed:`, e)
     }
   }
   const body = buildSitemapXml(config.siteUrl, entries)

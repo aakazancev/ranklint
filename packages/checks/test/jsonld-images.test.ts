@@ -55,3 +55,18 @@ describe('images checks', () => {
     expect(issues[0]?.selector).toBe('img[src="/1.png"]')
   })
 })
+
+describe('images:no-lazy-above-fold with real viewport data', () => {
+  it('uses aboveFoldImages instead of the first-n heuristic', async () => {
+    const imgs = '<img src="/1.png" loading="lazy"><img src="/2.png"><img src="/9.png" loading="lazy">'
+    const issues = await runCheckOnHtml(noLazyAboveFold, body(imgs), { aboveFoldImages: ['/9.png'] })
+    expect(issues).toHaveLength(1)
+    expect(issues[0]?.selector).toBe('img[src="/9.png"]')
+    expect(issues[0]?.message).toContain('viewport')
+  })
+
+  it('passes when no above-fold image is lazy', async () => {
+    const imgs = '<img src="/1.png" loading="lazy"><img src="/2.png">'
+    expect(await runCheckOnHtml(noLazyAboveFold, body(imgs), { aboveFoldImages: ['/2.png'] })).toEqual([])
+  })
+})

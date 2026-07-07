@@ -1,7 +1,7 @@
 import type { CheckContext, PageSnapshot } from '@ranklint/core'
 import { describe, expect, it } from 'vitest'
 import { hreflangSymmetric, hreflangValidTargets } from '../src/checks/i18n/hreflang'
-import { noLocaleLeak } from '../src/checks/i18n/locale-leak'
+import { detectTextLanguage, noLocaleLeak } from '../src/checks/i18n/locale-leak'
 import { fakeHeadFetcher, runCheckOnHtml, stubFetcher } from '../src/test-utils'
 
 function pageWith(head: string, lang = 'en'): string {
@@ -82,5 +82,33 @@ describe('i18n:no-locale-leak', () => {
     expect(await runCheckOnHtml(noLocaleLeak, pageWith('', 'ru-RU'), { url: 'https://x.com/ru/page' })).toEqual([])
     expect(await runCheckOnHtml(noLocaleLeak, pageWith('', 'en'), { url: 'https://x.com/page' })).toEqual([])
     expect(await runCheckOnHtml(noLocaleLeak, '<html><body></body></html>', { url: 'https://x.com/ru/page' })).toEqual([])
+  })
+})
+
+describe('i18n:no-locale-leak text heuristic', () => {
+  const ruText = 'Это длинный текст на русском языке про автомобили и запчасти, он достаточно длинный, чтобы сработала эвристика определения языка страницы по алфавиту.'
+  const enText = 'The quick brown fox jumps over the lazy dog and this text is long enough for the detection with the stopwords that are common in the english language.'
+
+  it('flags cyrillic text under /en/ even when lang matches url', async () => {
+    const html = `<html lang="en"><head></head><body><p>${ruText}</p></body></html>`
+    const issues = await runCheckOnHtml(noLocaleLeak, html, { url: 'https://x.com/en/page' })
+    expect(issues).toHaveLength(1)
+    expect(issues[0]?.selector).toBe('body')
+    expect(issues[0]?.message).toContain('cyrillic')
+  })
+
+  it('passes matching text and skips unknown url locales', async () => {
+    const en = `<html lang="en"><head></head><body><p>${enText}</p></body></html>`
+    expect(await runCheckOnHtml(noLocaleLeak, en, { url: 'https://x.com/en/page' })).toEqual([])
+    const ru = `<html lang="ru"><head></head><body><p>${ruText}</p></body></html>`
+    expect(await runCheckOnHtml(noLocaleLeak, ru, { url: 'https://x.com/ru/page' })).toEqual([])
+    const pt = `<html lang="pt"><head></head><body><p>${enText}</p></body></html>`
+    expect(await runCheckOnHtml(noLocaleLeak, pt, { url: 'https://x.com/pt/page' })).toEqual([])
+  })
+
+  it('detectTextLanguage identifies scripts and stopword languages', () => {
+    expect(detectTextLanguage(ruText)).toBe('cyrillic')
+    expect(detectTextLanguage(enText)).toBe('en')
+    expect(detectTextLanguage('too short')).toBeUndefined()
   })
 })

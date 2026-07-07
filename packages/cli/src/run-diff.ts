@@ -1,6 +1,7 @@
 import { readFile } from 'node:fs/promises'
 import type { DiffResult, Report } from '@ranklint/core'
 import { diffReports } from '@ranklint/core'
+import { GithubArtifactsStorage } from './github-storage'
 import { GitlabArtifactsStorage } from './gitlab-storage'
 
 export interface RunDiffOptions {
@@ -23,14 +24,24 @@ async function readReport(file: string): Promise<Report> {
   return report
 }
 
+function ciArtifactStorage(): (ref: string) => Promise<Report | null> {
+  if (process.env.GITHUB_ACTIONS === 'true') return ref => new GithubArtifactsStorage().load(ref)
+  return ref => new GitlabArtifactsStorage().load(ref)
+}
+
 export async function runDiff(opts: RunDiffOptions): Promise<RunDiffResult> {
   const current = await readReport(opts.currentFile)
   let base: Report | null
   try {
     base = await readReport(opts.base)
   } catch {
-    const loadBase = opts.loadBase ?? (ref => new GitlabArtifactsStorage().load(ref))
-    base = await loadBase(opts.base)
+    try {
+      const loadBase = opts.loadBase ?? ciArtifactStorage()
+      base = await loadBase(opts.base)
+    } catch (e) {
+      console.warn(`[ranklint] base "${opts.base}" could not be resolved: ${e instanceof Error ? e.message : String(e)}`)
+      base = null
+    }
   }
   if (!base) {
     return { diff: null, current, firstRun: true }
