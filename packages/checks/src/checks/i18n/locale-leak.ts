@@ -37,6 +37,13 @@ function textMatchesLocale(detected: string, locale: string): boolean {
   return detected === locale
 }
 
+function visibleText(body: Element | null): string {
+  if (!body) return ''
+  const clone = body.cloneNode(true) as Element
+  for (const el of clone.querySelectorAll('script, style, noscript, template')) el.remove()
+  return clone.textContent ?? ''
+}
+
 export const noLocaleLeak = defineCheck({
   id: 'i18n:no-locale-leak',
   category: 'i18n',
@@ -62,7 +69,7 @@ export const noLocaleLeak = defineCheck({
     }
     const localeKnown = urlLocale in STOPWORDS || CYRILLIC_LOCALES.has(urlLocale)
     const detected = localeKnown
-      ? detectTextLanguage(ctx.document?.querySelector('body')?.textContent ?? '')
+      ? detectTextLanguage(visibleText(ctx.document?.querySelector('body') ?? null))
       : undefined
     if (detected && !textMatchesLocale(detected, urlLocale)) {
       const label = detected === 'cyrillic' ? 'a cyrillic-script language' : `"${detected}"`

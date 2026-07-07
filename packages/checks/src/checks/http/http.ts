@@ -96,7 +96,7 @@ export const ttfbBudget = defineCheck({
     }
     const pages = (ctx.pages ?? []).filter(p => p.statusCode === 200 && p.ttfb > 0)
     if (pages.length === 0) return []
-    const groups = new Map<string, { budget: number, values: number[] }>()
+    const groups = new Map<string, { budget: number, values: number[], configured: boolean }>()
     for (const page of pages) {
       let path: string
       try {
@@ -107,18 +107,20 @@ export const ttfbBudget = defineCheck({
       const pattern = budgets ? mostSpecific(Object.keys(budgets), path) : undefined
       const key = pattern ?? routePatternOf(path)
       const budget = pattern ? budgets![pattern]! : defaultBudget
-      const group = groups.get(key) ?? { budget, values: [] }
+      const group = groups.get(key) ?? { budget, values: [], configured: pattern !== undefined }
       group.values.push(page.ttfb)
       groups.set(key, group)
     }
     const issues: Issue[] = []
     for (const [pattern, group] of groups) {
+      if (!group.configured && group.values.length < 2) continue
       const value = p75(group.values)
       if (value <= group.budget) continue
+      const count = group.values.length
       issues.push({
         checkId: 'http:ttfb-budget',
         severity: 'warn',
-        message: `p75 TTFB for ${pattern} is ${value}ms, budget ${group.budget}ms (${group.values.length} pages)`,
+        message: `p75 TTFB for ${pattern} is ${value}ms, budget ${group.budget}ms (${count} page${count === 1 ? '' : 's'})`,
         url: ctx.site.url,
         suggestion: 'Investigate server rendering time and caching for this route group',
         docs: docsUrl('http:ttfb-budget'),

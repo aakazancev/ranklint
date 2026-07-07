@@ -25,7 +25,10 @@ export default defineNuxtConfig({
   ranklint: {
     site: { url: 'https://example.com', name: 'Example' },
     sitemap: {
-      sources: ['/api/seo/urls'],
+      sources: [
+        '/api/seo/urls',
+        async () => (await $fetch<string[]>('/api/products')).map(slug => ({ loc: `/p/${slug}` })),
+      ],
       cacheTtl: 3600,
     },
     robots: { mode: 'owner' },
@@ -35,6 +38,8 @@ export default defineNuxtConfig({
 ```
 
 Каждый блок отключается через `false` — выключенный код не регистрируется вообще.
+
+Источник-функция сериализуется в серверный бандл через `toString()`, поэтому должна быть самодостаточной: Nitro-глобалы (`$fetch`) доступны, а замыкания на переменные и импорты из `nuxt.config` — нет.
 
 ```vue
 <script setup>

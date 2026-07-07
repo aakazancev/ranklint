@@ -1,7 +1,7 @@
 import { existsSync, readdirSync } from 'node:fs'
 import { dirname, join, relative } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { addImports, addServerHandler, createResolver, defineNuxtModule } from '@nuxt/kit'
+import { addImports, addServerHandler, createResolver, defineNuxtModule, useLogger } from '@nuxt/kit'
 import { pageFilesToRoutes, resolveRanklintOptions, type ModuleOptions } from './options'
 
 export type { ModuleOptions, ResolvedRanklintOptions, SitemapSource, SitemapSourceEntry } from './options'
@@ -20,16 +20,29 @@ export default defineNuxtModule<ModuleOptions>({
         '[ranklint] Requires Nuxt 4. Set future.compatibilityVersion to 4 or upgrade: https://nuxt.com/docs/getting-started/upgrade',
       )
     }
+    const logger = useLogger('ranklint')
     const resolved = resolveRanklintOptions(options)
     const fnSources = resolved.sitemap === false ? [] : resolved.sitemap.fnSources
     if (resolved.sitemap !== false) resolved.sitemap.fnSources = []
     nuxt.options.runtimeConfig.ranklint = resolved
     const resolver = createResolver(import.meta.url)
 
+    const serializedSources = fnSources.map((fn, i) => {
+      const code = String(fn)
+      try {
+        new Function(`return (${code})`)
+        return code
+      } catch {
+        throw new TypeError(
+          `[ranklint] sitemap source #${i} cannot be serialized (bound/native functions are not supported); `
+          + 'use a plain self-contained function',
+        )
+      }
+    })
     nuxt.hook('nitro:config' as never, ((nitroConfig: { virtual?: Record<string, string> }) => {
       nitroConfig.virtual ??= {}
       nitroConfig.virtual['#ranklint/sitemap-sources']
-        = `export const fnSources = [${fnSources.map(String).join(', ')}]`
+        = `export const fnSources = [${serializedSources.join(', ')}]`
     }) as never)
 
     if (resolved.sitemap !== false) {
@@ -64,6 +77,9 @@ export default defineNuxtModule<ModuleOptions>({
 
     if (resolved.devtools && nuxt.options.dev) {
       const clientDir = join(dirname(fileURLToPath(import.meta.resolve('@ranklint/devtools'))), 'client')
+      if (!existsSync(clientDir)) {
+        logger.warn('devtools client bundle is not built — the SEO tab is disabled (run `pnpm --filter @ranklint/devtools build`)')
+      }
       if (existsSync(clientDir)) {
         addServerHandler({
           route: '/__ranklint/devtools',

@@ -28,21 +28,44 @@ export function fileToDynamicRoute(relativePath: string): DynamicRoute | null {
   if (!relativePath.endsWith('.vue') || !relativePath.includes('[')) return null
   let route = `/${relativePath.replace(/\.vue$/, '')}`
   route = route === '/index' ? '/' : route.replace(/\/index$/, '')
-  const source = route
-    .split('/')
-    .map(segment => segment.replace(/\[\.\.\.[^\]]*\]|\[[^\]]*\]|[^[\]]+/g, part =>
-      part.startsWith('[...') ? '.+' : part.startsWith('[') ? '[^/]+' : escapeRegExp(part)))
-    .join('/')
-  return { pattern: route, regex: new RegExp(`^${source}/?$`) }
+  let source = ''
+  for (const segment of route.split('/').slice(1)) {
+    if (/^\[\[\.\.\.[^\]]*\]\]$/.test(segment)) source += '(?:/.+)?'
+    else if (/^\[\[[^\]]*\]\]$/.test(segment)) source += '(?:/[^/]+)?'
+    else if (/^\[\.\.\.[^\]]*\]$/.test(segment)) source += '/.+'
+    else source += `/${segment.replace(/\[[^\]]*\]|[^[\]]+/g, part =>
+      part.startsWith('[') ? '[^/]+' : escapeRegExp(part))}`
+  }
+  try {
+    return { pattern: route, regex: new RegExp(`^${source || '/'}/?$`) }
+  } catch {
+    return null
+  }
+}
+
+function extractLocs(xml: string): string[] {
+  return [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map(match => match[1]!.trim())
 }
 
 export async function sitemapPaths(baseUrl: string, fetcher: PageFetcher): Promise<string[]> {
   const snapshot = await fetcher.fetch(new URL('/sitemap.xml', baseUrl).toString())
   if (snapshot.statusCode !== 200) return []
-  return [...snapshot.html.matchAll(/<loc>([^<]+)<\/loc>/g)]
-    .map((match) => {
+  let locs = extractLocs(snapshot.html)
+  if (snapshot.html.includes('<sitemapindex')) {
+    const children = await Promise.all(locs.map(async (loc) => {
       try {
-        return new URL(match[1]!).pathname
+        const child = await fetcher.fetch(new URL(new URL(loc).pathname, baseUrl).toString())
+        return child.statusCode === 200 ? extractLocs(child.html) : []
+      } catch {
+        return []
+      }
+    }))
+    locs = children.flat()
+  }
+  return locs
+    .map((loc) => {
+      try {
+        return new URL(loc).pathname
       } catch {
         return ''
       }
@@ -109,7 +132,12 @@ export function startWatch(options: WatchOptions): { close: () => Promise<void> 
   let sitemapCache: Promise<string[]> | undefined
   const resolveDynamic = async (dynamic: DynamicRoute): Promise<string[]> => {
     sitemapCache ??= sitemapPaths(options.baseUrl, fetcher).catch(() => [])
-    return (await sitemapCache).filter(path => dynamic.regex.test(path)).slice(0, 3)
+    let matched = (await sitemapCache).filter(path => dynamic.regex.test(path))
+    if (matched.length === 0) {
+      sitemapCache = sitemapPaths(options.baseUrl, fetcher).catch(() => [])
+      matched = (await sitemapCache).filter(path => dynamic.regex.test(path))
+    }
+    return matched.slice(0, 3)
   }
 
   const checkRoutes = async (label: string, routes: string[]) => {
@@ -139,7 +167,12 @@ export function startWatch(options: WatchOptions): { close: () => Promise<void> 
       const run = route === null
         ? resolveDynamic(dynamic!).then(routes => checkRoutes(dynamic!.pattern, routes))
         : runFastChecks(route, options.baseUrl, fetcher).then(issues => report(route, issues))
-      run.catch(() => report(key, []))
+      run.catch(e => report(key, [{
+        checkId: 'watch:error',
+        severity: 'warn',
+        message: `Check failed: ${e instanceof Error ? e.message : String(e)}`,
+        url: key,
+      }]))
     }, debounceMs))
   })
 

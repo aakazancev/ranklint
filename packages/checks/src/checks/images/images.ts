@@ -65,9 +65,20 @@ export const noLazyAboveFold = defineCheck({
   async run(ctx) {
     const { firstImages = 3 } = ctx.config.options as { firstImages?: number }
     const aboveFold = ctx.page!.aboveFoldImages
-    const candidates = aboveFold
-      ? images(ctx.document!).filter(img => aboveFold.includes(img.getAttribute('src') ?? ''))
-      : images(ctx.document!).slice(0, firstImages)
+    let candidates: Element[]
+    if (aboveFold) {
+      const remaining = new Map<string, number>()
+      for (const src of aboveFold) remaining.set(src, (remaining.get(src) ?? 0) + 1)
+      candidates = images(ctx.document!).filter((img) => {
+        const src = img.getAttribute('src') ?? ''
+        const left = remaining.get(src) ?? 0
+        if (left === 0) return false
+        remaining.set(src, left - 1)
+        return true
+      })
+    } else {
+      candidates = images(ctx.document!).slice(0, firstImages)
+    }
     return candidates
       .filter(img => img.getAttribute('loading') === 'lazy')
       .map((img): Issue => ({

@@ -19,7 +19,7 @@ export async function serviceAccountToken(key: ServiceAccountKey, tokenUrl?: str
     iss: key.client_email,
     scope: GSC_SCOPE,
     aud: url,
-    iat: now,
+    iat: now - 30,
     exp: now + 3600,
   })}`
   const signature = createSign('RSA-SHA256').update(unsigned).sign(key.private_key, 'base64url')
@@ -31,7 +31,10 @@ export async function serviceAccountToken(key: ServiceAccountKey, tokenUrl?: str
       assertion: `${unsigned}.${signature}`,
     }),
   })
-  if (!res.ok) throw new Error(`GSC token exchange failed with ${res.status}`)
+  if (!res.ok) {
+    const body = await res.text().catch(() => '')
+    throw new Error(`GSC token exchange failed with ${res.status}${body ? `: ${body.slice(0, 200)}` : ''}`)
+  }
   const data = await res.json() as { access_token?: string }
   if (!data.access_token) throw new Error('GSC token exchange returned no access_token')
   return data.access_token

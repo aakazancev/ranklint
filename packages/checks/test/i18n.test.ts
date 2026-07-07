@@ -106,6 +106,12 @@ describe('i18n:no-locale-leak text heuristic', () => {
     expect(await runCheckOnHtml(noLocaleLeak, pt, { url: 'https://x.com/pt/page' })).toEqual([])
   })
 
+  it('ignores script and style text when detecting the language', async () => {
+    const js = 'for (const item of items) { if (this.that) { window.data = data.filter(x => x.from && x.are) } } '.repeat(30)
+    const html = `<html lang="ru"><head></head><body><script>${js}</script><style>.a { color: red; }</style><p>${ruText}</p></body></html>`
+    expect(await runCheckOnHtml(noLocaleLeak, html, { url: 'https://x.com/ru/page' })).toEqual([])
+  })
+
   it('detectTextLanguage identifies scripts and stopword languages', () => {
     expect(detectTextLanguage(ruText)).toBe('cyrillic')
     expect(detectTextLanguage(enText)).toBe('en')

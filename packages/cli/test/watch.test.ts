@@ -88,7 +88,25 @@ describe('fileToDynamicRoute', () => {
     expect(listing?.regex.test('/listing/42/x')).toBe(false)
     const docs = fileToDynamicRoute('docs/[...slug].vue')
     expect(docs?.regex.test('/docs/a/b')).toBe(true)
+    expect(docs?.regex.test('/docs')).toBe(false)
     expect(fileToDynamicRoute('about.vue')).toBeNull()
+  })
+
+  it('supports nuxt optional params and optional catch-alls', () => {
+    const optional = fileToDynamicRoute('shop/[[category]].vue')
+    expect(optional?.regex.test('/shop')).toBe(true)
+    expect(optional?.regex.test('/shop/tools')).toBe(true)
+    expect(optional?.regex.test('/shop/tools/deep')).toBe(false)
+    const catchAll = fileToDynamicRoute('docs/[[...slug]].vue')
+    expect(catchAll?.regex.test('/docs')).toBe(true)
+    expect(catchAll?.regex.test('/docs/a/b')).toBe(true)
+    const mixed = fileToDynamicRoute('blog/post-[id]-draft.vue')
+    expect(mixed?.regex.test('/blog/post-42-draft')).toBe(true)
+    expect(mixed?.regex.test('/blog/post--draft/x')).toBe(false)
+  })
+
+  it('returns null instead of throwing on unbalanced brackets', () => {
+    expect(fileToDynamicRoute('x[.vue')).toBeNull()
   })
 })
 
@@ -98,6 +116,25 @@ describe('dynamic routes in watch', () => {
     const fetcher = new HttpFetcher()
     expect(await sitemapPaths(base, fetcher)).toEqual(['/listing/42', '/about'])
     await fetcher.close()
+  })
+
+  it('sitemapPaths follows sitemap-index children', async () => {
+    const indexServer = createServer((req, res) => {
+      res.writeHead(200, { 'content-type': 'application/xml' })
+      if (req.url === '/sitemap.xml') {
+        res.end('<sitemapindex><sitemap><loc>http://x/sitemap-pages.xml</loc></sitemap></sitemapindex>')
+      } else {
+        res.end('<urlset><url><loc>http://x/deep/1</loc></url></urlset>')
+      }
+    })
+    await new Promise<void>(r => indexServer.listen(0, () => r()))
+    const address = indexServer.address()
+    const indexBase = `http://127.0.0.1:${typeof address === 'object' && address ? address.port : 0}`
+    const { HttpFetcher } = await import('@ranklint/core')
+    const fetcher = new HttpFetcher()
+    expect(await sitemapPaths(indexBase, fetcher)).toEqual(['/deep/1'])
+    await fetcher.close()
+    await new Promise<void>(r => indexServer.close(() => r()))
   })
 
   it('checks sitemap-sampled urls when a dynamic page changes', async () => {

@@ -61,7 +61,7 @@ export function resolveRanklintOptions(options: ModuleOptions): ResolvedRanklint
       ? {
           path: sitemapObj.path ?? '/sitemap.xml',
           urlSources: sources.filter((s): s is string => typeof s === 'string'),
-          staticEntries: sources.filter((s): s is SitemapSourceEntry => typeof s === 'object'),
+          staticEntries: sources.filter((s): s is SitemapSourceEntry => typeof s === 'object' && s !== null),
           fnSources: sources.filter((s): s is SitemapSource => typeof s === 'function'),
           cacheTtl: sitemapObj.cacheTtl ?? 3600,
           routes: [],

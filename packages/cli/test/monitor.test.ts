@@ -1,4 +1,5 @@
-import { mkdtemp } from 'node:fs/promises'
+import { generateKeyPairSync } from 'node:crypto'
+import { mkdtemp, writeFile } from 'node:fs/promises'
 import { createServer, type Server } from 'node:http'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
@@ -165,5 +166,47 @@ describe('notify + crux against mock server', () => {
     const data = await fetchCruxField('https://x.com', 'key', `${base}/crux`)
     expect(data).toEqual({ lcp: 2100, cls: 0.05, inp: 180 })
     expect(await fetchCruxField('https://unknown.com', 'key', `${base}/crux-404`)).toBeNull()
+  })
+})
+
+describe('runMonitor with a gsc service account key file', () => {
+  it('exchanges the key for a token and inspects urls', async () => {
+    const { privateKey } = generateKeyPairSync('rsa', { modulusLength: 2048 })
+    const auths: string[] = []
+    const server = createServer((req, res) => {
+      res.writeHead(200, { 'content-type': 'application/json' })
+      if (req.url === '/token') {
+        res.end(JSON.stringify({ access_token: 'sa-token' }))
+        return
+      }
+      auths.push(req.headers.authorization ?? '')
+      res.end(JSON.stringify({ inspectionResult: { indexStatusResult: { verdict: 'PASS' } } }))
+    })
+    await new Promise<void>(r => server.listen(0, () => r()))
+    const address = server.address()
+    const base = `http://127.0.0.1:${typeof address === 'object' && address ? address.port : 0}`
+
+    const dir = await mkdtemp(join(tmpdir(), 'ranklint-gsc-key-'))
+    const keyFile = join(dir, 'sa.json')
+    await writeFile(keyFile, JSON.stringify({
+      client_email: 'bot@project.iam.gserviceaccount.com',
+      private_key: privateKey.export({ type: 'pkcs8', format: 'pem' }).toString(),
+    }))
+
+    const result = await runMonitor({
+      url: 'https://site.test/',
+      fetcher: fetcherFor(cleanPage),
+      config: { site: { url: 'https://site.test' } },
+      storage: new FsReportStorage(await mkdtemp(join(tmpdir(), 'ranklint-monitor-'))),
+      notifyEnv: {},
+      gscKeyFile: keyFile,
+      gscTokenUrl: `${base}/token`,
+      gscApiUrl: `${base}/inspect`,
+      gscProperty: 'https://site.test',
+    })
+    await new Promise<void>(r => server.close(() => r()))
+
+    expect(auths[0]).toBe('Bearer sa-token')
+    expect(result.report.searchConsole?.inspected[0]).toMatchObject({ verdict: 'PASS' })
   })
 })

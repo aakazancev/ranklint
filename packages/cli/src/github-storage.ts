@@ -13,6 +13,14 @@ const EOCD_SIGNATURE = 0x06054B50
 const CENTRAL_SIGNATURE = 0x02014B50
 
 export function unzipFile(zip: Buffer, fileName: string): Buffer | null {
+  try {
+    return unzipFileUnsafe(zip, fileName)
+  } catch {
+    return null
+  }
+}
+
+function unzipFileUnsafe(zip: Buffer, fileName: string): Buffer | null {
   let eocd = -1
   for (let i = zip.length - 22; i >= 0; i--) {
     if (zip.readUInt32LE(i) === EOCD_SIGNATURE) {
@@ -90,8 +98,9 @@ export class GithubArtifactsStorage implements ReportStorage {
     const res = await fetch(url, { headers: this.headers() })
     if (!res.ok) throw new Error(`GitHub artifacts API responded ${res.status}`)
     const { artifacts = [] } = await res.json() as ArtifactList
-    const match = artifacts.find(artifact =>
-      !artifact.expired && (ref === '' || artifact.workflow_run?.head_branch === ref))
+    const match = [...artifacts]
+      .sort((a, b) => b.id - a.id)
+      .find(artifact => !artifact.expired && (ref === '' || artifact.workflow_run?.head_branch === ref))
     if (!match) return null
     const zipRes = await fetch(match.archive_download_url, { headers: this.headers(), redirect: 'follow' })
     if (!zipRes.ok) throw new Error(`GitHub artifact download responded ${zipRes.status}`)

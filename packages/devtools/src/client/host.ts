@@ -10,19 +10,32 @@ export interface HostPage {
 
 const FLASH_MS = 1600
 const DEBOUNCE_MS = 400
+const MAX_WAIT_MS = 2000
 
 export function connectHostPage(client: NuxtDevtoolsIframeClient): HostPage | null {
-  const doc = client.host.getIframe()?.ownerDocument ?? window.parent?.parent?.document
-  if (!doc?.defaultView) return null
-  const win = doc.defaultView
+  let doc: Document | undefined
+  try {
+    doc = client.host.getIframe()?.ownerDocument ?? window.parent?.parent?.document
+  } catch {
+    return null
+  }
+  const win = doc?.defaultView
+  if (!doc || !win) return null
 
   const listeners: Array<() => void> = []
   let timer: ReturnType<typeof setTimeout> | undefined
-  let suspended = false
+  let oldestPending = 0
+  let activeFlashes = 0
   const notify = () => {
-    if (suspended) return
+    if (activeFlashes > 0) return
+    const now = Date.now()
+    if (oldestPending === 0) oldestPending = now
     clearTimeout(timer)
-    timer = setTimeout(() => listeners.forEach(cb => cb()), DEBOUNCE_MS)
+    const delay = now - oldestPending >= MAX_WAIT_MS ? 0 : DEBOUNCE_MS
+    timer = setTimeout(() => {
+      oldestPending = 0
+      listeners.forEach(cb => cb())
+    }, delay)
   }
 
   const observer = new win.MutationObserver(notify)
@@ -43,7 +56,7 @@ export function connectHostPage(client: NuxtDevtoolsIframeClient): HostPage | nu
         return false
       }
       if (!el) return false
-      suspended = true
+      activeFlashes++
       el.scrollIntoView({ behavior: 'smooth', block: 'center' })
       const target = el as HTMLElement
       const saved = target.style.outline
@@ -53,7 +66,7 @@ export function connectHostPage(client: NuxtDevtoolsIframeClient): HostPage | nu
       setTimeout(() => {
         target.style.outline = saved
         target.style.outlineOffset = savedOffset
-        setTimeout(() => { suspended = false }, 50)
+        setTimeout(() => { activeFlashes-- }, 50)
       }, FLASH_MS)
       return true
     },

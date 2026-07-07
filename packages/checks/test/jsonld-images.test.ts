@@ -69,4 +69,17 @@ describe('images:no-lazy-above-fold with real viewport data', () => {
     const imgs = '<img src="/1.png" loading="lazy"><img src="/2.png">'
     expect(await runCheckOnHtml(noLazyAboveFold, body(imgs), { aboveFoldImages: ['/2.png'] })).toEqual([])
   })
+
+  it('does not flag a lazy below-fold duplicate of an above-fold image', async () => {
+    const imgs = '<img src="/logo.png"><img src="/logo.png" loading="lazy">'
+    expect(await runCheckOnHtml(noLazyAboveFold, body(imgs), { aboveFoldImages: ['/logo.png'] })).toEqual([])
+    const both = '<img src="/logo.png" loading="lazy"><img src="/logo.png" loading="lazy">'
+    const issues = await runCheckOnHtml(noLazyAboveFold, body(both), { aboveFoldImages: ['/logo.png', '/logo.png'] })
+    expect(issues).toHaveLength(2)
+  })
+
+  it('skips srcset-only images without src (not measurable by viewport data)', async () => {
+    const imgs = '<img srcset="/a-2x.png 2x" loading="lazy">'
+    expect(await runCheckOnHtml(noLazyAboveFold, body(imgs), { aboveFoldImages: [] })).toEqual([])
+  })
 })

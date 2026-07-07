@@ -3,7 +3,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import type { Report } from '@ranklint/core'
 import { runCommand } from 'citty'
-import { afterEach, describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { audit } from '../src/commands/audit'
 import { diff } from '../src/commands/diff'
 import { generate } from '../src/commands/generate'
@@ -26,6 +26,7 @@ const brokenTitle = {
 
 afterEach(() => {
   process.exitCode = 0
+  vi.unstubAllEnvs()
 })
 
 describe('generate robots-fragment', () => {
@@ -59,6 +60,9 @@ describe('diff command', () => {
   })
 
   it('degrades to full report on missing base', async () => {
+    vi.stubEnv('GITHUB_ACTIONS', '')
+    vi.stubEnv('CI_API_V4_URL', '')
+    vi.stubEnv('CI_PROJECT_ID', '')
     const dir = await mkdtemp(join(tmpdir(), 'ranklint-cmd-'))
     const currentPath = join(dir, 'current.json')
     const output = join(dir, 'diff.md')

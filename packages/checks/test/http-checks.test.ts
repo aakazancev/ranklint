@@ -132,5 +132,14 @@ describe('http:ttfb-budget auto route groups', () => {
     const issues = await ttfbBudget.run(siteCtx(pages))
     expect(issues).toHaveLength(1)
     expect(issues[0]?.message).toContain('/listing/*')
+    expect(issues[0]?.message).toContain('(2 pages)')
+  })
+
+  it('skips auto groups with a single sample but keeps configured budgets', async () => {
+    const single = [snap('/about', { ttfb: 5000 }), snap('/', { ttfb: 100 })]
+    expect(await ttfbBudget.run(siteCtx(single))).toEqual([])
+    const budgeted = await ttfbBudget.run(siteCtx(single, stubFetcher, { budgets: { '/about': 500 } }))
+    expect(budgeted).toHaveLength(1)
+    expect(budgeted[0]?.message).toContain('(1 page)')
   })
 })

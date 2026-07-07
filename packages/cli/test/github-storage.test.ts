@@ -82,6 +82,20 @@ describe('unzipFile', () => {
     expect(unzipFile(zipEntry('a.json', content, 0), 'b.json')).toBeNull()
     expect(unzipFile(Buffer.from('not a zip at all........'), 'a.json')).toBeNull()
   })
+
+  it('returns null instead of throwing on malformed offsets', () => {
+    const evil = Buffer.alloc(22)
+    evil.writeUInt32LE(0x06054B50, 0)
+    evil.writeUInt16LE(1, 10)
+    evil.writeUInt32LE(0xFFFFFF00, 16)
+    expect(unzipFile(evil, 'a.json')).toBeNull()
+    const truncated = zipEntry('a.json', content, 8).subarray(0, 40)
+    const eocd = Buffer.alloc(22)
+    eocd.writeUInt32LE(0x06054B50, 0)
+    eocd.writeUInt16LE(1, 10)
+    eocd.writeUInt32LE(0, 16)
+    expect(unzipFile(Buffer.concat([truncated, eocd]), 'a.json')).toBeNull()
+  })
 })
 
 describe('GithubArtifactsStorage', () => {

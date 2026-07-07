@@ -38,6 +38,22 @@ describe('PlaywrightFetcher', () => {
     expect(snap.ttfb).toBeGreaterThanOrEqual(0)
   }, 60_000)
 
+  it('measures images above the fold by real viewport position', async () => {
+    const gif = 'data:image/gif;base64,R0lGODlhAQABAAAAACw='
+    const page = `<!doctype html><html><head><title>Fold</title></head><body>
+      <img src="${gif}" width="50" height="50">
+      <div style="height: 3000px"></div>
+      <img src="${gif},deep" width="50" height="50">
+    </body></html>`
+    server.removeAllListeners('request')
+    server.on('request', (req, res) => {
+      res.writeHead(200, { 'content-type': 'text/html' })
+      res.end(page)
+    })
+    const snap = await fetcher.fetch(`${base}/`)
+    expect(snap.aboveFoldImages).toEqual([gif])
+  }, 60_000)
+
   it('passes a custom user agent', async () => {
     let seenUa = ''
     server.removeAllListeners('request')

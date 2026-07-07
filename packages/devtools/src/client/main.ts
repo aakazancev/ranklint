@@ -17,26 +17,35 @@ const report = shallowRef<PageReport | null>(null)
 const links = ref<LinkResult[] | null>(null)
 const checkingLinks = ref(false)
 
+function cleanDocument(document: Document): Document {
+  const clone = new DOMParser().parseFromString(document.documentElement.outerHTML, 'text/html')
+  for (const el of clone.querySelectorAll('[id^="nuxt-devtools"], [class*="nuxt-devtools"]')) el.remove()
+  return clone
+}
+
 async function refresh() {
   const page = host.value
   if (!page) return
-  pageUrl.value = page.readUrl()
-  report.value = await buildPageReport(page.document, pageUrl.value)
+  const url = page.readUrl()
+  if (url !== pageUrl.value) links.value = null
+  pageUrl.value = url
+  report.value = await buildPageReport(cleanDocument(page.document), url)
 }
 
 async function checkLinks() {
   const page = host.value
   if (!page || checkingLinks.value) return
   checkingLinks.value = true
-  const targets = collectInternalLinks(page.document, pageUrl.value)
-  const results = ref<LinkResult[]>(targets.map(t => ({ href: t.href, count: t.count, state: 'pending' })))
-  links.value = results.value
-  const queue = [...results.value.keys()]
+  const targets = collectInternalLinks(cleanDocument(page.document), pageUrl.value)
+  links.value = targets.map(t => ({ href: t.href, count: t.count, state: 'pending' as const }))
+  const entries = links.value
+  const queue = entries.map((_, i) => i)
   const worker = async () => {
     for (let i = queue.shift(); i !== undefined; i = queue.shift()) {
-      const entry = results.value[i]!
+      const entry = entries[i]!
       try {
-        const res = await fetch(entry.href, { method: 'HEAD', redirect: 'follow' })
+        let res = await fetch(entry.href, { method: 'HEAD', redirect: 'follow' })
+        if (res.status === 405) res = await fetch(entry.href, { method: 'GET', redirect: 'follow' })
         entry.status = res.status
         entry.state = res.status >= 400 ? 'broken' : 'ok'
       } catch {
@@ -132,11 +141,10 @@ onDevtoolsClientConnected((client) => {
   const page = connectHostPage(client)
   if (!page) return
   host.value = page
-  page.onChange(() => {
-    links.value = null
-    void refresh()
-  })
+  page.onChange(() => void refresh())
   void refresh()
 })
+
+window.addEventListener('pagehide', () => host.value?.dispose())
 
 createApp(App).mount('#app')

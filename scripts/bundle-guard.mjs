@@ -25,3 +25,16 @@ if (total > LIMIT) {
   console.error(`BUNDLE GUARD FAILED: ${total} > ${LIMIT}`)
   process.exit(1)
 }
+
+const devtoolsClient = new URL('../packages/devtools/dist/client/main.mjs', import.meta.url).pathname
+if (existsSync(devtoolsClient)) {
+  const source = readFileSync(devtoolsClient, 'utf8')
+  const bare = [...source.matchAll(/(?:^|[;}])\s*(?:import|export)[^;]*?from\s*["']([^."'/][^"']*)["']/g)]
+    .map(m => m[1])
+    .filter(id => !id.startsWith('node:'))
+  console.log(`devtools client: self-contained (${bare.length} bare imports)`)
+  if (bare.length > 0) {
+    console.error(`BUNDLE GUARD FAILED: devtools client has bare imports: ${[...new Set(bare)].join(', ')}`)
+    process.exit(1)
+  }
+}
