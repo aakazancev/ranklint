@@ -1,0 +1,332 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "extends": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "site": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "url"
+      ]
+    },
+    "apps": {
+      "type": "object",
+      "propertyNames": {
+        "type": "string"
+      },
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "paths": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "owner": {
+            "type": "string",
+            "enum": [
+              "self",
+              "external"
+            ]
+          },
+          "checks": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "paths"
+        ]
+      }
+    },
+    "rules": {
+      "type": "object",
+      "propertyNames": {
+        "type": "string"
+      },
+      "additionalProperties": {
+        "anyOf": [
+          {
+            "type": "string",
+            "enum": [
+              "error",
+              "warn",
+              "info",
+              "off"
+            ]
+          },
+          {
+            "type": "array",
+            "prefixItems": [
+              {
+                "type": "string",
+                "enum": [
+                  "error",
+                  "warn",
+                  "info"
+                ]
+              },
+              {
+                "type": "object",
+                "propertyNames": {
+                  "type": "string"
+                },
+                "additionalProperties": {}
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "crawl": {
+      "type": "object",
+      "properties": {
+        "concurrency": {
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991
+        },
+        "delay": {
+          "type": "number",
+          "minimum": 0
+        },
+        "maxPages": {
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991
+        },
+        "ignore": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "strategy": {
+          "type": "string",
+          "enum": [
+            "full",
+            "sitemap+sample"
+          ]
+        },
+        "userAgent": {
+          "type": "string"
+        },
+        "viewport": {
+          "type": "object",
+          "properties": {
+            "width": {
+              "type": "integer",
+              "exclusiveMinimum": 0,
+              "maximum": 9007199254740991
+            },
+            "height": {
+              "type": "integer",
+              "exclusiveMinimum": 0,
+              "maximum": 9007199254740991
+            }
+          },
+          "required": [
+            "width",
+            "height"
+          ]
+        },
+        "auth": {
+          "type": "object",
+          "properties": {
+            "headers": {
+              "type": "object",
+              "propertyNames": {
+                "type": "string"
+              },
+              "additionalProperties": {
+                "type": "string"
+              }
+            },
+            "basic": {
+              "type": "object",
+              "properties": {
+                "username": {
+                  "type": "string"
+                },
+                "password": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "username",
+                "password"
+              ]
+            },
+            "cookies": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "value": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "name",
+                  "value"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "robots": {
+      "type": "object",
+      "properties": {
+        "mode": {
+          "type": "string",
+          "enum": [
+            "owner",
+            "external"
+          ]
+        },
+        "expect": {
+          "type": "object",
+          "properties": {
+            "allow": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "disallow": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "sitemaps": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "indexable": {
+              "type": "boolean"
+            }
+          }
+        }
+      }
+    },
+    "lighthouse": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "runs": {
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991
+        },
+        "aggregation": {
+          "type": "string",
+          "enum": [
+            "median",
+            "p75",
+            "best"
+          ]
+        },
+        "formFactor": {
+          "type": "string",
+          "enum": [
+            "mobile",
+            "desktop"
+          ]
+        },
+        "maxUrls": {
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991
+        },
+        "thresholds": {
+          "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
+          "additionalProperties": {
+            "type": "object",
+            "propertyNames": {
+              "type": "string"
+            },
+            "additionalProperties": {
+              "type": "number"
+            }
+          }
+        }
+      }
+    },
+    "customChecks": {
+      "type": "array",
+      "items": {}
+    },
+    "monitor": {
+      "type": "object",
+      "properties": {
+        "storage": {
+          "type": "string",
+          "enum": [
+            "fs",
+            "s3"
+          ]
+        },
+        "dir": {
+          "type": "string"
+        },
+        "keep": {
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991
+        },
+        "bucket": {
+          "type": "string"
+        },
+        "prefix": {
+          "type": "string"
+        },
+        "endpoint": {
+          "type": "string"
+        },
+        "region": {
+          "type": "string"
+        }
+      }
+    },
+    "profiles": {
+      "type": "object",
+      "propertyNames": {
+        "type": "string"
+      },
+      "additionalProperties": {}
+    }
+  },
+  "required": [
+    "site"
+  ],
+  "title": "ranklint seo.config"
+}

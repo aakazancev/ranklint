@@ -34,7 +34,7 @@ export function storageFromConfig(config: RanklintUserConfig): ReportStorage {
       region: config.monitor.region,
     })
   }
-  return new FsReportStorage(config.monitor?.dir ?? '.ranklint/reports')
+  return new FsReportStorage(config.monitor?.dir ?? '.ranklint/reports', config.monitor?.keep)
 }
 
 export async function runMonitor(opts: RunMonitorOptions): Promise<MonitorResult> {

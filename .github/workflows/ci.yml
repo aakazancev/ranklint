@@ -29,4 +29,5 @@ jobs:
       - run: pnpm test
       - run: pnpm build
       - run: pnpm publint
+      - run: node scripts/generate-config-schema.mjs --check
       - run: node scripts/bundle-guard.mjs

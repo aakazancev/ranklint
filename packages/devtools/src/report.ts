@@ -1,6 +1,6 @@
 import type { Issue, PageFetcher, PageSnapshot } from '@ranklint/core'
 import { level1Checks } from '@ranklint/checks/level1'
-import { validateSchemaOrg, type SchemaOrgIssue } from '@ranklint/checks/schema-org'
+import { extractSchemaNodes, validateSchemaNode, type SchemaOrgIssue } from '@ranklint/checks/schema-org'
 
 export interface OutlineNode {
   level: number
@@ -73,9 +73,9 @@ function extractJsonLd(document: Document): JsonLdBlock[] {
   return [...document.querySelectorAll('script[type="application/ld+json"]')].map((el) => {
     const raw = el.textContent ?? ''
     try {
-      const parsed = JSON.parse(raw) as Record<string, unknown>
-      const type = String(parsed['@type'] ?? 'unknown')
-      const issues = validateSchemaOrg(type, parsed)
+      const nodes = extractSchemaNodes(JSON.parse(raw))
+      const issues = nodes.flatMap(node => validateSchemaNode(node))
+      const type = nodes.map(node => node.types.join('+')).join(', ') || 'unknown'
       return { type, valid: issues.length === 0, issues, raw }
     } catch {
       return { type: 'invalid', valid: false, issues: [{ path: '(root)', message: 'JSON parse error' }], raw }

@@ -179,3 +179,34 @@ describe('dynamic routes in watch', () => {
     expect(issues[0]?.checkId).toBe('watch:no-sample-url')
   }, 20_000)
 })
+
+describe('app-dir changes re-check recent routes', () => {
+  it('re-runs the last checked route when a component outside pages changes', async () => {
+    const appDir = await mkdtemp(join(tmpdir(), 'ranklint-watch-app-'))
+    const pagesDir = join(appDir, 'pages')
+    await mkdir(join(appDir, 'components'), { recursive: true })
+    await mkdir(join(pagesDir, 'bugs'), { recursive: true })
+    const reports: string[] = []
+    const twoReports = new Promise<void>((resolve) => {
+      const watcher = startWatch({
+        pagesDir,
+        appDir,
+        baseUrl: base,
+        debounceMs: 50,
+        onReport: (route) => {
+          reports.push(route)
+          if (reports.length === 2) {
+            watcher.close()
+            resolve()
+          }
+        },
+      })
+    })
+    await new Promise(r => setTimeout(r, 300))
+    await writeFile(join(pagesDir, 'bugs', 'title-short.vue'), '<template><h1>x</h1></template>')
+    await new Promise(r => setTimeout(r, 400))
+    await writeFile(join(appDir, 'components', 'ProductCard.vue'), '<template><img src="/x.png"></template>')
+    await twoReports
+    expect(reports).toEqual(['/bugs/title-short', '/bugs/title-short'])
+  }, 20_000)
+})

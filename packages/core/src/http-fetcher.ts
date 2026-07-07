@@ -1,5 +1,5 @@
 import { parseHTML } from 'linkedom'
-import type { PageFetcher, PageLink, PageSnapshot } from './types'
+import type { FetchAuth, PageFetcher, PageLink, PageSnapshot } from './types'
 
 export function parseLinks(html: string): PageLink[] {
   const { document } = parseHTML(html)
@@ -10,11 +10,27 @@ export function parseLinks(html: string): PageLink[] {
   }))
 }
 
+export function authHeaders(auth?: FetchAuth): Record<string, string> {
+  const headers: Record<string, string> = { ...auth?.headers }
+  if (auth?.basic) {
+    headers.authorization = `Basic ${Buffer.from(`${auth.basic.username}:${auth.basic.password}`).toString('base64')}`
+  }
+  if (auth?.cookies?.length) {
+    headers.cookie = auth.cookies.map(c => `${c.name}=${c.value}`).join('; ')
+  }
+  return headers
+}
+
 export class HttpFetcher implements PageFetcher {
+  constructor(private auth?: FetchAuth) {}
+
   async fetch(url: string, opts?: { userAgent?: string }): Promise<PageSnapshot> {
     const start = performance.now()
     const res = await globalThis.fetch(url, {
-      headers: opts?.userAgent ? { 'user-agent': opts.userAgent } : undefined,
+      headers: {
+        ...authHeaders(this.auth),
+        ...(opts?.userAgent ? { 'user-agent': opts.userAgent } : {}),
+      },
     })
     const ttfb = Math.round(performance.now() - start)
     const html = await res.text()
@@ -29,7 +45,7 @@ export class HttpFetcher implements PageFetcher {
   }
 
   async head(url: string) {
-    const res = await globalThis.fetch(url, { method: 'HEAD', redirect: 'manual' })
+    const res = await globalThis.fetch(url, { method: 'HEAD', redirect: 'manual', headers: authHeaders(this.auth) })
     return { statusCode: res.status, headers: Object.fromEntries(res.headers.entries()) }
   }
 

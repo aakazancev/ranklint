@@ -2,6 +2,7 @@ export interface FixtureSeoOverrides {
   title?: string | null
   description?: string | null
   canonical?: string | null
+  og?: false
 }
 
 export function useFixtureSeo(overrides: FixtureSeoOverrides = {}) {
@@ -18,7 +19,17 @@ export function useFixtureSeo(overrides: FixtureSeoOverrides = {}) {
 
   useHead({
     ...(title !== null ? { title } : {}),
-    meta: description !== null ? [{ name: 'description', content: description }] : [],
+    meta: [
+      ...(description !== null ? [{ name: 'description', content: description }] : []),
+      ...(overrides.og === false
+        ? []
+        : [
+            { property: 'og:title', content: title ?? 'Fixture og title' },
+            { property: 'og:description', content: description ?? 'Fixture og description' },
+            { property: 'og:image', content: `${url.origin}/og-image.png` },
+            { name: 'twitter:card', content: 'summary' },
+          ]),
+    ],
     link: canonical !== null ? [{ rel: 'canonical', href: canonical }] : [],
   })
 }

@@ -1,16 +1,32 @@
-import type { PageFetcher, PageSnapshot } from '@ranklint/core'
-import { HttpFetcher } from '@ranklint/core'
+import type { FetchAuth, PageFetcher, PageSnapshot } from '@ranklint/core'
+import { authHeaders, HttpFetcher } from '@ranklint/core'
 import { chromium, type Browser } from 'playwright'
+
+export interface PlaywrightFetcherOptions {
+  auth?: FetchAuth
+  viewport?: { width: number, height: number }
+}
 
 export class PlaywrightFetcher implements PageFetcher {
   private browser?: Browser
-  private http = new HttpFetcher()
+  private http: HttpFetcher
+  private auth?: FetchAuth
+  private viewport?: { width: number, height: number }
+
+  constructor(options: PlaywrightFetcherOptions = {}) {
+    this.auth = options.auth
+    this.viewport = options.viewport
+    this.http = new HttpFetcher(options.auth)
+  }
 
   async fetch(url: string, opts?: { userAgent?: string }): Promise<PageSnapshot> {
     this.browser ??= await chromium.launch()
-    const context = await this.browser.newContext(
-      opts?.userAgent ? { userAgent: opts.userAgent } : {},
-    )
+    const headers = authHeaders(this.auth)
+    const context = await this.browser.newContext({
+      ...(opts?.userAgent ? { userAgent: opts.userAgent } : {}),
+      ...(Object.keys(headers).length > 0 ? { extraHTTPHeaders: headers } : {}),
+      ...(this.viewport ? { viewport: this.viewport } : {}),
+    })
     const page = await context.newPage()
     try {
       const start = performance.now()

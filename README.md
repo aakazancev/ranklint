@@ -98,9 +98,11 @@ seo:audit:
 
 ## Правила
 
-36 правил в категориях meta, headings, canonical, links, i18n, structured-data, images, robots, indexability, http — полный справочник в [docs/rules.md](docs/rules.md).
+42 правила в категориях meta, headings, canonical, links, i18n, structured-data, images, robots, indexability, http — полный справочник в [docs/rules.md](docs/rules.md).
 
 Любое правило: `'error' | 'warn' | 'off'` или `[severity, options]`. Инлайн-отключение на странице — `useRanklintIgnore([...])`.
+
+Для `seo.config.json`/`.jsonc` есть JSON-схема с автодополнением — [schemas/seo-config.schema.json](schemas/seo-config.schema.json). В TS-конфиге то же даёт `defineRanklintConfig`.
 
 Дополнительно: SEO Diff между ветками (`ranklint diff`), multi-app зоны, Lighthouse-пороги per-route, watch mode, прод-мониторинг с алертами (slack/telegram), CrUX и Search Console данные, crawl-budget анализ, кастомные правила.
 

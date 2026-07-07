@@ -30,8 +30,7 @@ jobs:
         run: >
           ranklint audit
           --url "${{ inputs.url }}"
-          --reporter junit
-          --output ranklint-report.xml
+          --reporter github
           --json-output ranklint-report.json
       - name: Download base report
         if: github.event_name == 'pull_request'
@@ -66,6 +65,5 @@ jobs:
         with:
           name: ranklint-report
           path: |
-            ranklint-report.xml
             ranklint-report.json
             ranklint-diff.md

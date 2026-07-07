@@ -37,7 +37,9 @@ export async function runAudit(opts: RunAuditOptions): Promise<Report> {
     registry.set(custom.id, { defaultSeverity: custom.severity })
   }
   const rules = resolveRules(config.rules, registry)
-  const fetcher = opts.fetcher ?? new PlaywrightFetcher()
+  const viewport = config.crawl?.viewport
+    ?? (config.lighthouse?.formFactor === 'mobile' ? { width: 375, height: 812 } : undefined)
+  const fetcher = opts.fetcher ?? new PlaywrightFetcher({ auth: config.crawl?.auth, viewport })
   try {
     let seeds = [opts.url]
     if (config.crawl?.strategy === 'sitemap+sample') {

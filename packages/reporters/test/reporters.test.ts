@@ -1,6 +1,6 @@
 import type { Report } from '@ranklint/core'
 import { describe, expect, it } from 'vitest'
-import { json, junit, markdown } from '../src/index'
+import { github, json, junit, markdown } from '../src/index'
 
 function report(overrides: Partial<Report> = {}): Report {
   return {
@@ -61,5 +61,24 @@ describe('junit reporter', () => {
     const out = junit(report({ issues: [] }))
     expect(out).toContain('failures="0"')
     expect(out).toContain('<testcase name="no issues"')
+  })
+})
+
+describe('github reporter', () => {
+  it('emits workflow commands with escaped messages', () => {
+    const output = github({
+      formatVersion: 1,
+      meta: { url: 'https://x.com', timestamp: 't', pagesAudited: 2 },
+      issues: [
+        { checkId: 'meta:title-required', severity: 'error', message: 'Page has no <title>', url: 'https://x.com/', selector: 'head', suggestion: 'Add one' },
+        { checkId: 'http:ttfb-budget', severity: 'warn', message: 'p75 is 900ms\nover budget', url: 'https://x.com' },
+      ],
+      crawlStats: { visited: 2, skipped: 0, external: 0, ignored: 0 },
+    })
+    const lines = output.trim().split('\n')
+    expect(lines[0]).toBe('::error title=meta%3Atitle-required::https://x.com/ → head — Page has no <title> (Add one)')
+    expect(lines[1]).toContain('::warning title=http%3Attfb-budget::')
+    expect(lines[1]).toContain('%0A')
+    expect(lines[2]).toContain('2 issues on 2 pages')
   })
 })

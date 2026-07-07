@@ -21,7 +21,7 @@ export const outline = defineCommand({
     } catch {
       config = { site: { url: new URL(args.url).origin } }
     }
-    const fetcher = new PlaywrightFetcher()
+    const fetcher = new PlaywrightFetcher({ auth: config.crawl?.auth, viewport: config.crawl?.viewport })
     try {
       const result = await crawl(fetcher, [args.url], {
         siteUrl: config.site.url,

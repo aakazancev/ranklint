@@ -17,5 +17,10 @@
   "/bugs/duplicate-title-b": ["meta:no-duplicate-title"],
   "/bugs/orphan": ["links:no-orphans"],
   "/bugs/jsonld-broken": ["jsonld:parseable", "jsonld:valid-schema"],
-  "/bugs/images-bad": ["images:alt-required", "images:dimensions-required", "images:no-lazy-above-fold"]
+  "/bugs/images-bad": ["images:alt-required", "images:dimensions-required", "images:no-lazy-above-fold"],
+  "/bugs/noindex-in-sitemap": ["sitemap:no-noindex"],
+  "/bugs/og-missing": ["meta:og-required"],
+  "/bugs/canonical-chain-a": ["canonical:no-chain"],
+  "/bugs/canonical-chain-b": [],
+  "/bugs/canonical-chain-c": []
 }

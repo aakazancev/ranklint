@@ -18,6 +18,11 @@ const bugs = [
   'duplicate-title-b',
   'jsonld-broken',
   'images-bad',
+  'noindex-in-sitemap',
+  'og-missing',
+  'canonical-chain-a',
+  'canonical-chain-b',
+  'canonical-chain-c',
 ]
 </script>
 

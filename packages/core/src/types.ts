@@ -21,6 +21,12 @@ export interface PageSnapshot {
   aboveFoldImages?: string[]
 }
 
+export interface FetchAuth {
+  headers?: Record<string, string>
+  basic?: { username: string, password: string }
+  cookies?: { name: string, value: string }[]
+}
+
 export interface PageFetcher {
   fetch(url: string, opts?: { userAgent?: string }): Promise<PageSnapshot>
   head(url: string): Promise<{ statusCode: number, headers: Record<string, string> }>

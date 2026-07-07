@@ -1,6 +1,7 @@
 import type { Issue } from '@ranklint/core'
+import { z } from 'zod'
 import { defineCheck, docsUrl } from '../../define'
-import { validateSchemaOrg } from '../../schema-org'
+import { extractSchemaNodes, validateSchemaNode, type SchemaMap } from '../../schema-org'
 
 function blocks(doc: Document): string[] {
   return [...doc.querySelectorAll('script[type="application/ld+json"]')]
@@ -34,33 +35,44 @@ export const jsonldParseable = defineCheck({
   },
 })
 
+const schemaMapSchema = z.custom<SchemaMap>((value) => {
+  if (typeof value !== 'object' || value === null) return false
+  return Object.values(value).every(schema =>
+    typeof schema === 'object' && schema !== null && 'safeParse' in schema)
+}, 'schemas must map type names to zod schemas')
+
 export const jsonldValidSchema = defineCheck({
   id: 'jsonld:valid-schema',
   category: 'structured-data',
   severity: 'error',
   scope: 'page',
   docs: docsUrl('jsonld:valid-schema'),
+  optionsSchema: z.object({
+    schemas: schemaMapSchema.optional(),
+  }),
   async run(ctx) {
+    const customSchemas = (ctx.config.options as { schemas?: SchemaMap }).schemas ?? {}
     const issues: Issue[] = []
     for (const raw of blocks(ctx.document!)) {
-      let parsed: Record<string, unknown>
+      let parsed: unknown
       try {
-        parsed = JSON.parse(raw) as Record<string, unknown>
+        parsed = JSON.parse(raw)
       } catch {
         continue
       }
-      const type = String(parsed['@type'] ?? '')
-      if (!type) continue
-      for (const problem of validateSchemaOrg(type, parsed)) {
-        issues.push({
-          checkId: 'jsonld:valid-schema',
-          severity: 'error',
-          message: `JSON-LD ${type}: ${problem.path} — ${problem.message}`,
-          url: ctx.page!.url,
-          selector: 'script[type="application/ld+json"]',
-          suggestion: 'Fill the required schema.org fields so rich results are eligible',
-          docs: docsUrl('jsonld:valid-schema'),
-        })
+      for (const node of extractSchemaNodes(parsed)) {
+        const label = node.types.join('+')
+        for (const problem of validateSchemaNode(node, customSchemas)) {
+          issues.push({
+            checkId: 'jsonld:valid-schema',
+            severity: 'error',
+            message: `JSON-LD ${label}: ${problem.path} — ${problem.message}`,
+            url: ctx.page!.url,
+            selector: 'script[type="application/ld+json"]',
+            suggestion: 'Fill the required schema.org fields so rich results are eligible',
+            docs: docsUrl('jsonld:valid-schema'),
+          })
+        }
       }
     }
     return issues

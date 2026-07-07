@@ -54,6 +54,45 @@ describe('PlaywrightFetcher', () => {
     expect(snap.aboveFoldImages).toEqual([gif])
   }, 60_000)
 
+  it('respects a custom viewport for above-fold measurement', async () => {
+    const gif = 'data:image/gif;base64,R0lGODlhAQABAAAAACw='
+    const page = `<!doctype html><html><head><title>Fold</title></head><body style="margin:0">
+      <img src="${gif}" width="50" height="50">
+      <div style="height: 500px"></div>
+      <img src="${gif},second" width="50" height="50">
+    </body></html>`
+    server.removeAllListeners('request')
+    server.on('request', (req, res) => {
+      res.writeHead(200, { 'content-type': 'text/html' })
+      res.end(page)
+    })
+    const shortFetcher = new PlaywrightFetcher({ viewport: { width: 375, height: 400 } })
+    const short = await shortFetcher.fetch(`${base}/`)
+    await shortFetcher.close()
+    expect(short.aboveFoldImages).toEqual([gif])
+    const tall = await fetcher.fetch(`${base}/`)
+    expect(tall.aboveFoldImages).toEqual([gif, `${gif},second`])
+  }, 60_000)
+
+  it('sends auth headers with every browser request', async () => {
+    const authed = new PlaywrightFetcher({ auth: { headers: { 'x-stage-key': 'k1' } } })
+    server.removeAllListeners('request')
+    server.on('request', (req, res) => {
+      if (req.headers['x-stage-key'] !== 'k1') {
+        res.writeHead(401, { 'content-type': 'text/html' })
+        res.end('<html><body>denied</body></html>')
+        return
+      }
+      res.writeHead(200, { 'content-type': 'text/html' })
+      res.end(ssrPage)
+    })
+    const denied = await fetcher.fetch(`${base}/`)
+    expect(denied.statusCode).toBe(401)
+    const snap = await authed.fetch(`${base}/`)
+    expect(snap.statusCode).toBe(200)
+    await authed.close()
+  }, 60_000)
+
   it('passes a custom user agent', async () => {
     let seenUa = ''
     server.removeAllListeners('request')

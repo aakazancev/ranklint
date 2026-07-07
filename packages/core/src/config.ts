@@ -18,7 +18,7 @@ const ruleValueSchema = z.union([
   z.tuple([severitySchema, z.record(z.string(), z.unknown())]),
 ])
 
-const configSchema = z.object({
+export const configSchema = z.object({
   extends: z.array(z.string()).optional(),
   site: z.object({ url: z.string(), name: z.string().optional() }),
   apps: z.record(z.string(), z.object({
@@ -34,6 +34,12 @@ const configSchema = z.object({
     ignore: z.array(z.string()).optional(),
     strategy: z.enum(['full', 'sitemap+sample']).optional(),
     userAgent: z.string().optional(),
+    viewport: z.object({ width: z.number().int().positive(), height: z.number().int().positive() }).optional(),
+    auth: z.object({
+      headers: z.record(z.string(), z.string()).optional(),
+      basic: z.object({ username: z.string(), password: z.string() }).optional(),
+      cookies: z.array(z.object({ name: z.string(), value: z.string() })).optional(),
+    }).optional(),
   }).optional(),
   robots: z.object({
     mode: z.enum(['owner', 'external']).optional(),
@@ -56,6 +62,7 @@ const configSchema = z.object({
   monitor: z.object({
     storage: z.enum(['fs', 's3']).optional(),
     dir: z.string().optional(),
+    keep: z.number().int().positive().optional(),
     bucket: z.string().optional(),
     prefix: z.string().optional(),
     endpoint: z.string().optional(),
@@ -65,6 +72,10 @@ const configSchema = z.object({
 })
 
 export type RanklintUserConfig = z.infer<typeof configSchema>
+
+export function configJsonSchema(): Record<string, unknown> {
+  return z.toJSONSchema(configSchema, { unrepresentable: 'any', io: 'input' }) as Record<string, unknown>
+}
 
 export function defineRanklintConfig(config: RanklintUserConfig): RanklintUserConfig {
   return config

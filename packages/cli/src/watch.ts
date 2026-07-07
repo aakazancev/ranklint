@@ -1,3 +1,4 @@
+import { relative } from 'node:path'
 import { getDocument, HttpFetcher, type Issue, type PageFetcher, type SiteConfig } from '@ranklint/core'
 import { allChecks } from '@ranklint/checks'
 import { watch as chokidarWatch } from 'chokidar'
@@ -116,11 +117,14 @@ export function formatIssues(route: string, issues: Issue[]): string {
 
 export interface WatchOptions {
   pagesDir: string
+  appDir?: string
   baseUrl: string
   fetcher?: PageFetcher
   debounceMs?: number
   onReport?: (route: string, issues: Issue[]) => void
 }
+
+const RECENT_LIMIT = 3
 
 export function startWatch(options: WatchOptions): { close: () => Promise<void> } {
   const fetcher = options.fetcher ?? new HttpFetcher()
@@ -128,6 +132,13 @@ export function startWatch(options: WatchOptions): { close: () => Promise<void> 
   const timers = new Map<string, NodeJS.Timeout>()
   const report = options.onReport
     ?? ((route: string, issues: Issue[]) => process.stdout.write(formatIssues(route, issues)))
+  const recentRoutes: string[] = ['/']
+  const rememberRoute = (route: string) => {
+    const index = recentRoutes.indexOf(route)
+    if (index !== -1) recentRoutes.splice(index, 1)
+    recentRoutes.unshift(route)
+    recentRoutes.length = Math.min(recentRoutes.length, RECENT_LIMIT)
+  }
 
   let sitemapCache: Promise<string[]> | undefined
   const resolveDynamic = async (dynamic: DynamicRoute): Promise<string[]> => {
@@ -152,6 +163,7 @@ export function startWatch(options: WatchOptions): { close: () => Promise<void> 
       return
     }
     for (const route of routes) {
+      rememberRoute(route)
       report(route, await runFastChecks(route, options.baseUrl, fetcher))
     }
   }
@@ -166,7 +178,10 @@ export function startWatch(options: WatchOptions): { close: () => Promise<void> 
     timers.set(key, setTimeout(() => {
       const run = route === null
         ? resolveDynamic(dynamic!).then(routes => checkRoutes(dynamic!.pattern, routes))
-        : runFastChecks(route, options.baseUrl, fetcher).then(issues => report(route, issues))
+        : runFastChecks(route, options.baseUrl, fetcher).then((issues) => {
+            rememberRoute(route)
+            report(route, issues)
+          })
       run.catch(e => report(key, [{
         checkId: 'watch:error',
         severity: 'warn',
@@ -176,10 +191,24 @@ export function startWatch(options: WatchOptions): { close: () => Promise<void> 
     }, debounceMs))
   })
 
+  let appWatcher: ReturnType<typeof chokidarWatch> | undefined
+  if (options.appDir) {
+    const pagesPrefix = `${relative(options.appDir, options.pagesDir)}/`
+    appWatcher = chokidarWatch('.', { cwd: options.appDir, ignoreInitial: true })
+    appWatcher.on('all', (_event, relativePath) => {
+      if (relativePath.startsWith(pagesPrefix) || !/\.(vue|ts|js)$/.test(relativePath)) return
+      clearTimeout(timers.get('(app)'))
+      timers.set('(app)', setTimeout(() => {
+        checkRoutes(relativePath, [...recentRoutes]).catch(() => {})
+      }, debounceMs))
+    })
+  }
+
   return {
     close: async () => {
       for (const timer of timers.values()) clearTimeout(timer)
       await watcher.close()
+      await appWatcher?.close()
       await fetcher.close()
     },
   }

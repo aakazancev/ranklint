@@ -35,3 +35,19 @@ describe('FsReportStorage', () => {
     expect(await storage.latest()).toBeNull()
   })
 })
+
+describe('FsReportStorage retention and list', () => {
+  it('prunes oldest reports beyond keep on save and lists chronologically', async () => {
+    const dir = await mkdtemp(join(tmpdir(), 'ranklint-storage-keep-'))
+    const storage = new FsReportStorage(dir, 2)
+    await storage.save(report('t1'), 'first')
+    await new Promise(r => setTimeout(r, 20))
+    await storage.save(report('t2'), 'second')
+    await new Promise(r => setTimeout(r, 20))
+    await storage.save(report('t3'), 'third')
+    const keys = (await storage.list()).map(e => e.key)
+    expect(keys).toEqual(['second', 'third'])
+    expect(await storage.load('first')).toBeNull()
+    expect((await storage.latest())?.meta.timestamp).toBe('t3')
+  })
+})
