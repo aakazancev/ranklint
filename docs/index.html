@@ -188,6 +188,11 @@
     <button type="button" data-lang="en">EN</button>
     <button type="button" data-lang="ru">RU</button>
   </div>
+  <div class="lang-switch theme-btns" role="group" aria-label="Theme">
+    <button type="button" data-mode="auto">Auto</button>
+    <button type="button" data-mode="light" aria-label="Light theme">&#9788;</button>
+    <button type="button" data-mode="dark" aria-label="Dark theme">&#9790;</button>
+  </div>
 
   <div class="nv-top">rank<em>lint</em></div>
   <a href="#pkgs">Packages &amp; architecture</a>
@@ -574,6 +579,11 @@ customChecks: [
   <div class="lang-switch" role="group" aria-label="Language">
     <button type="button" data-lang="en">EN</button>
     <button type="button" data-lang="ru">RU</button>
+  </div>
+  <div class="lang-switch theme-btns" role="group" aria-label="Theme">
+    <button type="button" data-mode="auto">Auto</button>
+    <button type="button" data-mode="light" aria-label="Light theme">&#9788;</button>
+    <button type="button" data-mode="dark" aria-label="Dark theme">&#9790;</button>
   </div>
 
   <div class="nv-top">rank<em>lint</em></div>
@@ -995,9 +1005,22 @@ customChecks: [
   addEventListener('scroll', () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(pick) }, { passive: true })
   addEventListener('resize', pick)
 
+  const setTheme = (mode) => {
+    if (mode === 'auto') delete document.documentElement.dataset.theme
+    else document.documentElement.dataset.theme = mode
+    document.querySelectorAll('.theme-btns button').forEach(b =>
+      b.setAttribute('aria-pressed', String(b.dataset.mode === mode)))
+    try { localStorage.setItem('ranklint-theme', mode) } catch {}
+  }
+  document.querySelectorAll('.theme-btns button').forEach(b =>
+    b.addEventListener('click', () => setTheme(b.dataset.mode)))
+
   let stored = null
   try { stored = localStorage.getItem('ranklint-lang') } catch {}
   setLang(stored === 'ru' ? 'ru' : 'en', false)
+  let theme = null
+  try { theme = localStorage.getItem('ranklint-theme') } catch {}
+  setTheme(theme === 'light' || theme === 'dark' ? theme : 'auto')
 })()
 </script>
 
