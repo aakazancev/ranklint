@@ -1,7 +1,21 @@
 {
   "name": "@ranklint/reporters",
-  "version": "0.1.0",
+  "version": "0.1.1",
+  "description": "Report formats for ranklint: markdown, json, junit, gitlab, html, github annotations, diff and alert payloads.",
+  "keywords": [
+    "seo",
+    "reporter",
+    "junit",
+    "gitlab"
+  ],
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aakazancev/ranklint.git",
+    "directory": "packages/reporters"
+  },
+  "homepage": "https://aakazancev.github.io/ranklint/",
+  "bugs": "https://github.com/aakazancev/ranklint/issues",
   "type": "module",
   "engines": {
     "node": ">=20"

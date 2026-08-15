@@ -1,7 +1,23 @@
 {
   "name": "@ranklint/cli",
-  "version": "0.1.0",
+  "version": "0.1.1",
+  "description": "SEO audit CLI: crawl a deployed site with real Chrome, run 42 checks, Lighthouse, diff between branches, production monitoring.",
+  "keywords": [
+    "seo",
+    "lint",
+    "cli",
+    "audit",
+    "lighthouse",
+    "crawler"
+  ],
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aakazancev/ranklint.git",
+    "directory": "packages/cli"
+  },
+  "homepage": "https://aakazancev.github.io/ranklint/",
+  "bugs": "https://github.com/aakazancev/ranklint/issues",
   "type": "module",
   "engines": {
     "node": ">=20"
@@ -11,7 +27,8 @@
       "types": "./dist/index.d.mts",
       "import": "./dist/index.mjs",
       "default": "./dist/index.mjs"
-    }
+    },
+    "./cli": "./dist/cli.mjs"
   },
   "files": [
     "dist"

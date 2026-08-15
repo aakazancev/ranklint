@@ -1,5 +1,15 @@
 # @ranklint/nuxt
 
+## 0.1.1
+
+### Patch Changes
+
+- Per-package READMEs, npm metadata (description, keywords, repository), the bare `ranklint` alias package for @ranklint/cli.
+- Updated dependencies
+  - @ranklint/core@0.1.1
+  - @ranklint/checks@0.1.1
+  - @ranklint/devtools@0.1.1
+
 ## 0.1.0
 
 ### Minor Changes

@@ -1,7 +1,23 @@
 {
   "name": "@ranklint/nuxt",
-  "version": "0.1.0",
+  "version": "0.1.1",
+  "description": "Nuxt 4 SEO module: sitemap.xml, robots.txt, typed JSON-LD and a live SEO panel in Nuxt DevTools.",
+  "keywords": [
+    "nuxt",
+    "nuxt-module",
+    "seo",
+    "sitemap",
+    "robots",
+    "json-ld"
+  ],
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aakazancev/ranklint.git",
+    "directory": "packages/nuxt"
+  },
+  "homepage": "https://aakazancev.github.io/ranklint/",
+  "bugs": "https://github.com/aakazancev/ranklint/issues",
   "type": "module",
   "engines": {
     "node": ">=20"

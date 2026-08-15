@@ -177,6 +177,12 @@ importers:
         specifier: ^3.6.1
         version: 3.6.1(typescript@6.0.3)(vue-sfc-transformer@0.1.17(@vue/compiler-core@3.5.39)(esbuild@0.28.1)(vue@3.5.39(typescript@6.0.3)))(vue@3.5.39(typescript@6.0.3))
 
+  packages/ranklint:
+    dependencies:
+      '@ranklint/cli':
+        specifier: workspace:*
+        version: link:../cli
+
   packages/reporters:
     dependencies:
       '@ranklint/core':
