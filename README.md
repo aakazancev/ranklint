@@ -2,21 +2,21 @@
 
 > Lint your SEO before Google does.
 
-SEO-toolkit для Nuxt 4: генерация sitemap/robots/JSON-LD из коробки, SEO-линтер в dev через DevTools и регрессионный контроль в CI.
+SEO toolkit for Nuxt 4: sitemap/robots/JSON-LD generation out of the box, an SEO linter in dev via DevTools, and regression control in CI.
 
-- **Runtime** — модуль сам отдаёт `sitemap.xml`, `robots.txt`, типизированный JSON-LD
-- **Dev** — таб «SEO» в Nuxt DevTools: outline заголовков, meta, JSON-LD с валидацией, аудит страницы
-- **CI** — CLI краулит задеплоенный сайт и падает по порогам; junit/markdown/json отчёты
+- **Runtime** — the module serves `sitemap.xml`, `robots.txt`, and typed JSON-LD by itself
+- **Dev** — an "SEO" tab in Nuxt DevTools: heading outline, meta, JSON-LD with validation, page audit
+- **CI** — the CLI crawls a deployed site and fails on thresholds; junit/markdown/json reports
 
-## Быстрый старт
+## Quick start
 
-### Модуль
+### Module
 
 ```bash
 npx nuxi module add @ranklint/nuxt
 ```
 
-Работает без конфигурации: `/sitemap.xml` (статические роуты из `app/pages/`) и `/robots.txt` (не-prod окружения закрыты от индексации) доступны сразу.
+Works with zero configuration: `/sitemap.xml` (static routes from `app/pages/`) and `/robots.txt` (non-prod environments are closed to indexing) are available right away.
 
 ```ts
 // nuxt.config.ts
@@ -37,9 +37,9 @@ export default defineNuxtConfig({
 })
 ```
 
-Каждый блок отключается через `false` — выключенный код не регистрируется вообще.
+Every block can be disabled with `false` — disabled code is not registered at all.
 
-Источник-функция сериализуется в серверный бандл через `toString()`, поэтому должна быть самодостаточной: Nitro-глобалы (`$fetch`) доступны, а замыкания на переменные и импорты из `nuxt.config` — нет.
+A function source is serialized into the server bundle via `toString()`, so it must be self-contained: Nitro globals (`$fetch`) are available, but closures over variables and imports from `nuxt.config` are not.
 
 ```vue
 <script setup>
@@ -52,7 +52,7 @@ useRanklintIgnore(['headings:single-h1'])
 </script>
 ```
 
-В dev JSON-LD валидируется против Schema.org-схем (Product, Article, BreadcrumbList, Organization, WebSite) с предупреждениями в консоли; в prod валидатор полностью вырезается из бандла. Клиентский рантайм модуля — меньше 1 KB gzip.
+In dev, JSON-LD is validated against Schema.org schemas (Product, Article, BreadcrumbList, Organization, WebSite) with console warnings; in prod the validator is completely tree-shaken out of the bundle. The module's client runtime is under 1 KB gzip.
 
 ### CLI
 
@@ -60,13 +60,13 @@ useRanklintIgnore(['headings:single-h1'])
 npm i -D @ranklint/cli
 npx playwright install chromium
 
-ranklint audit --url https://uat.example.com          # аудит живого сайта
-ranklint audit --start .output/server/index.mjs        # или self-contained из сборки
+ranklint audit --url https://uat.example.com          # audit a live site
+ranklint audit --start .output/server/index.mjs        # or self-contained from a build
 ```
 
-Exit code 1, если найдены ошибки. Reporters: `markdown` (default), `json`, `junit` (`--reporter`, `--output`).
+Exit code 1 when errors are found. Reporters: `markdown` (default), `json`, `junit` (`--reporter`, `--output`).
 
-Правила настраиваются в `seo.config.ts` с семантикой ESLint:
+Rules are configured in `seo.config.ts` with ESLint semantics:
 
 ```ts
 import { defineRanklintConfig } from '@ranklint/core'
@@ -94,19 +94,19 @@ seo:audit:
     RANKLINT_URL: $CI_ENVIRONMENT_URL
 ```
 
-`ranklint diff --base main` резолвит базовый отчёт из артефактов CI: в GitLab — по job-артефакту ветки, в GitHub Actions — по артефакту `ranklint-report` (распаковка zip встроена). Base не найден — не ошибка: diff деградирует в полный отчёт.
+`ranklint diff --base main` resolves the base report from CI artifacts: in GitLab — from the branch's job artifact, in GitHub Actions — from the `ranklint-report` artifact (zip extraction is built in). A missing base is not an error: diff degrades to a full report.
 
-## Правила
+## Rules
 
-42 правила в категориях meta, headings, canonical, links, i18n, structured-data, images, robots, indexability, http — полный справочник в [docs/rules.md](docs/rules.md).
+42 rules across the meta, headings, canonical, links, i18n, structured-data, images, robots, indexability, and http categories — see the full reference in [docs/rules.md](docs/rules.md).
 
-Любое правило: `'error' | 'warn' | 'off'` или `[severity, options]`. Инлайн-отключение на странице — `useRanklintIgnore([...])`.
+Every rule accepts `'error' | 'warn' | 'off'` or `[severity, options]`. Inline suppression on a page — `useRanklintIgnore([...])`.
 
-Для `seo.config.json`/`.jsonc` есть JSON-схема с автодополнением — [schemas/seo-config.schema.json](schemas/seo-config.schema.json). В TS-конфиге то же даёт `defineRanklintConfig`.
+For `seo.config.json`/`.jsonc` there is a JSON schema with autocompletion — [schemas/seo-config.schema.json](schemas/seo-config.schema.json). In a TS config, `defineRanklintConfig` provides the same.
 
-Дополнительно: SEO Diff между ветками (`ranklint diff`), multi-app зоны, Lighthouse-пороги per-route, watch mode, прод-мониторинг с алертами (slack/telegram), CrUX и Search Console данные, crawl-budget анализ, кастомные правила.
+Also included: SEO diff between branches (`ranklint diff`), multi-app zones, per-route Lighthouse thresholds, watch mode, production monitoring with alerts (slack/telegram), CrUX and Search Console data, crawl-budget analysis, and custom rules.
 
-## Кастомные правила
+## Custom rules
 
 ```ts
 // seo.config.ts
@@ -141,9 +141,9 @@ export default defineRanklintConfig({
 })
 ```
 
-Кастомные правила равноправны со встроенными: настраиваются через `rules`, отключаются `'off'` и `useRanklintIgnore`. Контракт `CheckContext` стабилен в рамках мажорной версии.
+Custom rules are first-class alongside built-ins: configured via `rules`, disabled with `'off'` and `useRanklintIgnore`. The `CheckContext` contract is stable within a major version.
 
-Пресеты подключаются через `extends` (нативно c12): `@ranklint/preset-default` фиксирует все встроенные правила на дефолтных severity. Ранние слои приоритетнее поздних, сам `seo.config` переопределяет все слои:
+Presets are plugged in via `extends` (native c12): `@ranklint/preset-default` pins all built-in rules at their default severities. Earlier layers take precedence over later ones, and `seo.config` itself overrides all layers:
 
 ```ts
 export default defineRanklintConfig({
@@ -153,16 +153,16 @@ export default defineRanklintConfig({
 })
 ```
 
-## Пакеты
+## Packages
 
-| Пакет | Назначение |
+| Package | Purpose |
 | --- | --- |
-| `@ranklint/nuxt` | Nuxt 4 модуль: sitemap, robots, useJsonLd, DevTools-таб |
-| `@ranklint/cli` | `ranklint audit` — краулер (Playwright) + чеки + отчёты |
-| `@ranklint/core` | Движок: crawler, runner, config (без Nuxt-зависимостей) |
-| `@ranklint/checks` | Правила + Schema.org-схемы |
+| `@ranklint/nuxt` | Nuxt 4 module: sitemap, robots, useJsonLd, DevTools tab |
+| `@ranklint/cli` | `ranklint audit` — crawler (Playwright) + checks + reports |
+| `@ranklint/core` | Engine: crawler, runner, config (no Nuxt dependencies) |
+| `@ranklint/checks` | Rules + Schema.org schemas |
 | `@ranklint/reporters` | markdown / junit / json |
-| `@ranklint/devtools` | Vue-панель для Nuxt DevTools: live-чеки текущей страницы |
-| `@ranklint/preset-default` | Пресет со встроенными правилами для `extends` |
+| `@ranklint/devtools` | Vue panel for Nuxt DevTools: live checks of the current page |
+| `@ranklint/preset-default` | Preset with the built-in rules for `extends` |
 
-Требования: Nuxt `^4.0.0`, Node.js `>= 20`. Лицензия MIT.
+Requirements: Nuxt `^4.0.0`, Node.js `>= 20`. MIT license.

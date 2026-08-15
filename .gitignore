@@ -8,3 +8,8 @@ coverage
 .DS_Store
 .idea
 docs/superpowers
+PLAN_RANKLINT.md
+.playwright-mcp
+.claude
+CLAUDE.md
+AGENT.md
