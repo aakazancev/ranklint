@@ -1,5 +1,16 @@
 # @ranklint/checks
 
+## 0.2.0
+
+### Minor Changes
+
+- 3f6cd50: Config file renamed to `ranklint.config.{ts,js,mjs,json,jsonc}`. The old `seo.config.*` name still works as a deprecated fallback and will be removed in a future release. The JSON schema moved to `schemas/ranklint-config.schema.json`.
+
+### Patch Changes
+
+- Updated dependencies [3f6cd50]
+  - @ranklint/core@0.2.0
+
 ## 0.1.1
 
 ### Patch Changes
