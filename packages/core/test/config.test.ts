@@ -6,7 +6,7 @@ import { configSchema, loadRanklintConfig, resolveRules, type RuleRegistryEntry 
 const cwd = fileURLToPath(new URL('./fixtures/config', import.meta.url))
 
 describe('loadRanklintConfig', () => {
-  it('loads seo.config.ts', async () => {
+  it('loads ranklint.config.ts', async () => {
     const config = await loadRanklintConfig({ cwd })
     expect(config.site.url).toBe('https://car-market.com')
     expect(config.crawl?.concurrency).toBe(5)
@@ -68,5 +68,13 @@ describe('crawl.insecureTls', () => {
   it('accepts the flag', () => {
     const parsed = configSchema.safeParse({ site: { url: 'https://x.com' }, crawl: { insecureTls: true } })
     expect(parsed.success).toBe(true)
+  })
+})
+
+describe('legacy config name', () => {
+  it('falls back to seo.config.* with a deprecation warning', async () => {
+    const legacyCwd = fileURLToPath(new URL('./fixtures/config-legacy', import.meta.url))
+    const config = await loadRanklintConfig({ cwd: legacyCwd })
+    expect(config.site.url).toBeTruthy()
   })
 })

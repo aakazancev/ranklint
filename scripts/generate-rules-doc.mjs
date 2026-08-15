@@ -4,7 +4,7 @@ import { allChecks } from '../packages/checks/dist/index.mjs'
 const lines = [
   '# Ranklint rules reference',
   '',
-  `Generated from the check registry — ${allChecks.length} rules. Every rule accepts \`'error' | 'warn' | 'off'\` or \`[severity, options]\` in \`seo.config.ts\`, and can be suppressed per page with \`useRanklintIgnore()\`.`,
+  `Generated from the check registry — ${allChecks.length} rules. Every rule accepts \`'error' | 'warn' | 'off'\` or \`[severity, options]\` in \`ranklint.config.ts\`, and can be suppressed per page with \`useRanklintIgnore()\`.`,
   '',
   '| Rule | Category | Scope | Default | Docs |',
   '| --- | --- | --- | --- | --- |',

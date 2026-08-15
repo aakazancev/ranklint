@@ -13,11 +13,11 @@ export const audit = defineCommand({
   args: {
     url: { type: 'string', description: 'URL of a running site to audit' },
     start: { type: 'string', description: 'Path to a built server entry (.output/server/index.mjs) to launch and audit' },
-    profile: { type: 'string', description: 'Profile from seo.config to apply' },
+    profile: { type: 'string', description: 'Profile from ranklint.config to apply' },
     reporter: { type: 'string', default: 'markdown', description: 'Output format: markdown | json | junit' },
     output: { type: 'string', description: 'Write the report to a file instead of stdout' },
     jsonOutput: { type: 'string', description: 'Additionally write the raw json report to a file (input for ranklint diff)' },
-    cwd: { type: 'string', description: 'Directory to look up seo.config in' },
+    cwd: { type: 'string', description: 'Directory to look up ranklint.config in' },
     mode: { type: 'string', description: 'Set to "monitor" for scheduled prod runs: exit 0, diff against last stored report, alert on new issues only' },
   },
   async run({ args }) {

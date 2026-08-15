@@ -85,9 +85,16 @@ export function defineRanklintConfig(config: RanklintUserConfig): RanklintUserCo
 export async function loadRanklintConfig(
   opts: { cwd?: string, profile?: string } = {},
 ): Promise<RanklintUserConfig> {
-  const { config } = await loadConfig<RanklintUserConfig>({ name: 'seo', cwd: opts.cwd })
+  let { config } = await loadConfig<RanklintUserConfig>({ name: 'ranklint', cwd: opts.cwd })
   if (!config || Object.keys(config).length === 0) {
-    throw new Error('seo.config.{ts,js,mjs} not found')
+    const legacy = await loadConfig<RanklintUserConfig>({ name: 'seo', cwd: opts.cwd })
+    if (legacy.config && Object.keys(legacy.config).length > 0) {
+      console.warn('[ranklint] seo.config.* is deprecated — rename it to ranklint.config.*')
+      config = legacy.config
+    }
+  }
+  if (!config || Object.keys(config).length === 0) {
+    throw new Error('ranklint.config.{ts,js,mjs} not found')
   }
   let merged: unknown = config
   if (opts.profile) {
@@ -98,7 +105,7 @@ export async function loadRanklintConfig(
   const parsed = configSchema.safeParse(merged)
   if (!parsed.success) {
     const details = parsed.error.issues.map(i => `${i.path.join('.')}: ${i.message}`).join('; ')
-    throw new Error(`Invalid seo.config: ${details}`)
+    throw new Error(`Invalid ranklint.config: ${details}`)
   }
   return parsed.data
 }

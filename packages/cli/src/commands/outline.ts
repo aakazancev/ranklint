@@ -12,7 +12,7 @@ export const outline = defineCommand({
   args: {
     url: { type: 'string', required: true, description: 'URL to crawl' },
     output: { type: 'string', description: 'Write to a file instead of stdout' },
-    cwd: { type: 'string', description: 'Directory to look up seo.config in' },
+    cwd: { type: 'string', description: 'Directory to look up ranklint.config in' },
   },
   async run({ args }) {
     let config: RanklintUserConfig

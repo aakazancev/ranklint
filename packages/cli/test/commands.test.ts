@@ -30,9 +30,9 @@ afterEach(() => {
 })
 
 describe('generate robots-fragment', () => {
-  it('writes a fragment built from seo.config', async () => {
+  it('writes a fragment built from ranklint.config', async () => {
     const dir = await mkdtemp(join(tmpdir(), 'ranklint-cmd-'))
-    await writeFile(join(dir, 'seo.config.mjs'), `export default {
+    await writeFile(join(dir, 'ranklint.config.mjs'), `export default {
       site: { url: 'https://shop.example.com' },
       apps: { self: { paths: ['/shop/**'] } },
       robots: { expect: { disallow: ['/shop/cart*'], sitemaps: ['https://shop.example.com/sitemap.xml'] } },

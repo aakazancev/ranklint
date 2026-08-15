@@ -55,7 +55,7 @@ describe.skipIf(!existsSync(clientBundle))('devtools panel e2e', () => {
     if (server?.pid) process.kill(-server.pid, 'SIGTERM')
   })
 
-  it('serves the zones endpoint (null without seo.config)', async () => {
+  it('serves the zones endpoint (null without ranklint.config)', async () => {
     const res = await fetch(`${BASE}/__ranklint/devtools-zones`)
     expect(res.ok).toBe(true)
     expect(await res.json()).toEqual({ apps: null })

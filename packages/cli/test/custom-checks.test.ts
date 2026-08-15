@@ -15,7 +15,7 @@ function fetcherFor(html: string): PageFetcher {
 
 const loremPage = '<html><body><h1>Nice heading long enough for checks</h1><p>Lorem ipsum dolor sit amet.</p></body></html>'
 
-describe('custom checks from seo.config', () => {
+describe('custom checks from ranklint.config', () => {
   it('runs user checks alongside built-ins with severity from rules', async () => {
     const report = await runAudit({
       url: 'https://custom.test/',

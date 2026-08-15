@@ -1,6 +1,6 @@
 # Ranklint rules reference
 
-Generated from the check registry — 42 rules. Every rule accepts `'error' | 'warn' | 'off'` or `[severity, options]` in `seo.config.ts`, and can be suppressed per page with `useRanklintIgnore()`.
+Generated from the check registry — 42 rules. Every rule accepts `'error' | 'warn' | 'off'` or `[severity, options]` in `ranklint.config.ts`, and can be suppressed per page with `useRanklintIgnore()`.
 
 | Rule | Category | Scope | Default | Docs |
 | --- | --- | --- | --- | --- |

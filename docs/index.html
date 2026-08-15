@@ -199,7 +199,7 @@
   <a href="#module">Nuxt module</a>
   <a href="#composables">Composables</a>
   <a href="#devtools">DevTools tab</a>
-  <a href="#config">seo.config — every field</a>
+  <a href="#config">ranklint.config — every field</a>
   <a href="#rules">The 42 rules</a>
   <a href="#heuristics">Smart heuristics</a>
   <a href="#cli">CLI — all commands</a>
@@ -279,15 +279,15 @@ export default defineNuxtConfig({
 <p>An iframe Vue app, self-contained ~166 KB bundle (Vue runtime, level-1 checks and zod are inlined). Works <strong>live</strong>: re-checks on navigation and DOM mutations (MutationObserver, 400 ms debounce / 2 s max-wait). The DevTools panel's own DOM is stripped before analysis.</p>
 <ul>
   <li><strong>Issues</strong> — 17 page-scope Level 1 rules (no network, no ssrHtml); clicking an issue scrolls to the element with a 1.6 s highlight.</li>
-  <li><strong>Links</strong> — on-demand check: same-origin links are deduplicated, HEAD with a pool of 5 workers (405 → GET retry), broken ones listed. <strong>Zone-aware</strong>: the panel pulls zones from <code>seo.config.ts</code> via the dev endpoint <code>/__ranklint/devtools-zones</code> — links into foreign zones go into a yellow group with a <code>zone: name</code> badge instead of red "broken".</li>
+  <li><strong>Links</strong> — on-demand check: same-origin links are deduplicated, HEAD with a pool of 5 workers (405 → GET retry), broken ones listed. <strong>Zone-aware</strong>: the panel pulls zones from <code>ranklint.config.ts</code> via the dev endpoint <code>/__ranklint/devtools-zones</code> — links into foreign zones go into a yellow group with a <code>zone: name</code> badge instead of red "broken".</li>
   <li><strong>Outline</strong> — the h1–h6 tree with problems, click scrolls.</li>
   <li><strong>Meta</strong> — a table of all meta on the current page.</li>
   <li><strong>JSON-LD</strong> — blocks with schema validation; invalid ones show path and message.</li>
 </ul>
 <p>What the panel does not do (use the CLI): site-scope rules (duplicates, orphans, sitemap, robots), <code>indexability:ssr-content</code>, redirect chains, TTFB, Lighthouse. The tab only works with a built <code>@ranklint/devtools</code> — otherwise the module warns and skips registration.</p>
 
-<h2 id="config">seo.config — every field</h2>
-<p>The file <code>seo.config.{ts,js,mjs,json,jsonc}</code> is loaded by c12. TS gets autocompletion via <code>defineRanklintConfig</code>; JSON gets a <a href="https://github.com/aakazancev/ranklint/blob/main/schemas/seo-config.schema.json">JSON schema</a>. The whole config is Zod-validated at startup: an unknown rule id is an error with did-you-mean (Levenshtein ≤ 3).</p>
+<h2 id="config">ranklint.config — every field</h2>
+<p>The file <code>ranklint.config.{ts,js,mjs,json,jsonc}</code> is loaded by c12. TS gets autocompletion via <code>defineRanklintConfig</code>; JSON gets a <a href="https://github.com/aakazancev/ranklint/blob/main/schemas/ranklint-config.schema.json">JSON schema</a>. The whole config is Zod-validated at startup: an unknown rule id is an error with did-you-mean (Levenshtein ≤ 3).</p>
 <pre><code>import { defineRanklintConfig } from '@ranklint/core'
 
 export default defineRanklintConfig({
@@ -461,14 +461,14 @@ export default defineRanklintConfig({
 <tr><th>Flag</th><th>Description</th></tr>
 <tr><td><code>--url</code></td><td>address of a live site</td></tr>
 <tr><td><code>--start</code></td><td>path to <code>.output/server/index.mjs</code> — starts Nitro itself and stops it after</td></tr>
-<tr><td><code>--profile</code></td><td>profile from seo.config</td></tr>
+<tr><td><code>--profile</code></td><td>profile from ranklint.config</td></tr>
 <tr><td><code>--reporter</code></td><td>markdown (default) | json | junit | gitlab | html | github</td></tr>
 <tr><td><code>--output</code></td><td>report to a file instead of stdout</td></tr>
 <tr><td><code>--json-output</code></td><td>additionally the raw json (input for diff)</td></tr>
-<tr><td><code>--cwd</code></td><td>where to look for seo.config</td></tr>
+<tr><td><code>--cwd</code></td><td>where to look for ranklint.config</td></tr>
 <tr><td><code>--mode monitor</code></td><td>monitoring mode (below)</td></tr>
 </table></div>
-<p>Exit code 1 on error issues. Without a seo.config it runs with a minimal config from the URL origin. Flow: config → custom checks → seeds (with <code>strategy: 'sitemap+sample'</code> — a sitemap sample: group by route pattern, up to 5 random URLs per group) → BFS crawl → checks → crawl-budget analysis (parametric URL groups: how many, how many with canonical/noindex — shows where crawl budget leaks) → Lighthouse → report.</p>
+<p>Exit code 1 on error issues. Without a ranklint.config it runs with a minimal config from the URL origin. Flow: config → custom checks → seeds (with <code>strategy: 'sitemap+sample'</code> — a sitemap sample: group by route pattern, up to 5 random URLs per group) → BFS crawl → checks → crawl-budget analysis (parametric URL groups: how many, how many with canonical/noindex — shows where crawl budget leaks) → Lighthouse → report.</p>
 
 <h3>ranklint diff</h3>
 <div class="tbl"><table>
@@ -569,7 +569,7 @@ customChecks: [
 </ul>
 
 <hr>
-<p class="meta">Repository: github.com/aakazancev/ranklint · the rules reference is generated from the registry (docs/rules.md) · config JSON schema: schemas/seo-config.schema.json</p>
+<p class="meta">Repository: github.com/aakazancev/ranklint · the rules reference is generated from the registry (docs/rules.md) · config JSON schema: schemas/ranklint-config.schema.json</p>
 
 </main>
 </div>
@@ -591,7 +591,7 @@ customChecks: [
   <a href="#ru-module">Nuxt-модуль</a>
   <a href="#ru-composables">Композаблы</a>
   <a href="#ru-devtools">DevTools-таб</a>
-  <a href="#ru-config">seo.config — все поля</a>
+  <a href="#ru-config">ranklint.config — все поля</a>
   <a href="#ru-rules">42 правила</a>
   <a href="#ru-heuristics">Умные эвристики</a>
   <a href="#ru-cli">CLI — все команды</a>
@@ -671,15 +671,15 @@ export default defineNuxtConfig({
 <p>iframe-Vue-приложение, самодостаточный бандл ~166 KB (Vue-runtime, level1-чеки и zod заинлайнены). Работает <strong>live</strong>: пересчёт при навигации и мутациях DOM (MutationObserver, debounce 400мс / max-wait 2с). DOM панели самого DevTools вырезается перед анализом.</p>
 <ul>
   <li><strong>Issues</strong> — 17 page-scope правил уровня Level 1 (без сети и ssrHtml), клик по проблеме скроллит к элементу с подсветкой на 1.6с.</li>
-  <li><strong>Links</strong> — проверка по кнопке: same-origin ссылки дедупятся, HEAD пулом в 5 воркеров (405 → повтор GET), битые — списком. <strong>Zone-aware</strong>: панель забирает зоны из <code>seo.config.ts</code> через dev-эндпоинт <code>/__ranklint/devtools-zones</code> — ссылки в чужие зоны идут жёлтой группой с бейджем <code>zone: name</code>, а не красным «broken».</li>
+  <li><strong>Links</strong> — проверка по кнопке: same-origin ссылки дедупятся, HEAD пулом в 5 воркеров (405 → повтор GET), битые — списком. <strong>Zone-aware</strong>: панель забирает зоны из <code>ranklint.config.ts</code> через dev-эндпоинт <code>/__ranklint/devtools-zones</code> — ссылки в чужие зоны идут жёлтой группой с бейджем <code>zone: name</code>, а не красным «broken».</li>
   <li><strong>Outline</strong> — дерево h1–h6 с проблемами, клик скроллит.</li>
   <li><strong>Meta</strong> — таблица всех meta текущей страницы.</li>
   <li><strong>JSON-LD</strong> — блоки с валидацией по схемам, invalid — с путём и сообщением.</li>
 </ul>
 <p>Чего в панели нет (нужен CLI): site-scope правила (дубли, orphans, sitemap, robots), <code>indexability:ssr-content</code>, redirect-цепочки, TTFB, Lighthouse. Таб работает только с собранным <code>@ranklint/devtools</code> — иначе модуль предупредит и не зарегистрирует его.</p>
 
-<h2 id="ru-config">seo.config — все поля</h2>
-<p>Файл <code>seo.config.{ts,js,mjs,json,jsonc}</code>, грузится c12. Для TS — автодополнение через <code>defineRanklintConfig</code>, для JSON — <a href="https://github.com/aakazancev/ranklint/blob/main/schemas/seo-config.schema.json">JSON-схема</a>. Весь конфиг валидируется Zod на старте: неизвестное правило — ошибка с did-you-mean (Левенштейн ≤ 3).</p>
+<h2 id="ru-config">ranklint.config — все поля</h2>
+<p>Файл <code>ranklint.config.{ts,js,mjs,json,jsonc}</code>, грузится c12. Для TS — автодополнение через <code>defineRanklintConfig</code>, для JSON — <a href="https://github.com/aakazancev/ranklint/blob/main/schemas/ranklint-config.schema.json">JSON-схема</a>. Весь конфиг валидируется Zod на старте: неизвестное правило — ошибка с did-you-mean (Левенштейн ≤ 3).</p>
 <pre><code>import { defineRanklintConfig } from '@ranklint/core'
 
 export default defineRanklintConfig({
@@ -853,14 +853,14 @@ export default defineRanklintConfig({
 <tr><th>Флаг</th><th>Описание</th></tr>
 <tr><td><code>--url</code></td><td>адрес живого сайта</td></tr>
 <tr><td><code>--start</code></td><td>путь к <code>.output/server/index.mjs</code> — сам поднимет Nitro и погасит после</td></tr>
-<tr><td><code>--profile</code></td><td>профиль из seo.config</td></tr>
+<tr><td><code>--profile</code></td><td>профиль из ranklint.config</td></tr>
 <tr><td><code>--reporter</code></td><td>markdown (default) | json | junit | gitlab | html | github</td></tr>
 <tr><td><code>--output</code></td><td>отчёт в файл вместо stdout</td></tr>
 <tr><td><code>--json-output</code></td><td>дополнительно сырой json (вход для diff)</td></tr>
-<tr><td><code>--cwd</code></td><td>где искать seo.config</td></tr>
+<tr><td><code>--cwd</code></td><td>где искать ranklint.config</td></tr>
 <tr><td><code>--mode monitor</code></td><td>режим мониторинга (см. ниже)</td></tr>
 </table></div>
-<p>Exit code 1 при error-issues. Без seo.config работает с минимальным конфигом из origin URL. Флоу: конфиг → кастомные чеки → seeds (при <code>strategy: 'sitemap+sample'</code> — выборка из sitemap: группировка по route-pattern, до 5 случайных URL из группы) → BFS-краул → чеки → crawl-budget анализ (группы параметрических URL: сколько, у скольких canonical/noindex — видно, куда утекает краул-бюджет) → Lighthouse → отчёт.</p>
+<p>Exit code 1 при error-issues. Без ranklint.config работает с минимальным конфигом из origin URL. Флоу: конфиг → кастомные чеки → seeds (при <code>strategy: 'sitemap+sample'</code> — выборка из sitemap: группировка по route-pattern, до 5 случайных URL из группы) → BFS-краул → чеки → crawl-budget анализ (группы параметрических URL: сколько, у скольких canonical/noindex — видно, куда утекает краул-бюджет) → Lighthouse → отчёт.</p>
 
 <h3>ranklint diff</h3>
 <div class="tbl"><table>
@@ -961,7 +961,7 @@ customChecks: [
 </ul>
 
 <hr>
-<p class="meta">Репозиторий: github.com/aakazancev/ranklint · справочник правил генерируется из реестра (docs/rules.md) · JSON-схема конфига: schemas/seo-config.schema.json</p>
+<p class="meta">Репозиторий: github.com/aakazancev/ranklint · справочник правил генерируется из реестра (docs/rules.md) · JSON-схема конфига: schemas/ranklint-config.schema.json</p>
 
 </main>
 </div>

@@ -36,7 +36,7 @@ describe('runAudit', () => {
     expect(ids).toContain('canonical:required')
   })
 
-  it('falls back to url origin when seo.config is absent', async () => {
+  it('falls back to url origin when ranklint.config is absent', async () => {
     const fetcher = fakeFetcher({ '/': '<html></html>' })
     const report = await runAudit({ url: 'https://site.test/', cwd: '/tmp', fetcher })
     expect(report.meta.url).toBe('https://site.test')

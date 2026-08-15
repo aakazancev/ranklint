@@ -8,8 +8,8 @@ export const history = defineCommand({
     description: 'Show the trend of stored monitor reports (fs storage)',
   },
   args: {
-    cwd: { type: 'string', description: 'Directory to look up seo.config in' },
-    dir: { type: 'string', description: 'Reports directory (default: monitor.dir from seo.config)' },
+    cwd: { type: 'string', description: 'Directory to look up ranklint.config in' },
+    dir: { type: 'string', description: 'Reports directory (default: monitor.dir from ranklint.config)' },
     limit: { type: 'string', default: '20', description: 'Show at most N latest reports' },
     csv: { type: 'boolean', default: false, description: 'Output CSV instead of a table' },
   },

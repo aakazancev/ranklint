@@ -8,12 +8,12 @@ import { realLighthouseRunner } from '../real-lighthouse'
 export const lighthouse = defineCommand({
   meta: {
     name: 'lighthouse',
-    description: 'Run Lighthouse against a URL with aggregation and per-route thresholds from seo.config',
+    description: 'Run Lighthouse against a URL with aggregation and per-route thresholds from ranklint.config',
   },
   args: {
     url: { type: 'string', required: true, description: 'URL to measure' },
-    runs: { type: 'string', description: 'Number of runs (default 5 or seo.config value)' },
-    cwd: { type: 'string', description: 'Directory to look up seo.config in' },
+    runs: { type: 'string', description: 'Number of runs (default 5 or ranklint.config value)' },
+    cwd: { type: 'string', description: 'Directory to look up ranklint.config in' },
     output: { type: 'string', description: 'Write the json result to a file instead of stdout' },
   },
   async run({ args }) {

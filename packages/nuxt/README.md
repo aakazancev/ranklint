@@ -66,7 +66,7 @@ ranklint audit --start .output/server/index.mjs        # or self-contained from 
 
 Exit code 1 when errors are found. Reporters: `markdown` (default), `json`, `junit` (`--reporter`, `--output`).
 
-Rules are configured in `seo.config.ts` with ESLint semantics:
+Rules are configured in `ranklint.config.ts` with ESLint semantics:
 
 ```ts
 import { defineRanklintConfig } from '@ranklint/core'
@@ -102,14 +102,14 @@ seo:audit:
 
 Every rule accepts `'error' | 'warn' | 'off'` or `[severity, options]`. Inline suppression on a page — `useRanklintIgnore([...])`.
 
-For `seo.config.json`/`.jsonc` there is a JSON schema with autocompletion — [schemas/seo-config.schema.json](schemas/seo-config.schema.json). In a TS config, `defineRanklintConfig` provides the same.
+For `ranklint.config.json`/`.jsonc` there is a JSON schema with autocompletion — [schemas/ranklint-config.schema.json](schemas/ranklint-config.schema.json). In a TS config, `defineRanklintConfig` provides the same.
 
 Also included: SEO diff between branches (`ranklint diff`), multi-app zones, per-route Lighthouse thresholds, watch mode, production monitoring with alerts (slack/telegram), CrUX and Search Console data, crawl-budget analysis, and custom rules.
 
 ## Custom rules
 
 ```ts
-// seo.config.ts
+// ranklint.config.ts
 import { defineCheck } from '@ranklint/checks'
 import { defineRanklintConfig } from '@ranklint/core'
 
@@ -143,7 +143,7 @@ export default defineRanklintConfig({
 
 Custom rules are first-class alongside built-ins: configured via `rules`, disabled with `'off'` and `useRanklintIgnore`. The `CheckContext` contract is stable within a major version.
 
-Presets are plugged in via `extends` (native c12): `@ranklint/preset-default` pins all built-in rules at their default severities. Earlier layers take precedence over later ones, and `seo.config` itself overrides all layers:
+Presets are plugged in via `extends` (native c12): `@ranklint/preset-default` pins all built-in rules at their default severities. Earlier layers take precedence over later ones, and `ranklint.config` itself overrides all layers:
 
 ```ts
 export default defineRanklintConfig({

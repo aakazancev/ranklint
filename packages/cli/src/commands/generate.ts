@@ -9,7 +9,7 @@ const robotsFragment = defineCommand({
     description: 'Print a robots.txt fragment for the team owning the root robots.txt',
   },
   args: {
-    cwd: { type: 'string', description: 'Directory to look up seo.config in' },
+    cwd: { type: 'string', description: 'Directory to look up ranklint.config in' },
     output: { type: 'string', description: 'Write the fragment to a file instead of stdout' },
   },
   async run({ args }) {
@@ -23,7 +23,7 @@ const robotsFragment = defineCommand({
 export const generate = defineCommand({
   meta: {
     name: 'generate',
-    description: 'Generate artifacts from seo.config',
+    description: 'Generate artifacts from ranklint.config',
   },
   subCommands: {
     'robots-fragment': robotsFragment,
