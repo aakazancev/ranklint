@@ -1,0 +1,1005 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Complete reference for ranklint — the SEO toolkit for Nuxt 4">
+<title>Ranklint Reference</title>
+</head>
+<body>
+<style>
+  :root {
+    --bg: #fbfdfc;
+    --bg-raise: #f1f6f3;
+    --ink: #17211c;
+    --ink-soft: #4e5f57;
+    --ink-faint: #7d8c85;
+    --accent: #00885a;
+    --accent-bright: #00b877;
+    --line: #dbe5df;
+    --code-bg: #edf3ef;
+    --err: #d13438;
+    --warn: #b57400;
+    --info: #5c7080;
+    --badge-err-bg: #d1343818;
+    --badge-warn-bg: #b5740018;
+    --badge-ok-bg: #00885a18;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0e1411;
+      --bg-raise: #16201b;
+      --ink: #d9e5df;
+      --ink-soft: #93a69d;
+      --ink-faint: #66786f;
+      --accent: #00dc82;
+      --accent-bright: #34e8a0;
+      --line: #24322b;
+      --code-bg: #131d17;
+      --err: #ff6b6e;
+      --warn: #ffb224;
+      --info: #8fa8b8;
+      --badge-err-bg: #ff6b6e1c;
+      --badge-warn-bg: #ffb2241c;
+      --badge-ok-bg: #00dc821c;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0e1411;
+    --bg-raise: #16201b;
+    --ink: #d9e5df;
+    --ink-soft: #93a69d;
+    --ink-faint: #66786f;
+    --accent: #00dc82;
+    --accent-bright: #34e8a0;
+    --line: #24322b;
+    --code-bg: #131d17;
+    --err: #ff6b6e;
+    --warn: #ffb224;
+    --info: #8fa8b8;
+    --badge-err-bg: #ff6b6e1c;
+    --badge-warn-bg: #ffb2241c;
+    --badge-ok-bg: #00dc821c;
+  }
+
+  * { box-sizing: border-box; }
+  @media (prefers-reduced-motion: no-preference) {
+    html { scroll-behavior: smooth; }
+  }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font: 15px/1.65 -apple-system, "Segoe UI", system-ui, sans-serif;
+    margin: 0;
+  }
+  .wrap { display: flex; max-width: 1200px; margin: 0 auto; }
+
+  nav {
+    width: 230px; flex: none;
+    position: sticky; top: 0; align-self: flex-start;
+    max-height: 100vh; overflow-y: auto;
+    padding: 28px 8px 40px 20px;
+    font-size: 13px;
+  }
+  nav a { display: block; color: var(--ink-soft); text-decoration: none; padding: 3px 10px; border-left: 2px solid var(--line); }
+  nav a:hover { color: var(--accent); border-left-color: var(--accent); }
+  nav a.active { color: var(--accent); border-left-color: var(--accent); font-weight: 600; }
+  nav a:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  nav .nv-top { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 15px; font-weight: 700; color: var(--ink); border: none; padding: 0 10px 10px; }
+  nav .nv-top em { color: var(--accent); font-style: normal; }
+
+  main { flex: 1; min-width: 0; padding: 28px 24px 90px 32px; }
+  @media (max-width: 860px) {
+    .wrap { display: block; }
+    nav { position: static; width: auto; max-height: none; padding: 20px 16px 0; }
+    main { padding: 16px 16px 60px; }
+  }
+
+  h1, h2, h3 { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; line-height: 1.25; text-wrap: balance; }
+  h1 { font-size: 27px; margin: 6px 0 4px; }
+  h1 em { color: var(--accent); font-style: normal; }
+  .sub { color: var(--ink-soft); max-width: 640px; margin: 0 0 8px; }
+  .meta { font-family: ui-monospace, Menlo, monospace; font-size: 12px; color: var(--ink-faint); margin-bottom: 24px; }
+
+  h2 { font-size: 19px; margin: 52px 0 12px; padding-top: 14px; border-top: 1px solid var(--line); scroll-margin-top: 16px; }
+  h2 .no { color: var(--accent); margin-right: 8px; }
+  h3 { font-size: 15px; margin: 28px 0 8px; color: var(--ink); }
+  p, li { max-width: 72ch; }
+  a { color: var(--accent); }
+  a:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  strong { color: var(--ink); }
+
+  code {
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: .88em;
+    background: var(--code-bg);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 1px 5px;
+  }
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 14px 16px;
+    overflow-x: auto;
+    font-size: 12.5px;
+    line-height: 1.55;
+  }
+  pre code { background: none; border: none; padding: 0; font-size: inherit; }
+
+  .tbl { overflow-x: auto; margin: 12px 0; }
+  table { border-collapse: collapse; width: 100%; font-size: 13.5px; }
+  th { text-align: left; font-family: ui-monospace, Menlo, monospace; font-size: 11px; text-transform: uppercase; letter-spacing: .07em; color: var(--ink-faint); font-weight: 600; }
+  th, td { padding: 7px 14px 7px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+  td:first-child code { white-space: nowrap; }
+  td { font-variant-numeric: tabular-nums; }
+
+  .pill { font-family: ui-monospace, Menlo, monospace; font-size: 11px; padding: 1px 8px; border-radius: 99px; white-space: nowrap; }
+  .p-err { background: var(--badge-err-bg); color: var(--err); }
+  .p-warn { background: var(--badge-warn-bg); color: var(--warn); }
+  .p-ok { background: var(--badge-ok-bg); color: var(--accent); }
+  .p-dim { background: var(--bg-raise); color: var(--ink-soft); }
+
+  .note {
+    border-left: 3px solid var(--accent);
+    background: var(--bg-raise);
+    border-radius: 0 8px 8px 0;
+    padding: 10px 16px;
+    margin: 14px 0;
+  }
+  .note.w { border-left-color: var(--warn); }
+  .note p { margin: 4px 0; }
+
+  .cat { font-family: ui-monospace, Menlo, monospace; font-size: 11px; text-transform: uppercase; letter-spacing: .09em; color: var(--accent); margin: 26px 0 4px; }
+
+  .pkg { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 10px; margin: 14px 0; padding: 0; list-style: none; }
+  .pkg li { background: var(--bg-raise); border: 1px solid var(--line); border-radius: 8px; padding: 10px 14px; font-size: 13px; }
+  .pkg b { font-family: ui-monospace, Menlo, monospace; display: block; color: var(--accent); font-weight: 600; }
+
+  ul { padding-left: 22px; }
+  li { margin: 3px 0; }
+  hr { border: none; border-top: 1px solid var(--line); margin: 40px 0; }
+
+  .lang-switch { display: flex; gap: 4px; margin: 0 10px 14px; }
+  .lang-switch button {
+    font: 600 11px/1 ui-monospace, Menlo, monospace;
+    letter-spacing: .06em;
+    padding: 5px 12px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: var(--bg-raise);
+    color: var(--ink-soft);
+    cursor: pointer;
+  }
+  .lang-switch button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--bg); }
+  .lang-switch button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .wrap-ru { display: none; }
+  body.ru .wrap-ru { display: flex; }
+  body.ru .wrap-en { display: none; }
+  @media (max-width: 860px) {
+    body.ru .wrap-ru { display: block; }
+  }
+</style>
+
+<div class="wrap wrap-en">
+<nav aria-label="Contents">
+  <div class="lang-switch" role="group" aria-label="Language">
+    <button type="button" data-lang="en">EN</button>
+    <button type="button" data-lang="ru">RU</button>
+  </div>
+
+  <div class="nv-top">rank<em>lint</em></div>
+  <a href="#pkgs">Packages &amp; architecture</a>
+  <a href="#module">Nuxt module</a>
+  <a href="#composables">Composables</a>
+  <a href="#devtools">DevTools tab</a>
+  <a href="#config">seo.config — every field</a>
+  <a href="#rules">The 42 rules</a>
+  <a href="#heuristics">Smart heuristics</a>
+  <a href="#cli">CLI — all commands</a>
+  <a href="#zones">Zones (multi-app)</a>
+  <a href="#lighthouse">Lighthouse</a>
+  <a href="#diff">Diff &amp; CI</a>
+  <a href="#monitor">Prod monitoring</a>
+  <a href="#watch">Watch mode</a>
+  <a href="#custom">Custom rules</a>
+  <a href="#env">Env variables</a>
+  <a href="#nuances">Nuances &amp; limitations</a>
+</nav>
+<main>
+
+<h1>rank<em>lint</em> — complete reference</h1>
+<p class="sub">SEO toolkit for Nuxt 4: sitemap/robots/JSON-LD generation out of the box, a live SEO linter in DevTools, and regression control in CI. Everything it does, every setting, every nuance.</p>
+<p class="meta">v0.1 · 7 packages · 42 rules · Nuxt ^4.0.0 · Node ≥ 20 · MIT</p>
+
+<h2 id="pkgs">Packages &amp; architecture</h2>
+<ul class="pkg">
+  <li><b>@ranklint/nuxt</b>Module: sitemap, robots, useJsonLd, DevTools tab</li>
+  <li><b>@ranklint/cli</b>The <code>ranklint</code> command: crawler (Playwright), Lighthouse, monitor, watch</li>
+  <li><b>@ranklint/core</b>Engine: types, crawler, runner, config, diff, storages — no Nuxt, no Playwright</li>
+  <li><b>@ranklint/checks</b>42 rules + Schema.org Zod schemas</li>
+  <li><b>@ranklint/reporters</b>markdown, json, junit, gitlab, html, github + diff and alerts</li>
+  <li><b>@ranklint/devtools</b>Vue panel for Nuxt DevTools (self-contained bundle)</li>
+  <li><b>@ranklint/preset-default</b>"All built-in rules" preset for <code>extends</code></li>
+</ul>
+<p>Dependencies point strictly downward: <code>core</code> knows nothing about Nuxt or Playwright — page loading is described by the <code>PageFetcher</code> interface (implementations: <code>HttpFetcher</code> — bare fetch, <code>PlaywrightFetcher</code> — real Chrome). Everything revolves around four types: <code>PageSnapshot</code> (html after hydration + ssrHtml before JS, status, headers, ttfb, links, above-fold images) → <code>Check</code> → <code>Issue</code> (checkId, severity, message, url, selector, suggestion, docs) → <code>Report</code> (<code>formatVersion: 1</code>).</p>
+<p>Every feature block is disableable — disabled code is not registered at all. The module's client bundle contribution is <strong>485 bytes gzip</strong> (a 5 KB limit is guarded by a CI test).</p>
+
+<h2 id="module">Nuxt module</h2>
+<pre><code>// nuxt.config.ts
+export default defineNuxtConfig({
+  modules: ['@ranklint/nuxt'],
+  ranklint: {
+    site: { url: 'https://example.com', name: 'Example' },
+    sitemap: {
+      enabled: true,              // false or sitemap: false — the route is not registered
+      path: '/sitemap.xml',
+      sources: [ /* three kinds of sources, see below */ ],
+      cacheTtl: 3600,             // in-memory response cache, seconds
+    },
+    robots: { mode: 'owner' },    // false — leave robots.txt alone entirely
+    jsonLd: true,                 // false — useJsonLd is not registered
+    devtools: true,               // false — the SEO tab is not registered
+  },
+})</code></pre>
+<p>Works with <strong>zero configuration</strong>: <code>/sitemap.xml</code> and <code>/robots.txt</code> are available right after <code>npx nuxi module add @ranklint/nuxt</code>. Requires Nuxt 4 — throws a clear error when <code>compatibilityVersion &lt; 4</code>.</p>
+
+<h3>Sitemap: four sources of entries</h3>
+<ul>
+  <li><strong>Static routes</strong> — the module scans <code>app/pages/**</code> at build time; dynamic files (<code>[id].vue</code>) are excluded.</li>
+  <li><strong>Static entries</strong> — <code>{ loc, lastmod?, changefreq?, priority? }</code> objects right in <code>sources</code>.</li>
+  <li><strong>URL sources</strong> — strings (<code>'/api/seo/urls'</code>): the route <code>$fetch</code>es them on every request.</li>
+  <li><strong>Function sources</strong> — <code>async () =&gt; SitemapSourceEntry[]</code>. Serialized into the server bundle via <code>toString()</code> into a Nitro virtual module, so the function must be self-contained: Nitro globals (<code>$fetch</code>) are available, closures over nuxt.config variables are not. A non-serializable (bound/native) function fails the build with a clear error.</li>
+</ul>
+<p>Nuances: a failing source → <code>console.warn</code> + serve what was collected (a partial sitemap beats a 500). <code>loc</code> is absolutized against <code>site.url</code>, entries are deduplicated, XML is escaped. The path is added to nitro prerender — with <code>nuxt generate</code> sources are queried at build time.</p>
+
+<h3>Robots: environment policy</h3>
+<p>The route is registered only with <code>mode: 'owner'</code>. Environment: <code>NUXT_RANKLINT_ENV</code> → otherwise autodetect (dev, known CI variables). Non-prod → <code>Disallow: /</code> (UAT never leaks into the index), prod → <code>Allow: /</code> + a <code>Sitemap:</code> directive. An explicit override always beats autodetect. For a team that does not own the root robots.txt — <code>ranklint generate robots-fragment</code>.</p>
+
+<h3>runtimeConfig</h3>
+<p>Options live in <code>runtimeConfig.ranklint</code> — overridable per environment via env variables without a rebuild: <code>NUXT_RANKLINT_SITE_URL</code> and friends.</p>
+
+<h2 id="composables">Composables</h2>
+<h3>useJsonLd(type, data)</h3>
+<pre><code>useJsonLd('Product', {
+  name: 'Widget',
+  offers: { price: 9.99, priceCurrency: 'USD' },
+})</code></pre>
+<p>Renders <code>&lt;script type="application/ld+json"&gt;</code> via <code>useHead</code> with <code>@context/@type</code>. In dev the data is validated by Zod schemas (lazily imported — the validator never reaches the prod bundle) with console warnings. Schemas: <strong>Product, Article, BreadcrumbList, Organization, WebSite, FAQPage, Event, LocalBusiness, JobPosting</strong>; <code>@graph</code> graphs are supported. The CLI rule <code>jsonld:valid-schema</code> uses the same schema set — no duplication.</p>
+<h3>useRanklintIgnore([...ruleIds])</h3>
+<p>Emits <code>&lt;meta name="ranklint:ignore" content="..."&gt;</code>; the audit subtracts these rules for that specific page. Works for custom rules too.</p>
+
+<h2 id="devtools">The DevTools "SEO" tab</h2>
+<p>An iframe Vue app, self-contained ~166 KB bundle (Vue runtime, level-1 checks and zod are inlined). Works <strong>live</strong>: re-checks on navigation and DOM mutations (MutationObserver, 400 ms debounce / 2 s max-wait). The DevTools panel's own DOM is stripped before analysis.</p>
+<ul>
+  <li><strong>Issues</strong> — 17 page-scope Level 1 rules (no network, no ssrHtml); clicking an issue scrolls to the element with a 1.6 s highlight.</li>
+  <li><strong>Links</strong> — on-demand check: same-origin links are deduplicated, HEAD with a pool of 5 workers (405 → GET retry), broken ones listed. <strong>Zone-aware</strong>: the panel pulls zones from <code>seo.config.ts</code> via the dev endpoint <code>/__ranklint/devtools-zones</code> — links into foreign zones go into a yellow group with a <code>zone: name</code> badge instead of red "broken".</li>
+  <li><strong>Outline</strong> — the h1–h6 tree with problems, click scrolls.</li>
+  <li><strong>Meta</strong> — a table of all meta on the current page.</li>
+  <li><strong>JSON-LD</strong> — blocks with schema validation; invalid ones show path and message.</li>
+</ul>
+<p>What the panel does not do (use the CLI): site-scope rules (duplicates, orphans, sitemap, robots), <code>indexability:ssr-content</code>, redirect chains, TTFB, Lighthouse. The tab only works with a built <code>@ranklint/devtools</code> — otherwise the module warns and skips registration.</p>
+
+<h2 id="config">seo.config — every field</h2>
+<p>The file <code>seo.config.{ts,js,mjs,json,jsonc}</code> is loaded by c12. TS gets autocompletion via <code>defineRanklintConfig</code>; JSON gets a <a href="https://github.com/aakazancev/ranklint/blob/main/schemas/seo-config.schema.json">JSON schema</a>. The whole config is Zod-validated at startup: an unknown rule id is an error with did-you-mean (Levenshtein ≤ 3).</p>
+<pre><code>import { defineRanklintConfig } from '@ranklint/core'
+
+export default defineRanklintConfig({
+  extends: ['./agency-preset.ts', '@ranklint/preset-default'],
+
+  site: { url: 'https://example.com', name: 'Example' },
+
+  apps: {                                  // multi-app domain zones
+    self: { paths: ['/en/market/**'] },    // the zone named self is crawled
+    main: { paths: ['/**'], owner: 'external', checks: ['...'] },
+  },
+
+  rules: {
+    'meta:title-length': ['error', { min: 30, max: 60 }],
+    'meta:description-length': 'off',      // 'error' | 'warn' | 'info' | 'off' | [severity, options]
+  },
+
+  crawl: {
+    concurrency: 5,                        // parallel tabs
+    delay: 0,                              // ms between pages
+    maxPages: 1000,                        // stop + truncated: true in the report
+    ignore: ['/admin/**'],                 // globs — skip
+    strategy: 'full',                      // 'full' | 'sitemap+sample'
+    userAgent: 'custom UA',
+    insecureTls: true,                     // self-signed certs on dev/staging
+    viewport: { width: 375, height: 812 },
+    auth: {                                // staging behind a wall
+      headers: { 'X-Auth': '...' },
+      basic: { username: '...', password: '...' },
+      cookies: [{ name: '...', value: '...' }],
+    },
+  },
+
+  robots: {                                // expectations for an EXTERNAL robots.txt
+    mode: 'owner',                         // 'owner' | 'external'
+    expect: {
+      allow: ['/'], disallow: ['/admin'],
+      sitemaps: ['https://example.com/sitemap.xml'],
+      indexable: true,
+    },
+  },
+
+  lighthouse: {
+    enabled: true,
+    runs: 5,                               // runs per URL
+    aggregation: 'median',                 // 'median' | 'p75' | 'best'
+    formFactor: 'mobile',                  // 'mobile' | 'desktop'
+    maxUrls: 5,
+    thresholds: { '/listing/**': { performance: 90, lcp: 2500 } },
+  },
+
+  customChecks: [ /* defineCheck({...}) */ ],
+
+  monitor: {
+    storage: 'fs',                         // 'fs' | 's3'
+    dir: '.ranklint/reports',              // for fs
+    keep: 60,                              // rotation
+    bucket: '...', prefix: '...', endpoint: '...', region: '...',  // for s3
+  },
+
+  profiles: {                              // defu-patched over the base: --profile uat
+    uat: { site: { url: 'https://uat.example.com' } },
+  },
+})</code></pre>
+<div class="note">
+<p><strong>Layer precedence:</strong> the config itself &gt; earlier <code>extends</code> entries &gt; later ones. A profile is patched on top of the base. Local paths in <code>extends</code> require a file extension (<code>./preset.ts</code>).</p>
+<p><strong>insecureTls</strong> belongs only in a dev/local profile — it must never reach a prod audit.</p>
+</div>
+
+<h2 id="rules">The 42 rules</h2>
+<p>Each: <code>'error' | 'warn' | 'off'</code> or <code>[severity, options]</code>; per-page suppression via <code>useRanklintIgnore()</code>. Scope <span class="pill p-dim">page</span> — per page, <span class="pill p-dim">site</span> — once for all pages.</p>
+
+<div class="cat">meta</div>
+<div class="tbl"><table>
+<tr><th>Rule</th><th>Scope</th><th>Default</th><th>Checks / options</th></tr>
+<tr><td><code>meta:title-required</code></td><td>page</td><td><span class="pill p-err">error</span></td><td>&lt;title&gt; exists</td></tr>
+<tr><td><code>meta:title-length</code></td><td>page</td><td><span class="pill p-warn">warn</span></td><td>length; <code>{ min, max }</code></td></tr>
+<tr><td><code>meta:description-required</code></td><td>page</td><td><span class="pill p-err">error</span></td><td>meta description exists</td></tr>
+<tr><td><code>meta:description-length</code></td><td>page</td><td><span class="pill p-warn">warn</span></td><td>length; <code>{ min, max }</code></td></tr>
+<tr><td><code>meta:og-required</code></td><td>page</td><td><span class="pill p-warn">warn</span></td><td>og:title, og:description, og:image</td></tr>
+<tr><td><code>meta:twitter-card</code></td><td>page</td><td><span class="pill p-warn">warn</span></td><td>twitter:card is valid</td></tr>
+<tr><td><code>meta:no-duplicate-title</code></td><td>site</td><td><span class="pill p-err">error</span></td><td>identical titles across pages</td></tr>
+<tr><td><code>meta:no-duplicate-description</code></td><td>site</td><td><span class="pill p-err">error</span></td><td>identical descriptions</td></tr>
+<tr><td><code>canonical:required</code></td><td>page</td><td><span class="pill p-err">error</span></td><td>rel=canonical exists</td></tr>
+<tr><td><code>canonical:valid</code></td><td>page</td><td><span class="pill p-err">error</span></td><td>canonical responds 200 (network)</td></tr>
+<tr><td><code>canonical:no-chain</code></td><td>site</td><td><span class="pill p-warn">warn</span></td><td>canonical doesn't point to a page with a different canonical</td></tr>
+</table></div>
+
+<div class="cat">headings</div>
+<div class="tbl"><table>
+<tr><th>Rule</th><th>Scope</th><th>Default</th><th>Checks / options</th></tr>
+<tr><td><code>headings:single-h1</code></td><td>page</td><td><span class="pill p-err">error</span></td><td>exactly one h1</td></tr>
+<tr><td><code>headings:no-empty</code></td><td>page</td><td><span class="pill p-warn">warn</span></td><td>no empty headings</td></tr>
+<tr><td><code>headings:hierarchy</code></td><td>page</td><td><span class="pill p-warn">warn</span></td><td>no level skips (h2 → h4)</td></tr>
+<tr><td><code>headings:h1-length</code></td><td>page</td><td><span class="pill p-warn">warn</span></td><td>h1 length; <code>{ min, max }</code></td></tr>
+<tr><td><code>headings:unique-h1</code></td><td>site</td><td><span class="pill p-warn">warn</span></td><td>h1s are unique across pages</td></tr>
+</table></div>
+
+<div class="cat">links</div>
+<div class="tbl"><table>
+<tr><th>Rule</th><th>Scope</th><th>Default</th><th>Checks / options</th></tr>
+<tr><td><code>links:no-broken</code></td><td>page</td><td><span class="pill p-err">error</span></td><td>internal links aren't 4xx/5xx (HEAD, cached per run)</td></tr>
+<tr><td><code>links:no-redirect-chain</code></td><td>page</td><td><span class="pill p-warn">warn</span></td><td>redirect chains; <code>{ maxHops }</code></td></tr>
+<tr><td><code>links:permanent-redirects</code></td><td>page</td><td><span class="pill p-warn">warn</span></td><td>302 where a 301 belongs</td></tr>
+<tr><td><code>links:trailing-slash-consistent</code></td><td>site</td><td><span class="pill p-warn">warn</span></td><td>trailing-slash consistency</td></tr>
+<tr><td><code>links:no-orphans</code></td><td>site</td><td><span class="pill p-warn">warn</span></td><td>sitemap pages nobody links to</td></tr>
+</table></div>
+
+<div class="cat">i18n</div>
+<div class="tbl"><table>
+<tr><th>Rule</th><th>Scope</th><th>Default</th><th>Checks</th></tr>
+<tr><td><code>hreflang:valid-targets</code></td><td>page</td><td><span class="pill p-err">error</span></td><td>hreflang targets respond 200</td></tr>
+<tr><td><code>hreflang:symmetric</code></td><td>site</td><td><span class="pill p-err">error</span></td><td>hreflang links are reciprocal</td></tr>
+<tr><td><code>i18n:no-locale-leak</code></td><td>page</td><td><span class="pill p-err">error</span></td><td>content language matches URL locale and html lang</td></tr>
+</table></div>
+
+<div class="cat">structured-data · images</div>
+<div class="tbl"><table>
+<tr><th>Rule</th><th>Scope</th><th>Default</th><th>Checks / options</th></tr>
+<tr><td><code>jsonld:parseable</code></td><td>page</td><td><span class="pill p-err">error</span></td><td>JSON-LD parses</td></tr>
+<tr><td><code>jsonld:valid-schema</code></td><td>page</td><td><span class="pill p-err">error</span></td><td>validity against Schema.org schemas; <code>{ schemas }</code> — your own</td></tr>
+<tr><td><code>images:alt-required</code></td><td>page</td><td><span class="pill p-warn">warn</span></td><td>content imgs have alt</td></tr>
+<tr><td><code>images:dimensions-required</code></td><td>page</td><td><span class="pill p-warn">warn</span></td><td>width/height against CLS</td></tr>
+<tr><td><code>images:no-lazy-above-fold</code></td><td>page</td><td><span class="pill p-warn">warn</span></td><td>no loading=lazy in the viewport; <code>{ firstImages }</code></td></tr>
+</table></div>
+
+<div class="cat">robots</div>
+<div class="tbl"><table>
+<tr><th>Rule</th><th>Scope</th><th>Default</th><th>Checks</th></tr>
+<tr><td><code>robots:reachable</code></td><td>site</td><td><span class="pill p-err">error</span></td><td>robots.txt responds 200</td></tr>
+<tr><td><code>robots:zone-not-blocked</code></td><td>site</td><td><span class="pill p-err">error</span></td><td>own zone isn't Disallow'ed</td></tr>
+<tr><td><code>robots:sitemap-declared</code></td><td>site</td><td><span class="pill p-warn">warn</span></td><td>Sitemap directive declared</td></tr>
+<tr><td><code>robots:env-policy</code></td><td>site</td><td><span class="pill p-err">error</span></td><td>prod open / non-prod closed</td></tr>
+<tr><td><code>robots:expected-disallow</code></td><td>site</td><td><span class="pill p-warn">warn</span></td><td><code>robots.expect</code> expectations hold</td></tr>
+</table></div>
+
+<div class="cat">indexability · http</div>
+<div class="tbl"><table>
+<tr><th>Rule</th><th>Scope</th><th>Default</th><th>Checks / options</th></tr>
+<tr><td><code>indexability:ssr-content</code></td><td>page</td><td><span class="pill p-err">error</span></td><td>content exists in SSR, not only after hydration; <code>{ minRatio }</code></td></tr>
+<tr><td><code>sitemap:reachable</code></td><td>site</td><td><span class="pill p-err">error</span></td><td>sitemap.xml responds 200 and parses</td></tr>
+<tr><td><code>sitemap:no-noindex</code></td><td>site</td><td><span class="pill p-err">error</span></td><td>no noindex pages in the sitemap</td></tr>
+<tr><td><code>http:no-mixed-content</code></td><td>page</td><td><span class="pill p-err">error</span></td><td>no http resources on an https page</td></tr>
+<tr><td><code>http:no-soft-404</code></td><td>site</td><td><span class="pill p-err">error</span></td><td>404s aren't masked as 200</td></tr>
+<tr><td><code>http:x-robots-consistent</code></td><td>page</td><td><span class="pill p-err">error</span></td><td>X-Robots-Tag doesn't contradict meta robots</td></tr>
+<tr><td><code>http:ttfb-budget</code></td><td>site</td><td><span class="pill p-warn">warn</span></td><td>p75 TTFB per group; <code>{ p75, budgets }</code></td></tr>
+<tr><td><code>mobile:viewport</code></td><td>page</td><td><span class="pill p-err">error</span></td><td>viewport meta exists</td></tr>
+</table></div>
+
+<h3>Special rules outside the registry</h3>
+<ul>
+  <li><code>links:reachable</code> — links into foreign domain zones are alive (synthesized by the crawler from the reachability queue; configurable via <code>rules</code>).</li>
+  <li><code>lighthouse:threshold</code> — a threshold from the lighthouse config was violated.</li>
+  <li><code>crawl:timeout</code> — the page failed to load (warn); its page checks are skipped, no false errors.</li>
+  <li><code>internal:check-failed</code> — a rule threw (info); one failing check never kills the audit.</li>
+</ul>
+
+<h2 id="heuristics">Smart heuristics</h2>
+<ul>
+  <li><strong>i18n:no-locale-leak</strong> — two layers: (1) <code>html lang</code> vs the URL prefix locale; (2) the language of the text itself — a body clone without script/style/noscript/template → Cyrillic share &gt;50% or stop-word profiles for en/de/fr/es/it (min 40 letters, best score ≥3 and ≥2× the runner-up; unknown locales aren't flagged). Catches Russian text under <code>/en/</code> even with a correct lang attribute.</li>
+  <li><strong>images:no-lazy-above-fold</strong> — Playwright reports the src of images actually inside the viewport (1280×720); matching is per-instance: a lazy duplicate of the same image in the footer isn't flagged. Without data — fallback to "first 3 imgs".</li>
+  <li><strong>http:ttfb-budget</strong> — p75 per group: explicit <code>budgets: {'/listing/**': 500}</code> match by route pattern, remaining pages are grouped automatically (segments with ids/uuids → <code>*</code>); an auto group warns only with ≥2 samples — a single cold start is not a signal.</li>
+  <li><strong>http:no-soft-404</strong> — HEAD to a deliberately nonexistent path: 200 → the site masks 404s; plus "not found" text patterns on status-200 pages.</li>
+  <li><strong>indexability:ssr-content</strong> — compares ssrHtml with post-hydration html: an H1 that exists only on the client, or &lt;50% of text present in SSR → an indexing error.</li>
+</ul>
+
+<h2 id="cli">CLI — all commands</h2>
+
+<h3>ranklint audit</h3>
+<div class="tbl"><table>
+<tr><th>Flag</th><th>Description</th></tr>
+<tr><td><code>--url</code></td><td>address of a live site</td></tr>
+<tr><td><code>--start</code></td><td>path to <code>.output/server/index.mjs</code> — starts Nitro itself and stops it after</td></tr>
+<tr><td><code>--profile</code></td><td>profile from seo.config</td></tr>
+<tr><td><code>--reporter</code></td><td>markdown (default) | json | junit | gitlab | html | github</td></tr>
+<tr><td><code>--output</code></td><td>report to a file instead of stdout</td></tr>
+<tr><td><code>--json-output</code></td><td>additionally the raw json (input for diff)</td></tr>
+<tr><td><code>--cwd</code></td><td>where to look for seo.config</td></tr>
+<tr><td><code>--mode monitor</code></td><td>monitoring mode (below)</td></tr>
+</table></div>
+<p>Exit code 1 on error issues. Without a seo.config it runs with a minimal config from the URL origin. Flow: config → custom checks → seeds (with <code>strategy: 'sitemap+sample'</code> — a sitemap sample: group by route pattern, up to 5 random URLs per group) → BFS crawl → checks → crawl-budget analysis (parametric URL groups: how many, how many with canonical/noindex — shows where crawl budget leaks) → Lighthouse → report.</p>
+
+<h3>ranklint diff</h3>
+<div class="tbl"><table>
+<tr><th>Flag</th><th>Description</th></tr>
+<tr><td><code>--base</code></td><td>path to report.json <em>or</em> a git ref — then the report is pulled from CI artifacts</td></tr>
+<tr><td><code>--current</code></td><td>current report.json</td></tr>
+<tr><td><code>--reporter</code></td><td>markdown | json</td></tr>
+<tr><td><code>--output</code></td><td>to a file</td></tr>
+</table></div>
+<p>The CI adapter picks by environment: <code>GITHUB_ACTIONS=true</code> → GitHub (artifact by name, zip unpacked by a built-in reader), otherwise GitLab (branch job artifact). Error policy: <strong>no CI context → warn + full "first run" report</strong> (a missing base is not an error); <strong>a download error (401/403/network) → hard fail</strong>, so an expired token can't hide behind an eternal first run. Exit 1 only on new error issues.</p>
+
+<h3>The rest</h3>
+<div class="tbl"><table>
+<tr><th>Command</th><th>Flags</th><th>What it does</th></tr>
+<tr><td><code>lighthouse</code></td><td>--url (req.), --runs, --cwd, --output</td><td>standalone LH run with aggregation and config thresholds; exit 1 on violation</td></tr>
+<tr><td><code>outline</code></td><td>--url (req.), --output, --cwd</td><td>markdown tree of h1–h6 for every crawled page — structure review</td></tr>
+<tr><td><code>watch</code></td><td>--url (default localhost:3000), --pages, --app</td><td>live checks on file edits (see Watch)</td></tr>
+<tr><td><code>history</code></td><td>--dir, --limit (20), --csv, --cwd</td><td>trend of stored monitor reports as a table or CSV</td></tr>
+<tr><td><code>generate robots-fragment</code></td><td>--output, --cwd</td><td>a root robots.txt fragment from <code>robots.expect</code> for the owning team</td></tr>
+</table></div>
+
+<h2 id="zones">Zones (multi-app domains)</h2>
+<p>When several apps from different teams share one domain:</p>
+<pre><code>apps: {
+  self: { paths: ['/en/market/**', '/ar/market/**'] },  // the zone named self is crawled
+  main: { paths: ['/**'], owner: 'external' },          // the rest is foreign
+}</code></pre>
+<p>Every URL is classified by the most specific pattern (globs <code>*</code>/<code>**</code>): own zone → full crawl; a foreign zone of the same domain → HEAD only, into the reachability queue → the <code>links:reachable</code> rule ("is our link into the other section alive?"); <code>crawl.ignore</code> → skip; external domain → counted, never visited. The same route-pattern matcher powers lighthouse thresholds, ttfb budgets and crawl-budget grouping. The DevTools panel understands zones too (via the dev endpoint). A broken link into a foreign zone is <em>not</em> <code>links:no-broken</code>: not yours to fix, but yours to know about.</p>
+
+<h2 id="lighthouse">Lighthouse</h2>
+<p>A separate Chrome via chrome-launcher (not Playwright — requires an installed Chrome). N runs per URL, per-metric aggregation: <code>median</code> (default) / <code>p75</code> / <code>best</code> — a single run is ±10 points of noise. Metrics: performance, seo, accessibility, bestPractices, lcp, cls, tbt + the LCP element with a suggestion. Thresholds are route patterns and become regular error issues (→ exit 1). Results land in <code>Report.lighthouse</code>; diff compares by (url-pattern, metric) — a metric regression between branches is visible. <code>formFactor: 'mobile'</code> also sets the crawler viewport to 375×812 unless <code>crawl.viewport</code> is set.</p>
+
+<h2 id="diff">Diff &amp; CI</h2>
+<p>Issue key: <code>checkId + url without origin + selector</code> — stable across environments (UAT compares against prod). <code>diffReports</code> → newIssues / fixedIssues / pagesDelta.</p>
+<p>Base report storages (<code>ReportStorage</code>): <strong>fs</strong> (a JSON directory, latest by mtime), <strong>GitLab artifacts</strong> (read-only, branch job artifact), <strong>GitHub artifacts</strong> (read-only: list by name, branch filter, zip download — a built-in minimal zip reader: EOCD → central directory → inflateRawSync; corrupt input → null, not an exception), <strong>S3</strong> (for the monitor; the SDK is an optional peer, any S3-compatible endpoint).</p>
+<p>Ready-made CI presets: <code>presets/gitlab-ci/seo.yml</code> (jobs <code>.ranklint-audit</code>, <code>.ranklint-diff</code> with an automatic MR comment, <code>.ranklint-lighthouse</code>, <code>.ranklint-monitor</code> with Playwright and report caches) and <code>presets/github-actions/seo.yml</code>. The <code>github</code> reporter emits PR annotations.</p>
+
+<h2 id="monitor">Production monitoring</h2>
+<p><code>ranklint audit --url https://prod --mode monitor</code> — for cron/schedules. <strong>Exit is always 0</strong>: prod monitoring never fails the pipeline, it alerts instead. Flow: audit → enrichment → diff against the last stored report → save by timestamp → alerts only when <code>newIssues &gt; 0</code>.</p>
+<ul>
+  <li><strong>CrUX</strong> (<code>RANKLINT_CRUX_API_KEY</code>) — field Core Web Vitals of the origin: LCP, CLS, INP of real users.</li>
+  <li><strong>Search Console URL Inspection</strong> — up to 10 pages: verdict, coverageState, indexingState, rich-results issues. Auth: a ready token <code>RANKLINT_GSC_TOKEN</code> or a service account <code>RANKLINT_GSC_KEY_FILE</code> (an RS256 JWT built on node:crypto with zero dependencies, iat shifted −30 s for clock skew).</li>
+  <li><strong>Alerts</strong>: Slack webhook and/or Telegram (bot token + chat id) — payloads built by <code>slackPayload</code>/<code>telegramText</code>.</li>
+  <li><strong>Storage</strong>: fs (default) or s3 with <code>keep</code> rotation; trend — <code>ranklint history</code>.</li>
+</ul>
+
+<h2 id="watch">Watch mode</h2>
+<p><code>ranklint watch --url http://localhost:3000</code> — chokidar watches <code>app/pages/**</code> (and the rest of the app dir: editing a layout/composable re-checks recent routes). File → route → HttpFetcher hits the dev server → fast page checks without network rules → ESLint-style output (url + selector + suggestion).</p>
+<p>Dynamic routes: <code>[id]</code> → <code>[^/]+</code>, <code>[...slug]</code> → <code>.+</code>, <code>[[x]]</code> — optional segments; sample URLs come from the dev server's <code>/sitemap.xml</code> (understands a 1-level sitemap index, up to 3 URLs per pattern, cache with refetch). No match → <code>watch:no-sample-url</code>; a failing check → <code>watch:error</code>, never a false "clean". No module integration by design — the CLI stays independent.</p>
+
+<h2 id="custom">Custom rules &amp; presets</h2>
+<pre><code>import { defineCheck } from '@ranklint/checks'
+
+customChecks: [
+  defineCheck({
+    id: 'myteam:no-lorem',          // clashing with a built-in id is an error with a hint
+    category: 'meta',
+    severity: 'warn',
+    scope: 'page',                  // 'page' | 'site'
+    docs: 'https://wiki.myteam.dev/seo/no-lorem',
+    optionsSchema: z.object({...}), // optional — options validation
+    async run(ctx) {
+      // ctx: page, pages, document (linkedom DOM), config, site, fetcher
+      return [{ checkId: 'myteam:no-lorem', severity: 'warn', message: '...', url: ctx.page!.url }]
+    },
+  }),
+]</code></pre>
+<p>Custom rules are first-class: configured via <code>rules</code>, disabled with <code>'off'</code> and <code>useRanklintIgnore</code>. The <code>CheckContext</code> contract is stable within a major version. Presets — via <code>extends</code> (an npm package or a local file); <code>@ranklint/preset-default</code> pins the built-in rules at their default severities — a "live" snapshot of the installed checks version.</p>
+
+<h2 id="env">Env variables</h2>
+<div class="tbl"><table>
+<tr><th>Variable</th><th>Purpose</th></tr>
+<tr><td><code>NUXT_RANKLINT_ENV</code></td><td>environment override for the robots policy (prod / staging / dev)</td></tr>
+<tr><td><code>NUXT_RANKLINT_SITE_URL</code></td><td>per-environment override of the module's site.url</td></tr>
+<tr><td><code>RANKLINT_CRUX_API_KEY</code></td><td>CrUX API (field CWV in the monitor)</td></tr>
+<tr><td><code>RANKLINT_GSC_TOKEN</code> / <code>RANKLINT_GSC_KEY_FILE</code> / <code>RANKLINT_GSC_PROPERTY</code></td><td>Search Console: token / service-account JSON / property</td></tr>
+<tr><td><code>RANKLINT_SLACK_WEBHOOK</code></td><td>monitor alerts to Slack</td></tr>
+<tr><td><code>RANKLINT_TELEGRAM_BOT_TOKEN</code> + <code>RANKLINT_TELEGRAM_CHAT_ID</code></td><td>alerts to Telegram</td></tr>
+<tr><td><code>CI_API_V4_URL</code>, <code>CI_PROJECT_ID</code>, <code>CI_JOB_TOKEN</code> / <code>RANKLINT_GITLAB_TOKEN</code>, <code>RANKLINT_AUDIT_JOB</code></td><td>GitLab artifacts for diff (set by GitLab automatically, except the token and job name)</td></tr>
+<tr><td><code>GITHUB_REPOSITORY</code>, <code>GITHUB_TOKEN</code> / <code>RANKLINT_GITHUB_TOKEN</code>, <code>RANKLINT_ARTIFACT_NAME</code>, <code>GITHUB_API_URL</code></td><td>GitHub artifacts for diff (artifact name default: <code>ranklint-report</code>)</td></tr>
+</table></div>
+
+<h2 id="nuances">Nuances &amp; limitations</h2>
+<ul>
+  <li>URL dedup while crawling: the hash is dropped, <strong>the query is kept</strong> — faceted filters matter for crawl-budget analysis.</li>
+  <li>A page that failed to load (timeout, network, TLS) → a snapshot with statusCode 0 + <code>crawl:timeout</code>; its page checks are <strong>skipped</strong> — no false "missing title". The crawler as a whole never dies.</li>
+  <li><code>maxPages</code> reached → <code>truncated: true</code> in the report — you can see the audit is partial.</li>
+  <li>The Nuxt dev server is not for full crawls: on-the-fly compilation × parallel tabs = worker OOM. Locally use <code>--start</code> against a build or lower <code>concurrency</code>/<code>maxPages</code>; full audits belong on deployed environments.</li>
+  <li><code>insecureTls</code> sets Playwright's <code>ignoreHTTPSErrors</code> and <code>NODE_TLS_REJECT_UNAUTHORIZED=0</code> for the process — dev/staging profiles only.</li>
+  <li>Lighthouse requires an installed Chrome (chrome-launcher) and doesn't work with self-signed TLS — run it against deployed environments.</li>
+  <li>The above-fold heuristic viewport is Playwright's default 1280×720 (or <code>crawl.viewport</code>). srcset-only images without src aren't measured.</li>
+  <li><code>http:x-robots-consistent</code> is part of DevTools Level 1, but the panel has no headers — it's a no-op there.</li>
+  <li>Sitemap function sources are self-contained: no closures over nuxt.config variables.</li>
+  <li>A profile is applied as a defu patch: objects merge, scalars override.</li>
+  <li>One monitor run = one JSON; storage keys: timestamp (monitor) or commit SHA (MR).</li>
+  <li>DOM is parsed by linkedom (server) / DOMParser (panel) — the same rule code runs in both worlds.</li>
+  <li>One failing rule (<code>internal:check-failed</code>, info) never kills the audit; an unknown rule id in the config does — with did-you-mean.</li>
+</ul>
+
+<hr>
+<p class="meta">Repository: github.com/aakazancev/ranklint · the rules reference is generated from the registry (docs/rules.md) · config JSON schema: schemas/seo-config.schema.json</p>
+
+</main>
+</div>
+
+<div class="wrap wrap-ru">
+<nav aria-label="Оглавление">
+  <div class="lang-switch" role="group" aria-label="Language">
+    <button type="button" data-lang="en">EN</button>
+    <button type="button" data-lang="ru">RU</button>
+  </div>
+
+  <div class="nv-top">rank<em>lint</em></div>
+  <a href="#ru-pkgs">Пакеты и архитектура</a>
+  <a href="#ru-module">Nuxt-модуль</a>
+  <a href="#ru-composables">Композаблы</a>
+  <a href="#ru-devtools">DevTools-таб</a>
+  <a href="#ru-config">seo.config — все поля</a>
+  <a href="#ru-rules">42 правила</a>
+  <a href="#ru-heuristics">Умные эвристики</a>
+  <a href="#ru-cli">CLI — все команды</a>
+  <a href="#ru-zones">Зоны (multi-app)</a>
+  <a href="#ru-lighthouse">Lighthouse</a>
+  <a href="#ru-diff">Diff и CI</a>
+  <a href="#ru-monitor">Мониторинг прода</a>
+  <a href="#ru-watch">Watch mode</a>
+  <a href="#ru-custom">Кастомные правила</a>
+  <a href="#ru-env">Env-переменные</a>
+  <a href="#ru-nuances">Нюансы и ограничения</a>
+</nav>
+<main lang="ru">
+
+<h1>rank<em>lint</em> — полный справочник</h1>
+<p class="sub">SEO-toolkit для Nuxt 4: генерация sitemap/robots/JSON-LD из коробки, живой SEO-линтер в DevTools и регрессионный контроль в CI. Всё, что умеет, все настройки, все нюансы.</p>
+<p class="meta">v0.1 · 7 пакетов · 42 правила · Nuxt ^4.0.0 · Node ≥ 20 · MIT</p>
+
+<h2 id="ru-pkgs">Пакеты и архитектура</h2>
+<ul class="pkg">
+  <li><b>@ranklint/nuxt</b>Модуль: sitemap, robots, useJsonLd, DevTools-таб</li>
+  <li><b>@ranklint/cli</b>Команда <code>ranklint</code>: краулер (Playwright), Lighthouse, monitor, watch</li>
+  <li><b>@ranklint/core</b>Движок: типы, краулер, runner, конфиг, diff, хранилища — без Nuxt и Playwright</li>
+  <li><b>@ranklint/checks</b>42 правила + Zod-схемы Schema.org</li>
+  <li><b>@ranklint/reporters</b>markdown, json, junit, gitlab, html, github + diff и алерты</li>
+  <li><b>@ranklint/devtools</b>Vue-панель для Nuxt DevTools (самодостаточный бандл)</li>
+  <li><b>@ranklint/preset-default</b>Пресет «все встроенные правила» для <code>extends</code></li>
+</ul>
+<p>Зависимости строго вниз: <code>core</code> не знает ни про Nuxt, ни про Playwright — загрузку страниц описывает интерфейс <code>PageFetcher</code> (реализации: <code>HttpFetcher</code> — голый fetch, <code>PlaywrightFetcher</code> — реальный Chrome). Всё крутится вокруг четырёх типов: <code>PageSnapshot</code> (html после гидрации + ssrHtml до JS, статус, заголовки, ttfb, ссылки, картинки во вьюпорте) → <code>Check</code> → <code>Issue</code> (checkId, severity, message, url, selector, suggestion, docs) → <code>Report</code> (<code>formatVersion: 1</code>).</p>
+<p>Каждый блок функциональности отключается — выключенный код вообще не регистрируется. Клиентский вклад модуля в бандл — <strong>485 байт gzip</strong> (лимит 5 KB охраняется тестом в CI).</p>
+
+<h2 id="ru-module">Nuxt-модуль</h2>
+<pre><code>// nuxt.config.ts
+export default defineNuxtConfig({
+  modules: ['@ranklint/nuxt'],
+  ranklint: {
+    site: { url: 'https://example.com', name: 'Example' },
+    sitemap: {
+      enabled: true,              // false или sitemap: false — роут не регистрируется
+      path: '/sitemap.xml',
+      sources: [ /* три вида источников, см. ниже */ ],
+      cacheTtl: 3600,             // кеш ответа в памяти, секунд
+    },
+    robots: { mode: 'owner' },    // false — не трогать robots.txt вообще
+    jsonLd: true,                 // false — useJsonLd не регистрируется
+    devtools: true,               // false — таб SEO не регистрируется
+  },
+})</code></pre>
+<p>Работает <strong>без конфигурации</strong>: <code>/sitemap.xml</code> и <code>/robots.txt</code> доступны сразу после <code>npx nuxi module add @ranklint/nuxt</code>. Требует Nuxt 4 — при <code>compatibilityVersion &lt; 4</code> бросает понятную ошибку.</p>
+
+<h3>Sitemap: четыре источника записей</h3>
+<ul>
+  <li><strong>Статические роуты</strong> — модуль на build-time сканирует <code>app/pages/**</code>; динамические файлы (<code>[id].vue</code>) не включаются.</li>
+  <li><strong>Статические записи</strong> — объекты <code>{ loc, lastmod?, changefreq?, priority? }</code> прямо в <code>sources</code>.</li>
+  <li><strong>URL-источники</strong> — строки (<code>'/api/seo/urls'</code>): роут дергает их <code>$fetch</code>'ем на каждый запрос.</li>
+  <li><strong>Функции-источники</strong> — <code>async () =&gt; SitemapSourceEntry[]</code>. Сериализуются в серверный бандл через <code>toString()</code> в Nitro virtual-модуль, поэтому функция обязана быть самодостаточной: Nitro-глобалы (<code>$fetch</code>) доступны, замыкания на переменные nuxt.config — нет. Несериализуемая (bound/native) функция даст внятную ошибку сборки.</li>
+</ul>
+<p>Нюансы: падение любого источника → <code>console.warn</code> + отдаём что собрали (неполный sitemap лучше 500). <code>loc</code> абсолютизируется против <code>site.url</code>, записи дедупятся, XML экранируется. Путь добавляется в nitro prerender — при <code>nuxt generate</code> источники опрашиваются на билде.</p>
+
+<h3>Robots: политика по окружению</h3>
+<p>Роут регистрируется только при <code>mode: 'owner'</code>. Окружение: <code>NUXT_RANKLINT_ENV</code> → иначе автодетект (dev, известные CI-переменные). Не-prod → <code>Disallow: /</code> (UAT не уедет в индекс), prod → <code>Allow: /</code> + директива <code>Sitemap:</code>. Явный override всегда побеждает автодетект. Команде, не владеющей корневым robots.txt, — <code>ranklint generate robots-fragment</code>.</p>
+
+<h3>runtimeConfig</h3>
+<p>Опции лежат в <code>runtimeConfig.ranklint</code> — на каждом окружении переопределяются env-переменными без пересборки: <code>NUXT_RANKLINT_SITE_URL</code>, и т.д.</p>
+
+<h2 id="ru-composables">Композаблы</h2>
+<h3>useJsonLd(type, data)</h3>
+<pre><code>useJsonLd('Product', {
+  name: 'Widget',
+  offers: { price: 9.99, priceCurrency: 'USD' },
+})</code></pre>
+<p>Рендерит <code>&lt;script type="application/ld+json"&gt;</code> через <code>useHead</code> с <code>@context/@type</code>. В dev данные валидируются Zod-схемами (лениво импортируются — в prod-бандл валидатор не попадает) с warn'ами в консоль. Схемы: <strong>Product, Article, BreadcrumbList, Organization, WebSite, FAQPage, Event, LocalBusiness, JobPosting</strong>; поддерживаются <code>@graph</code>-графы. Тот же набор схем использует CLI-правило <code>jsonld:valid-schema</code> — никакого дублирования.</p>
+<h3>useRanklintIgnore([...ruleIds])</h3>
+<p>Кладёт <code>&lt;meta name="ranklint:ignore" content="..."&gt;</code>; аудит вычитает эти правила для конкретной страницы. Работает и для кастомных правил.</p>
+
+<h2 id="ru-devtools">DevTools-таб «SEO»</h2>
+<p>iframe-Vue-приложение, самодостаточный бандл ~166 KB (Vue-runtime, level1-чеки и zod заинлайнены). Работает <strong>live</strong>: пересчёт при навигации и мутациях DOM (MutationObserver, debounce 400мс / max-wait 2с). DOM панели самого DevTools вырезается перед анализом.</p>
+<ul>
+  <li><strong>Issues</strong> — 17 page-scope правил уровня Level 1 (без сети и ssrHtml), клик по проблеме скроллит к элементу с подсветкой на 1.6с.</li>
+  <li><strong>Links</strong> — проверка по кнопке: same-origin ссылки дедупятся, HEAD пулом в 5 воркеров (405 → повтор GET), битые — списком. <strong>Zone-aware</strong>: панель забирает зоны из <code>seo.config.ts</code> через dev-эндпоинт <code>/__ranklint/devtools-zones</code> — ссылки в чужие зоны идут жёлтой группой с бейджем <code>zone: name</code>, а не красным «broken».</li>
+  <li><strong>Outline</strong> — дерево h1–h6 с проблемами, клик скроллит.</li>
+  <li><strong>Meta</strong> — таблица всех meta текущей страницы.</li>
+  <li><strong>JSON-LD</strong> — блоки с валидацией по схемам, invalid — с путём и сообщением.</li>
+</ul>
+<p>Чего в панели нет (нужен CLI): site-scope правила (дубли, orphans, sitemap, robots), <code>indexability:ssr-content</code>, redirect-цепочки, TTFB, Lighthouse. Таб работает только с собранным <code>@ranklint/devtools</code> — иначе модуль предупредит и не зарегистрирует его.</p>
+
+<h2 id="ru-config">seo.config — все поля</h2>
+<p>Файл <code>seo.config.{ts,js,mjs,json,jsonc}</code>, грузится c12. Для TS — автодополнение через <code>defineRanklintConfig</code>, для JSON — <a href="https://github.com/aakazancev/ranklint/blob/main/schemas/seo-config.schema.json">JSON-схема</a>. Весь конфиг валидируется Zod на старте: неизвестное правило — ошибка с did-you-mean (Левенштейн ≤ 3).</p>
+<pre><code>import { defineRanklintConfig } from '@ranklint/core'
+
+export default defineRanklintConfig({
+  extends: ['./agency-preset.ts', '@ranklint/preset-default'],
+
+  site: { url: 'https://example.com', name: 'Example' },
+
+  apps: {                                  // зоны multi-app домена
+    self: { paths: ['/en/market/**'] },    // зона с именем self — краулится
+    main: { paths: ['/**'], owner: 'external', checks: ['...'] },
+  },
+
+  rules: {
+    'meta:title-length': ['error', { min: 30, max: 60 }],
+    'meta:description-length': 'off',      // 'error' | 'warn' | 'info' | 'off' | [severity, options]
+  },
+
+  crawl: {
+    concurrency: 5,                        // параллельных вкладок
+    delay: 0,                              // мс между страницами
+    maxPages: 1000,                        // стоп + truncated: true в отчёте
+    ignore: ['/admin/**'],                 // глобы — пропуск
+    strategy: 'full',                      // 'full' | 'sitemap+sample'
+    userAgent: 'custom UA',
+    insecureTls: true,                     // self-signed сертификаты dev/staging
+    viewport: { width: 375, height: 812 },
+    auth: {                                // staging за заглушкой
+      headers: { 'X-Auth': '...' },
+      basic: { username: '...', password: '...' },
+      cookies: [{ name: '...', value: '...' }],
+    },
+  },
+
+  robots: {                                // ожидания для ВНЕШНЕГО robots.txt
+    mode: 'owner',                         // 'owner' | 'external'
+    expect: {
+      allow: ['/'], disallow: ['/admin'],
+      sitemaps: ['https://example.com/sitemap.xml'],
+      indexable: true,
+    },
+  },
+
+  lighthouse: {
+    enabled: true,
+    runs: 5,                               // прогонов на URL
+    aggregation: 'median',                 // 'median' | 'p75' | 'best'
+    formFactor: 'mobile',                  // 'mobile' | 'desktop'
+    maxUrls: 5,
+    thresholds: { '/listing/**': { performance: 90, lcp: 2500 } },
+  },
+
+  customChecks: [ /* defineCheck({...}) */ ],
+
+  monitor: {
+    storage: 'fs',                         // 'fs' | 's3'
+    dir: '.ranklint/reports',              // для fs
+    keep: 60,                              // ротация
+    bucket: '...', prefix: '...', endpoint: '...', region: '...',  // для s3
+  },
+
+  profiles: {                              // накладываются defu поверх базы: --profile uat
+    uat: { site: { url: 'https://uat.example.com' } },
+  },
+})</code></pre>
+<div class="note">
+<p><strong>Приоритеты слоёв:</strong> сам конфиг &gt; ранние элементы <code>extends</code> &gt; поздние. Профиль накладывается патчем поверх базы. Локальные пути в <code>extends</code> требуют расширение файла (<code>./preset.ts</code>).</p>
+<p><strong>insecureTls</strong> держите только в dev/local-профиле — в прод-аудит он попасть не должен.</p>
+</div>
+
+<h2 id="ru-rules">42 правила</h2>
+<p>Каждое: <code>'error' | 'warn' | 'off'</code> или <code>[severity, options]</code>; подавление на странице — <code>useRanklintIgnore()</code>. Scope <span class="pill p-dim">page</span> — по каждой странице, <span class="pill p-dim">site</span> — один раз по всем.</p>
+
+<div class="cat">meta</div>
+<div class="tbl"><table>
+<tr><th>Правило</th><th>Scope</th><th>Default</th><th>Что проверяет / опции</th></tr>
+<tr><td><code>meta:title-required</code></td><td>page</td><td><span class="pill p-err">error</span></td><td>есть &lt;title&gt;</td></tr>
+<tr><td><code>meta:title-length</code></td><td>page</td><td><span class="pill p-warn">warn</span></td><td>длина; <code>{ min, max }</code></td></tr>
+<tr><td><code>meta:description-required</code></td><td>page</td><td><span class="pill p-err">error</span></td><td>есть meta description</td></tr>
+<tr><td><code>meta:description-length</code></td><td>page</td><td><span class="pill p-warn">warn</span></td><td>длина; <code>{ min, max }</code></td></tr>
+<tr><td><code>meta:og-required</code></td><td>page</td><td><span class="pill p-warn">warn</span></td><td>og:title, og:description, og:image</td></tr>
+<tr><td><code>meta:twitter-card</code></td><td>page</td><td><span class="pill p-warn">warn</span></td><td>twitter:card корректен</td></tr>
+<tr><td><code>meta:no-duplicate-title</code></td><td>site</td><td><span class="pill p-err">error</span></td><td>одинаковые title на разных страницах</td></tr>
+<tr><td><code>meta:no-duplicate-description</code></td><td>site</td><td><span class="pill p-err">error</span></td><td>одинаковые description</td></tr>
+<tr><td><code>canonical:required</code></td><td>page</td><td><span class="pill p-err">error</span></td><td>есть rel=canonical</td></tr>
+<tr><td><code>canonical:valid</code></td><td>page</td><td><span class="pill p-err">error</span></td><td>canonical отвечает 200 (сетевой)</td></tr>
+<tr><td><code>canonical:no-chain</code></td><td>site</td><td><span class="pill p-warn">warn</span></td><td>canonical не ведёт на страницу с другим canonical</td></tr>
+</table></div>
+
+<div class="cat">headings</div>
+<div class="tbl"><table>
+<tr><th>Правило</th><th>Scope</th><th>Default</th><th>Что проверяет / опции</th></tr>
+<tr><td><code>headings:single-h1</code></td><td>page</td><td><span class="pill p-err">error</span></td><td>ровно один h1</td></tr>
+<tr><td><code>headings:no-empty</code></td><td>page</td><td><span class="pill p-warn">warn</span></td><td>нет пустых заголовков</td></tr>
+<tr><td><code>headings:hierarchy</code></td><td>page</td><td><span class="pill p-warn">warn</span></td><td>без перескоков уровней (h2 → h4)</td></tr>
+<tr><td><code>headings:h1-length</code></td><td>page</td><td><span class="pill p-warn">warn</span></td><td>длина h1; <code>{ min, max }</code></td></tr>
+<tr><td><code>headings:unique-h1</code></td><td>site</td><td><span class="pill p-warn">warn</span></td><td>h1 уникальны между страницами</td></tr>
+</table></div>
+
+<div class="cat">links</div>
+<div class="tbl"><table>
+<tr><th>Правило</th><th>Scope</th><th>Default</th><th>Что проверяет / опции</th></tr>
+<tr><td><code>links:no-broken</code></td><td>page</td><td><span class="pill p-err">error</span></td><td>внутренние ссылки не 4xx/5xx (HEAD с кешем на прогон)</td></tr>
+<tr><td><code>links:no-redirect-chain</code></td><td>page</td><td><span class="pill p-warn">warn</span></td><td>цепочки редиректов; <code>{ maxHops }</code></td></tr>
+<tr><td><code>links:permanent-redirects</code></td><td>page</td><td><span class="pill p-warn">warn</span></td><td>302 там, где должен быть 301</td></tr>
+<tr><td><code>links:trailing-slash-consistent</code></td><td>site</td><td><span class="pill p-warn">warn</span></td><td>единообразие завершающего слеша</td></tr>
+<tr><td><code>links:no-orphans</code></td><td>site</td><td><span class="pill p-warn">warn</span></td><td>страницы sitemap, на которые никто не ссылается</td></tr>
+</table></div>
+
+<div class="cat">i18n</div>
+<div class="tbl"><table>
+<tr><th>Правило</th><th>Scope</th><th>Default</th><th>Что проверяет</th></tr>
+<tr><td><code>hreflang:valid-targets</code></td><td>page</td><td><span class="pill p-err">error</span></td><td>hreflang-цели отвечают 200</td></tr>
+<tr><td><code>hreflang:symmetric</code></td><td>site</td><td><span class="pill p-err">error</span></td><td>взаимность hreflang-ссылок</td></tr>
+<tr><td><code>i18n:no-locale-leak</code></td><td>page</td><td><span class="pill p-err">error</span></td><td>язык контента соответствует локали URL и html lang</td></tr>
+</table></div>
+
+<div class="cat">structured-data · images</div>
+<div class="tbl"><table>
+<tr><th>Правило</th><th>Scope</th><th>Default</th><th>Что проверяет / опции</th></tr>
+<tr><td><code>jsonld:parseable</code></td><td>page</td><td><span class="pill p-err">error</span></td><td>JSON-LD парсится</td></tr>
+<tr><td><code>jsonld:valid-schema</code></td><td>page</td><td><span class="pill p-err">error</span></td><td>валидность по Schema.org-схемам; <code>{ schemas }</code> — свои схемы</td></tr>
+<tr><td><code>images:alt-required</code></td><td>page</td><td><span class="pill p-warn">warn</span></td><td>у контентных img есть alt</td></tr>
+<tr><td><code>images:dimensions-required</code></td><td>page</td><td><span class="pill p-warn">warn</span></td><td>width/height против CLS</td></tr>
+<tr><td><code>images:no-lazy-above-fold</code></td><td>page</td><td><span class="pill p-warn">warn</span></td><td>нет loading=lazy во вьюпорте; <code>{ firstImages }</code></td></tr>
+</table></div>
+
+<div class="cat">robots</div>
+<div class="tbl"><table>
+<tr><th>Правило</th><th>Scope</th><th>Default</th><th>Что проверяет</th></tr>
+<tr><td><code>robots:reachable</code></td><td>site</td><td><span class="pill p-err">error</span></td><td>robots.txt отвечает 200</td></tr>
+<tr><td><code>robots:zone-not-blocked</code></td><td>site</td><td><span class="pill p-err">error</span></td><td>своя зона не закрыта Disallow</td></tr>
+<tr><td><code>robots:sitemap-declared</code></td><td>site</td><td><span class="pill p-warn">warn</span></td><td>Sitemap-директива объявлена</td></tr>
+<tr><td><code>robots:env-policy</code></td><td>site</td><td><span class="pill p-err">error</span></td><td>prod открыт / не-prod закрыт</td></tr>
+<tr><td><code>robots:expected-disallow</code></td><td>site</td><td><span class="pill p-warn">warn</span></td><td>ожидания из <code>robots.expect</code> выполняются</td></tr>
+</table></div>
+
+<div class="cat">indexability · http</div>
+<div class="tbl"><table>
+<tr><th>Правило</th><th>Scope</th><th>Default</th><th>Что проверяет / опции</th></tr>
+<tr><td><code>indexability:ssr-content</code></td><td>page</td><td><span class="pill p-err">error</span></td><td>контент есть в SSR, а не только после гидрации; <code>{ minRatio }</code></td></tr>
+<tr><td><code>sitemap:reachable</code></td><td>site</td><td><span class="pill p-err">error</span></td><td>sitemap.xml отвечает 200 и парсится</td></tr>
+<tr><td><code>sitemap:no-noindex</code></td><td>site</td><td><span class="pill p-err">error</span></td><td>в sitemap нет noindex-страниц</td></tr>
+<tr><td><code>http:no-mixed-content</code></td><td>page</td><td><span class="pill p-err">error</span></td><td>нет http-ресурсов на https-странице</td></tr>
+<tr><td><code>http:no-soft-404</code></td><td>site</td><td><span class="pill p-err">error</span></td><td>404 не маскируются под 200</td></tr>
+<tr><td><code>http:x-robots-consistent</code></td><td>page</td><td><span class="pill p-err">error</span></td><td>X-Robots-Tag не противоречит meta robots</td></tr>
+<tr><td><code>http:ttfb-budget</code></td><td>site</td><td><span class="pill p-warn">warn</span></td><td>p75 TTFB по группам; <code>{ p75, budgets }</code></td></tr>
+<tr><td><code>mobile:viewport</code></td><td>page</td><td><span class="pill p-err">error</span></td><td>есть viewport meta</td></tr>
+</table></div>
+
+<h3>Спец-правила вне реестра</h3>
+<ul>
+  <li><code>links:reachable</code> — ссылки в чужие зоны домена живы (синтезируется краулером из reachability-очереди; настраивается через <code>rules</code>).</li>
+  <li><code>lighthouse:threshold</code> — нарушение порога из lighthouse-конфига.</li>
+  <li><code>crawl:timeout</code> — страница не загрузилась (warn); её page-чеки пропускаются, ложных ошибок не будет.</li>
+  <li><code>internal:check-failed</code> — правило бросило исключение (info); один упавший чек не валит аудит.</li>
+</ul>
+
+<h2 id="ru-heuristics">Умные эвристики</h2>
+<ul>
+  <li><strong>i18n:no-locale-leak</strong> — двухслойный: (1) <code>html lang</code> против локали из префикса URL; (2) язык самого текста — клон body без script/style/noscript/template → доля кириллицы &gt;50% либо стоп-словные профили en/de/fr/es/it (минимум 40 букв, лучший скор ≥3 и ≥2× второго места; неизвестные локали не флагаются). Ловит русский текст под <code>/en/</code> даже при правильном lang.</li>
+  <li><strong>images:no-lazy-above-fold</strong> — Playwright присылает src картинок, реально попавших во вьюпорт (1280×720); матчинг поштучный: lazy-дубликат той же картинки в футере не флагается. Без данных — фоллбэк «первые 3 img».</li>
+  <li><strong>http:ttfb-budget</strong> — p75 по группам: явные <code>budgets: {'/listing/**': 500}</code> матчатся route-pattern'ом, остальные страницы группируются автоматически (сегменты с id/uuid → <code>*</code>); авто-группа предупреждает только при ≥2 сэмплах — одиночный холодный старт не сигнал.</li>
+  <li><strong>http:no-soft-404</strong> — HEAD на заведомо несуществующий путь: 200 → сайт маскирует 404; плюс паттерны «не найдено» в тексте при статусе 200.</li>
+  <li><strong>indexability:ssr-content</strong> — сравнение ssrHtml и html после гидрации: H1 только на клиенте или &lt;50% текста в SSR → ошибка индексации.</li>
+</ul>
+
+<h2 id="ru-cli">CLI — все команды</h2>
+
+<h3>ranklint audit</h3>
+<div class="tbl"><table>
+<tr><th>Флаг</th><th>Описание</th></tr>
+<tr><td><code>--url</code></td><td>адрес живого сайта</td></tr>
+<tr><td><code>--start</code></td><td>путь к <code>.output/server/index.mjs</code> — сам поднимет Nitro и погасит после</td></tr>
+<tr><td><code>--profile</code></td><td>профиль из seo.config</td></tr>
+<tr><td><code>--reporter</code></td><td>markdown (default) | json | junit | gitlab | html | github</td></tr>
+<tr><td><code>--output</code></td><td>отчёт в файл вместо stdout</td></tr>
+<tr><td><code>--json-output</code></td><td>дополнительно сырой json (вход для diff)</td></tr>
+<tr><td><code>--cwd</code></td><td>где искать seo.config</td></tr>
+<tr><td><code>--mode monitor</code></td><td>режим мониторинга (см. ниже)</td></tr>
+</table></div>
+<p>Exit code 1 при error-issues. Без seo.config работает с минимальным конфигом из origin URL. Флоу: конфиг → кастомные чеки → seeds (при <code>strategy: 'sitemap+sample'</code> — выборка из sitemap: группировка по route-pattern, до 5 случайных URL из группы) → BFS-краул → чеки → crawl-budget анализ (группы параметрических URL: сколько, у скольких canonical/noindex — видно, куда утекает краул-бюджет) → Lighthouse → отчёт.</p>
+
+<h3>ranklint diff</h3>
+<div class="tbl"><table>
+<tr><th>Флаг</th><th>Описание</th></tr>
+<tr><td><code>--base</code></td><td>путь к report.json <em>или</em> git-ref — тогда отчёт достаётся из артефактов CI</td></tr>
+<tr><td><code>--current</code></td><td>текущий report.json</td></tr>
+<tr><td><code>--reporter</code></td><td>markdown | json</td></tr>
+<tr><td><code>--output</code></td><td>в файл</td></tr>
+</table></div>
+<p>CI-адаптер по окружению: <code>GITHUB_ACTIONS=true</code> → GitHub (артефакт по имени, zip распаковывается встроенным ридером), иначе GitLab (job-артефакт ветки). Политика ошибок: <strong>нет CI-контекста → warn + полный отчёт «first run»</strong> (base не найден — не ошибка); <strong>ошибка загрузки (401/403/сеть) → падение</strong>, чтобы протухший токен не маскировался вечным first run. Exit 1 только при новых error-issues.</p>
+
+<h3>Остальные</h3>
+<div class="tbl"><table>
+<tr><th>Команда</th><th>Флаги</th><th>Что делает</th></tr>
+<tr><td><code>lighthouse</code></td><td>--url (обяз.), --runs, --cwd, --output</td><td>отдельный прогон LH с агрегацией и порогами из конфига; exit 1 при нарушении</td></tr>
+<tr><td><code>outline</code></td><td>--url (обяз.), --output, --cwd</td><td>markdown-дерево h1–h6 всех страниц краула — ревью структуры</td></tr>
+<tr><td><code>watch</code></td><td>--url (default localhost:3000), --pages, --app</td><td>live-чеки при правке файлов (см. Watch)</td></tr>
+<tr><td><code>history</code></td><td>--dir, --limit (20), --csv, --cwd</td><td>тренд накопленных monitor-отчётов таблицей или CSV</td></tr>
+<tr><td><code>generate robots-fragment</code></td><td>--output, --cwd</td><td>фрагмент корневого robots.txt из <code>robots.expect</code> для команды-владельца</td></tr>
+</table></div>
+
+<h2 id="ru-zones">Зоны (multi-app домены)</h2>
+<p>Когда на одном домене живут несколько приложений разных команд:</p>
+<pre><code>apps: {
+  self: { paths: ['/en/market/**', '/ar/market/**'] },  // зона с именем self краулится
+  main: { paths: ['/**'], owner: 'external' },          // остальное — чужое
+}</code></pre>
+<p>Каждый URL классифицируется по самому специфичному паттерну (глобы <code>*</code>/<code>**</code>): своя зона → полный краул; чужая зона того же домена → только HEAD в reachability-очередь → правило <code>links:reachable</code> («наша ссылка в чужой раздел жива?»); <code>crawl.ignore</code> → пропуск; внешний домен → счётчик, не ходим. Тот же route-pattern-матчер используют lighthouse-пороги, ttfb-бюджеты и crawl-budget группировка. DevTools-панель тоже понимает зоны (через dev-эндпоинт). Битая ссылка в чужую зону — это <em>не</em> <code>links:no-broken</code>: чинить не вам, но знать нужно.</p>
+
+<h2 id="ru-lighthouse">Lighthouse</h2>
+<p>Отдельный Chrome через chrome-launcher (не Playwright — нужен установленный Chrome). N прогонов на URL, агрегация per-metric: <code>median</code> (default) / <code>p75</code> / <code>best</code> — одиночный прогон шумит на ±10 баллов. Метрики: performance, seo, accessibility, bestPractices, lcp, cls, tbt + LCP-элемент с подсказкой. Пороги задаются route-паттернами и превращаются в обычные error-issues (→ exit 1). Результат попадает в <code>Report.lighthouse</code>; diff сравнивает по паре (url-pattern, metric) — регрессия метрики между ветками видна. <code>formFactor: 'mobile'</code> заодно ставит краулеру вьюпорт 375×812, если <code>crawl.viewport</code> не задан.</p>
+
+<h2 id="ru-diff">Diff и CI</h2>
+<p>Ключ проблемы: <code>checkId + url без origin + selector</code> — стабилен между окружениями (UAT сравнивается с prod). <code>diffReports</code> → newIssues / fixedIssues / pagesDelta.</p>
+<p>Хранилища базовых отчётов (<code>ReportStorage</code>): <strong>fs</strong> (директория JSON, latest по mtime), <strong>GitLab artifacts</strong> (read-only, по job-артефакту ветки), <strong>GitHub artifacts</strong> (read-only: список по имени, фильтр по ветке, скачивание zip — свой минимальный zip-ридер: EOCD → central directory → inflateRawSync; битый вход → null, не исключение), <strong>S3</strong> (для монитора; SDK — опциональный peer, любой S3-совместимый endpoint).</p>
+<p>Готовые CI-пресеты: <code>presets/gitlab-ci/seo.yml</code> (джобы <code>.ranklint-audit</code>, <code>.ranklint-diff</code> с автокомментом в MR, <code>.ranklint-lighthouse</code>, <code>.ranklint-monitor</code> с кешем Playwright и отчётов) и <code>presets/github-actions/seo.yml</code>. Репортер <code>github</code> — аннотации в PR.</p>
+
+<h2 id="ru-monitor">Мониторинг прода</h2>
+<p><code>ranklint audit --url https://prod --mode monitor</code> — для крона/schedule. <strong>Exit всегда 0</strong>: прод-мониторинг не роняет пайплайн, вместо этого алертит. Флоу: аудит → обогащение → diff против последнего сохранённого отчёта → сохранение по timestamp → алерты только при <code>newIssues &gt; 0</code>.</p>
+<ul>
+  <li><strong>CrUX</strong> (<code>RANKLINT_CRUX_API_KEY</code>) — полевые Core Web Vitals origin'а: LCP, CLS, INP реальных пользователей.</li>
+  <li><strong>Search Console URL Inspection</strong> — до 10 страниц: verdict, coverageState, indexingState, rich-results issues. Авторизация: готовый токен <code>RANKLINT_GSC_TOKEN</code> или сервис-аккаунт <code>RANKLINT_GSC_KEY_FILE</code> (RS256-JWT собирается на node:crypto без зависимостей, iat со сдвигом −30с на clock skew).</li>
+  <li><strong>Алерты</strong>: Slack webhook и/или Telegram (bot token + chat id) — payload'ы собирают <code>slackPayload</code>/<code>telegramText</code>.</li>
+  <li><strong>Хранилище</strong>: fs (default) или s3 с ротацией <code>keep</code>; тренд — <code>ranklint history</code>.</li>
+</ul>
+
+<h2 id="ru-watch">Watch mode</h2>
+<p><code>ranklint watch --url http://localhost:3000</code> — chokidar следит за <code>app/pages/**</code> (и остальным app-каталогом: правка layout/композабла перепроверяет недавние роуты). Файл → роут → HttpFetcher дергает дев-сервер → быстрые page-чеки без сетевых → вывод в стиле ESLint (url + selector + suggestion).</p>
+<p>Динамические роуты: <code>[id]</code> → <code>[^/]+</code>, <code>[...slug]</code> → <code>.+</code>, <code>[[x]]</code> — опциональные сегменты; сэмплы URL берутся из <code>/sitemap.xml</code> дев-сервера (понимает sitemap-index на 1 уровень, до 3 URL на паттерн, кеш с рефетчем). Нет совпадений → <code>watch:no-sample-url</code>; упал чек → <code>watch:error</code>, а не ложный «clean». Интеграции с модулем нет намеренно — CLI независим.</p>
+
+<h2 id="ru-custom">Кастомные правила и пресеты</h2>
+<pre><code>import { defineCheck } from '@ranklint/checks'
+
+customChecks: [
+  defineCheck({
+    id: 'myteam:no-lorem',          // коллизия со встроенным id — ошибка с подсказкой
+    category: 'meta',
+    severity: 'warn',
+    scope: 'page',                  // 'page' | 'site'
+    docs: 'https://wiki.myteam.dev/seo/no-lorem',
+    optionsSchema: z.object({...}), // опционально — валидация опций
+    async run(ctx) {
+      // ctx: page, pages, document (linkedom DOM), config, site, fetcher
+      return [{ checkId: 'myteam:no-lorem', severity: 'warn', message: '...', url: ctx.page!.url }]
+    },
+  }),
+]</code></pre>
+<p>Кастомные правила равноправны: настраиваются через <code>rules</code>, отключаются <code>'off'</code> и <code>useRanklintIgnore</code>. Контракт <code>CheckContext</code> стабилен в рамках мажорной версии. Пресеты — через <code>extends</code> (npm-пакет или локальный файл); <code>@ranklint/preset-default</code> фиксирует встроенные правила на дефолтных severity — «живой» снапшот от установленной версии checks.</p>
+
+<h2 id="ru-env">Env-переменные</h2>
+<div class="tbl"><table>
+<tr><th>Переменная</th><th>Назначение</th></tr>
+<tr><td><code>NUXT_RANKLINT_ENV</code></td><td>override окружения для robots-политики (prod / staging / dev)</td></tr>
+<tr><td><code>NUXT_RANKLINT_SITE_URL</code></td><td>override site.url модуля per-окружение</td></tr>
+<tr><td><code>RANKLINT_CRUX_API_KEY</code></td><td>CrUX API (полевые CWV в мониторе)</td></tr>
+<tr><td><code>RANKLINT_GSC_TOKEN</code> / <code>RANKLINT_GSC_KEY_FILE</code> / <code>RANKLINT_GSC_PROPERTY</code></td><td>Search Console: токен / JSON сервис-аккаунта / property</td></tr>
+<tr><td><code>RANKLINT_SLACK_WEBHOOK</code></td><td>алерты монитора в Slack</td></tr>
+<tr><td><code>RANKLINT_TELEGRAM_BOT_TOKEN</code> + <code>RANKLINT_TELEGRAM_CHAT_ID</code></td><td>алерты в Telegram</td></tr>
+<tr><td><code>CI_API_V4_URL</code>, <code>CI_PROJECT_ID</code>, <code>CI_JOB_TOKEN</code> / <code>RANKLINT_GITLAB_TOKEN</code>, <code>RANKLINT_AUDIT_JOB</code></td><td>GitLab-артефакты для diff (подставляются GitLab'ом автоматически, кроме токена и имени джобы)</td></tr>
+<tr><td><code>GITHUB_REPOSITORY</code>, <code>GITHUB_TOKEN</code> / <code>RANKLINT_GITHUB_TOKEN</code>, <code>RANKLINT_ARTIFACT_NAME</code>, <code>GITHUB_API_URL</code></td><td>GitHub-артефакты для diff (имя артефакта default: <code>ranklint-report</code>)</td></tr>
+</table></div>
+
+<h2 id="ru-nuances">Нюансы и ограничения</h2>
+<ul>
+  <li>Дедуп URL при краула: hash отбрасывается, <strong>query сохраняется</strong> — фасеточные фильтры важны для crawl-budget анализа.</li>
+  <li>Страница не загрузилась (таймаут, сеть, TLS) → снапшот со statusCode 0 + <code>crawl:timeout</code>; page-чеки по ней <strong>пропускаются</strong> — ложных «нет title» не будет. Краулер не падает целиком никогда.</li>
+  <li><code>maxPages</code> достигнут → <code>truncated: true</code> в отчёте — видно, что аудит неполный.</li>
+  <li>Дев-сервер Nuxt — не для полного краула: компиляция на лету × параллельные вкладки = OOM воркера. Локально гоняйте <code>--start</code> по сборке или снижайте <code>concurrency</code>/<code>maxPages</code>; полный аудит — по deployed-окружениям.</li>
+  <li><code>insecureTls</code> выставляет <code>ignoreHTTPSErrors</code> Playwright'у и <code>NODE_TLS_REJECT_UNAUTHORIZED=0</code> процессу — только для dev/staging профилей.</li>
+  <li>Lighthouse требует установленный Chrome (chrome-launcher) и не работает с self-signed TLS — гоняйте по deployed-окружениям.</li>
+  <li>Вьюпорт above-fold эвристики — дефолтный Playwright 1280×720 (или <code>crawl.viewport</code>). srcset-only картинки без src не меряются.</li>
+  <li><code>http:x-robots-consistent</code> входит в DevTools Level 1, но заголовков у панели нет — там он no-op.</li>
+  <li>Функции-источники sitemap самодостаточны: никаких замыканий на переменные nuxt.config.</li>
+  <li>Профиль накладывается defu-патчем: объекты сливаются, скаляры перекрываются.</li>
+  <li>Один прогон монитора = один JSON; ключи хранилища: timestamp (monitor) или commit SHA (MR).</li>
+  <li>DOM парсится linkedom (сервер) / DOMParser (панель) — один и тот же код правил работает в обеих средах.</li>
+  <li>Ошибка одного правила (<code>internal:check-failed</code>, info) не валит аудит; неизвестный rule-id в конфиге — валит с did-you-mean.</li>
+</ul>
+
+<hr>
+<p class="meta">Репозиторий: github.com/aakazancev/ranklint · справочник правил генерируется из реестра (docs/rules.md) · JSON-схема конфига: schemas/seo-config.schema.json</p>
+
+</main>
+</div>
+<script>
+(() => {
+  const setLang = (lang, scroll) => {
+    document.body.classList.toggle('ru', lang === 'ru')
+    document.documentElement.lang = lang
+    document.querySelectorAll('.lang-switch button').forEach(b =>
+      b.setAttribute('aria-pressed', String(b.dataset.lang === lang)))
+    try { localStorage.setItem('ranklint-lang', lang) } catch {}
+    if (scroll) window.scrollTo({ top: 0 })
+    pick()
+  }
+  document.querySelectorAll('.lang-switch button').forEach(b =>
+    b.addEventListener('click', () => setLang(b.dataset.lang, true)))
+
+  const spy = () => {
+    const wrap = document.body.classList.contains('ru')
+      ? document.querySelector('.wrap-ru')
+      : document.querySelector('.wrap-en')
+    const links = [...wrap.querySelectorAll('nav a[href^="#"]')]
+    const sections = links
+      .map(a => document.getElementById(a.getAttribute('href').slice(1)))
+      .filter(Boolean)
+    return { links, sections }
+  }
+  const pick = () => {
+    const { links, sections } = spy()
+    if (!sections.length) return
+    const probe = window.innerHeight * 0.25
+    let best = sections[0]
+    for (const s of sections) {
+      if (s.getBoundingClientRect().top <= probe) best = s
+      else break
+    }
+    if (window.innerHeight + window.scrollY >= document.body.scrollHeight - 4) best = sections[sections.length - 1]
+    links.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + best.id))
+  }
+  let raf = 0
+  addEventListener('scroll', () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(pick) }, { passive: true })
+  addEventListener('resize', pick)
+
+  let stored = null
+  try { stored = localStorage.getItem('ranklint-lang') } catch {}
+  setLang(stored === 'ru' ? 'ru' : 'en', false)
+})()
+</script>
+
+</body>
+</html>
