@@ -21,6 +21,7 @@
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
+    "@types/node": "^26.1.0",
     "unbuild": "^3.6.1"
   },
   "dependencies": {

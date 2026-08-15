@@ -26,6 +26,7 @@
   },
   "devDependencies": {
     "@nuxt/devtools-kit": "^3.2.4",
+    "@types/node": "^26.1.0",
     "happy-dom": "^20.0.11",
     "linkedom": "^0.18.12",
     "unbuild": "^3.6.1",
