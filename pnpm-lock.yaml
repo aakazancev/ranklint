@@ -144,6 +144,9 @@ importers:
       '@ranklint/checks':
         specifier: workspace:*
         version: link:../checks
+      '@ranklint/core':
+        specifier: workspace:*
+        version: link:../core
       '@ranklint/devtools':
         specifier: workspace:*
         version: link:../devtools
