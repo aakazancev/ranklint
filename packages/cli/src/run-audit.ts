@@ -39,7 +39,8 @@ export async function runAudit(opts: RunAuditOptions): Promise<Report> {
   const rules = resolveRules(config.rules, registry)
   const viewport = config.crawl?.viewport
     ?? (config.lighthouse?.formFactor === 'mobile' ? { width: 375, height: 812 } : undefined)
-  const fetcher = opts.fetcher ?? new PlaywrightFetcher({ auth: config.crawl?.auth, viewport })
+  if (config.crawl?.insecureTls) process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
+  const fetcher = opts.fetcher ?? new PlaywrightFetcher({ auth: config.crawl?.auth, viewport, insecureTls: config.crawl?.insecureTls })
   try {
     let seeds = [opts.url]
     if (config.crawl?.strategy === 'sitemap+sample') {

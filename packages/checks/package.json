@@ -9,15 +9,18 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.mts",
-      "import": "./dist/index.mjs"
+      "import": "./dist/index.mjs",
+      "default": "./dist/index.mjs"
     },
     "./schema-org": {
       "types": "./dist/schema-org.d.mts",
-      "import": "./dist/schema-org.mjs"
+      "import": "./dist/schema-org.mjs",
+      "default": "./dist/schema-org.mjs"
     },
     "./level1": {
       "types": "./dist/level1.d.mts",
-      "import": "./dist/level1.mjs"
+      "import": "./dist/level1.mjs",
+      "default": "./dist/level1.mjs"
     }
   },
   "files": [

@@ -127,6 +127,9 @@
         "userAgent": {
           "type": "string"
         },
+        "insecureTls": {
+          "type": "boolean"
+        },
         "viewport": {
           "type": "object",
           "properties": {

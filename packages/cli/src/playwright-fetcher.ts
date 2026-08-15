@@ -5,6 +5,7 @@ import { chromium, type Browser } from 'playwright'
 export interface PlaywrightFetcherOptions {
   auth?: FetchAuth
   viewport?: { width: number, height: number }
+  insecureTls?: boolean
 }
 
 export class PlaywrightFetcher implements PageFetcher {
@@ -12,10 +13,12 @@ export class PlaywrightFetcher implements PageFetcher {
   private http: HttpFetcher
   private auth?: FetchAuth
   private viewport?: { width: number, height: number }
+  private insecureTls?: boolean
 
   constructor(options: PlaywrightFetcherOptions = {}) {
     this.auth = options.auth
     this.viewport = options.viewport
+    this.insecureTls = options.insecureTls
     this.http = new HttpFetcher(options.auth)
   }
 
@@ -26,6 +29,7 @@ export class PlaywrightFetcher implements PageFetcher {
       ...(opts?.userAgent ? { userAgent: opts.userAgent } : {}),
       ...(Object.keys(headers).length > 0 ? { extraHTTPHeaders: headers } : {}),
       ...(this.viewport ? { viewport: this.viewport } : {}),
+      ...(this.insecureTls ? { ignoreHTTPSErrors: true } : {}),
     })
     const page = await context.newPage()
     try {

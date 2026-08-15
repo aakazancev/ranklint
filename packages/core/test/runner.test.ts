@@ -111,3 +111,12 @@ describe('runChecks', () => {
     expect(getDocument(s)).toBe(getDocument(s))
   })
 })
+
+describe('failed snapshots', () => {
+  it('skips page checks for snapshots with statusCode 0', async () => {
+    const dead: PageSnapshot = { url: 'https://x.com/dead', html: '', statusCode: 0, headers: {}, ttfb: 0, links: [] }
+    const report = await runChecks(baseInput({ snapshots: [dead], checks: [h1Check] }))
+    expect(report.issues).toEqual([])
+    expect(report.meta.pagesAudited).toBe(1)
+  })
+})

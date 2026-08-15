@@ -51,6 +51,7 @@ export async function runChecks(input: RunnerInput): Promise<Report> {
   const siteChecks = input.checks.filter(c => c.scope === 'site')
 
   for (const snapshot of input.snapshots) {
+    if (snapshot.statusCode === 0) continue
     const doc = getDocument(snapshot)
     const ignored = ignoredRules(doc)
     for (const check of pageChecks) {

@@ -34,6 +34,7 @@ export const configSchema = z.object({
     ignore: z.array(z.string()).optional(),
     strategy: z.enum(['full', 'sitemap+sample']).optional(),
     userAgent: z.string().optional(),
+    insecureTls: z.boolean().optional(),
     viewport: z.object({ width: z.number().int().positive(), height: z.number().int().positive() }).optional(),
     auth: z.object({
       headers: z.record(z.string(), z.string()).optional(),

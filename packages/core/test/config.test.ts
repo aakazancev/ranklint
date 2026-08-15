@@ -1,7 +1,7 @@
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
 import { z } from 'zod'
-import { loadRanklintConfig, resolveRules, type RuleRegistryEntry } from '../src/config'
+import { configSchema, loadRanklintConfig, resolveRules, type RuleRegistryEntry } from '../src/config'
 
 const cwd = fileURLToPath(new URL('./fixtures/config', import.meta.url))
 
@@ -61,5 +61,12 @@ describe('resolveRules', () => {
   it('suggests similar rule on typo', () => {
     expect(() => resolveRules({ 'meta:title-lenght': 'error' }, registry))
       .toThrow('Did you mean "meta:title-length"?')
+  })
+})
+
+describe('crawl.insecureTls', () => {
+  it('accepts the flag', () => {
+    const parsed = configSchema.safeParse({ site: { url: 'https://x.com' }, crawl: { insecureTls: true } })
+    expect(parsed.success).toBe(true)
   })
 })
