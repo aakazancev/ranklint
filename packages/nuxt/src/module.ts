@@ -22,6 +22,7 @@ export default defineNuxtModule<ModuleOptions>({
     }
     const logger = useLogger('ranklint')
     const resolved = resolveRanklintOptions(options)
+    resolved.rootDir = nuxt.options.rootDir
     const fnSources = resolved.sitemap === false ? [] : resolved.sitemap.fnSources
     if (resolved.sitemap !== false) resolved.sitemap.fnSources = []
     nuxt.options.runtimeConfig.ranklint = resolved
@@ -84,6 +85,10 @@ export default defineNuxtModule<ModuleOptions>({
         addServerHandler({
           route: '/__ranklint/devtools',
           handler: resolver.resolve('./runtime/server/routes/ranklint-devtools.get'),
+        })
+        addServerHandler({
+          route: '/__ranklint/devtools-zones',
+          handler: resolver.resolve('./runtime/server/routes/ranklint-devtools-zones.get'),
         })
         const nuxtOptions = nuxt.options as unknown as { nitro?: { publicAssets?: unknown[] } }
         nuxtOptions.nitro ??= {}

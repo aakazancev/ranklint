@@ -1,4 +1,5 @@
-import type { Issue, PageFetcher, PageSnapshot } from '@ranklint/core'
+import type { AppZone, Issue, PageFetcher, PageSnapshot } from '@ranklint/core'
+import { classifyUrl } from '@ranklint/core'
 import { level1Checks } from '@ranklint/checks/level1'
 import { extractSchemaNodes, validateSchemaNode, type SchemaOrgIssue } from '@ranklint/checks/schema-org'
 
@@ -131,4 +132,10 @@ export async function buildPageReport(document: Document, url: string): Promise<
     jsonLd: extractJsonLd(document),
     issues,
   }
+}
+
+export function linkZone(href: string, apps?: Record<string, AppZone> | null): string | null {
+  if (!apps) return null
+  const cls = classifyUrl(href, { siteUrl: 'http://ranklint.local', apps })
+  return cls.action === 'reachability' ? cls.zone : null
 }

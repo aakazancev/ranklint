@@ -1,7 +1,7 @@
-import type { Issue } from '@ranklint/core'
+import type { AppZone, Issue } from '@ranklint/core'
 import { onDevtoolsClientConnected } from '@nuxt/devtools-kit/iframe-client'
 import { createApp, defineComponent, h, ref, shallowRef, type VNodeChild } from 'vue'
-import { buildPageReport, collectInternalLinks, type JsonLdBlock, type OutlineNode, type PageReport } from '../report'
+import { buildPageReport, collectInternalLinks, linkZone, type JsonLdBlock, type OutlineNode, type PageReport } from '../report'
 import { connectHostPage, type HostPage } from './host'
 
 interface LinkResult {
@@ -9,6 +9,7 @@ interface LinkResult {
   count: number
   state: 'pending' | 'ok' | 'broken' | 'failed'
   status?: number
+  zone?: string
 }
 
 const host = shallowRef<HostPage | null>(null)
@@ -32,12 +33,28 @@ async function refresh() {
   report.value = await buildPageReport(cleanDocument(page.document), url)
 }
 
+async function fetchZones(): Promise<Record<string, AppZone> | null> {
+  try {
+    const res = await fetch('/__ranklint/devtools-zones')
+    if (!res.ok) return null
+    return ((await res.json()) as { apps: Record<string, AppZone> | null }).apps
+  } catch {
+    return null
+  }
+}
+
 async function checkLinks() {
   const page = host.value
   if (!page || checkingLinks.value) return
   checkingLinks.value = true
+  const apps = await fetchZones()
   const targets = collectInternalLinks(cleanDocument(page.document), pageUrl.value)
-  links.value = targets.map(t => ({ href: t.href, count: t.count, state: 'pending' as const }))
+  links.value = targets.map(t => ({
+    href: t.href,
+    count: t.count,
+    state: 'pending' as const,
+    zone: linkZone(t.href, apps) ?? undefined,
+  }))
   const entries = links.value
   const queue = entries.map((_, i) => i)
   const worker = async () => {
@@ -108,12 +125,24 @@ function jsonLdList(blocks: JsonLdBlock[]): VNodeChild {
 function linkPanel(): VNodeChild {
   const results = links.value
   if (!results) return h('p', { class: 'dim' }, 'Not checked yet — link check is on demand.')
-  const broken = results.filter(r => r.state === 'broken' || r.state === 'failed')
+  const isDead = (r: LinkResult) => r.state === 'broken' || r.state === 'failed'
+  const broken = results.filter(r => !r.zone && isDead(r))
+  const foreign = results.filter(r => r.zone)
+  const foreignBroken = foreign.filter(isDead)
+  const summary = `${results.length} internal URLs, ${broken.length} broken`
+    + (foreign.length > 0 ? `, ${foreign.length} into other zones` : '')
+    + (checkingLinks.value ? ', checking…' : '')
   return [
-    h('p', `${results.length} internal URLs, ${broken.length} broken${checkingLinks.value ? ', checking…' : ''}`),
+    h('p', summary),
     ...broken.map(r => h('div', { class: 'issue error' }, [
       h('b', r.status ? `HTTP ${r.status}` : 'unreachable'),
       ` — ${r.href} (${r.count} link${r.count > 1 ? 's' : ''})`,
+    ])),
+    ...foreignBroken.map(r => h('div', { class: 'issue warn' }, [
+      h('b', r.status ? `HTTP ${r.status}` : 'unreachable'),
+      ` — ${r.href} (${r.count} link${r.count > 1 ? 's' : ''}) `,
+      h('span', { class: 'badge' }, `zone: ${r.zone}`),
+      h('div', { class: 'sg' }, 'Owned by another app on this domain — may not be running locally'),
     ])),
   ]
 }

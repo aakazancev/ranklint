@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { parseHTML } from 'linkedom'
-import { buildPageReport, collectInternalLinks } from '../src/report'
+import { buildPageReport, collectInternalLinks, linkZone } from '../src/report'
 
 const html = `<!doctype html><html><head>
 <title>A well sized page title for the devtools test</title>
@@ -68,5 +68,25 @@ describe('collectInternalLinks', () => {
       { href: '/about', count: 2 },
       { href: '/pricing?plan=pro', count: 1 },
     ])
+  })
+})
+
+describe('linkZone', () => {
+  const apps = {
+    self: { paths: ['/en/market/**', '/ar/market/**'] },
+    main: { paths: ['/**'] },
+  }
+
+  it('returns the zone name for links into a foreign zone', () => {
+    expect(linkZone('/en/about', apps)).toBe('main')
+  })
+
+  it('returns null for links inside the self zone', () => {
+    expect(linkZone('/en/market/cars?page=2', apps)).toBe(null)
+  })
+
+  it('returns null without zone config', () => {
+    expect(linkZone('/en/about', null)).toBe(null)
+    expect(linkZone('/en/about', undefined)).toBe(null)
   })
 })

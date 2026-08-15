@@ -55,6 +55,12 @@ describe.skipIf(!existsSync(clientBundle))('devtools panel e2e', () => {
     if (server?.pid) process.kill(-server.pid, 'SIGTERM')
   })
 
+  it('serves the zones endpoint (null without seo.config)', async () => {
+    const res = await fetch(`${BASE}/__ranklint/devtools-zones`)
+    expect(res.ok).toBe(true)
+    expect(await res.json()).toEqual({ apps: null })
+  })
+
   it('renders the live report and updates on host navigation', async () => {
     await page.goto(`${BASE}/`, { waitUntil: 'networkidle' })
     const toggle = 'nuxt-devtools-frame .nuxt-devtools-nuxt-button, nuxt-devtools-frame .nuxt-devtools-toggle'

@@ -21,6 +21,7 @@ export interface ModuleOptions {
 }
 
 export interface ResolvedRanklintOptions {
+  rootDir: string
   siteUrl: string
   siteName: string
   sitemap: false | {
@@ -55,6 +56,7 @@ export function resolveRanklintOptions(options: ModuleOptions): ResolvedRanklint
   const robotsInput = options.robots ?? { mode: 'owner' as const }
 
   return {
+    rootDir: '',
     siteUrl: options.site?.url?.replace(/\/$/, '') ?? '',
     siteName: options.site?.name ?? '',
     sitemap: sitemapEnabled
