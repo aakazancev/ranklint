@@ -46,6 +46,7 @@ export const audit = defineCommand({
       }
       const report = await runAudit({
         url,
+        siteUrl: server?.url,
         cwd: args.cwd,
         profile: args.profile,
       })

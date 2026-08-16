@@ -461,7 +461,7 @@ export default defineRanklintConfig({
 <div class="tbl"><table>
 <tr><th>Flag</th><th>Description</th></tr>
 <tr><td><code>--url</code></td><td>address of a live site</td></tr>
-<tr><td><code>--start</code></td><td>path to <code>.output/server/index.mjs</code> — starts Nitro itself and stops it after</td></tr>
+<tr><td><code>--start</code></td><td>path to <code>.output/server/index.mjs</code> — starts Nitro itself and stops it after; the server origin overrides <code>site.url</code>, so zones match localhost</td></tr>
 <tr><td><code>--profile</code></td><td>profile from ranklint.config</td></tr>
 <tr><td><code>--reporter</code></td><td>markdown (default) | json | junit | gitlab | html | github</td></tr>
 <tr><td><code>--output</code></td><td>report to a file instead of stdout</td></tr>
@@ -854,7 +854,7 @@ export default defineRanklintConfig({
 <div class="tbl"><table>
 <tr><th>Флаг</th><th>Описание</th></tr>
 <tr><td><code>--url</code></td><td>адрес живого сайта</td></tr>
-<tr><td><code>--start</code></td><td>путь к <code>.output/server/index.mjs</code> — сам поднимет Nitro и погасит после</td></tr>
+<tr><td><code>--start</code></td><td>путь к <code>.output/server/index.mjs</code> — сам поднимет Nitro и погасит после; origin сервера подменяет <code>site.url</code> — зоны матчатся на localhost</td></tr>
 <tr><td><code>--profile</code></td><td>профиль из ranklint.config</td></tr>
 <tr><td><code>--reporter</code></td><td>markdown (default) | json | junit | gitlab | html | github</td></tr>
 <tr><td><code>--output</code></td><td>отчёт в файл вместо stdout</td></tr>

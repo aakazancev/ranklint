@@ -6,6 +6,7 @@ import { PlaywrightFetcher } from './playwright-fetcher'
 
 export interface RunAuditOptions {
   url: string
+  siteUrl?: string
   cwd?: string
   profile?: string
   fetcher?: PageFetcher
@@ -27,6 +28,7 @@ export async function runAudit(opts: RunAuditOptions): Promise<Report> {
       config = { site: { url: new URL(opts.url).origin } }
     }
   }
+  if (opts.siteUrl) config = { ...config, site: { ...config.site, url: opts.siteUrl } }
   const checks: Check[] = [...allChecks]
   const registry = new Map(ruleRegistry)
   for (const custom of config.customChecks ?? []) {

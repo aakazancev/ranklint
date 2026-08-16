@@ -55,4 +55,19 @@ describe('runAudit', () => {
     expect(report.meta.pagesAudited).toBe(1)
     expect(report.pages).toEqual(['/en/app'])
   })
+
+  it('overrides site.url with siteUrl so a launched server is crawled as self', async () => {
+    const fetcher = fakeFetcher({
+      '/en/app': '<html><head><title>App page title long enough to pass</title></head><body><h1>App heading long enough here</h1></body></html>',
+    })
+    const report = await runAudit({
+      url: 'http://127.0.0.1:4000/',
+      siteUrl: 'http://127.0.0.1:4000',
+      cwd: '/tmp',
+      fetcher,
+      config: { site: { url: 'https://site.test' }, crawl: { entry: ['/en/app'] } },
+    })
+    expect(report.meta.pagesAudited).toBe(1)
+    expect(report.pages).toEqual(['/en/app'])
+  })
 })
