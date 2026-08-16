@@ -1,5 +1,14 @@
 # @ranklint/cli
 
+## 0.4.1
+
+### Patch Changes
+
+- 6b7a0e1: `--start` now overrides `site.url` with the launched server origin — zone classification treated every localhost page as external and audited nothing
+  - @ranklint/checks@0.4.1
+  - @ranklint/core@0.4.1
+  - @ranklint/reporters@0.4.1
+
 ## 0.4.0
 
 ### Minor Changes

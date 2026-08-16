@@ -1,5 +1,12 @@
 # @ranklint/preset-default
 
+## 0.4.1
+
+### Patch Changes
+
+- @ranklint/checks@0.4.1
+- @ranklint/core@0.4.1
+
 ## 0.4.0
 
 ### Patch Changes
