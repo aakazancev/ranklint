@@ -14,6 +14,7 @@ export interface ModuleOptions {
     path?: string
     sources?: (string | SitemapSourceEntry | SitemapSource)[]
     cacheTtl?: number
+    autoRoutes?: boolean
   }
   robots?: false | { mode?: 'owner' | 'external' }
   jsonLd?: boolean
@@ -30,6 +31,7 @@ export interface ResolvedRanklintOptions {
     staticEntries: SitemapSourceEntry[]
     fnSources: SitemapSource[]
     cacheTtl: number
+    autoRoutes: boolean
     routes: string[]
   }
   robots: false | { mode: 'owner' | 'external' }
@@ -66,6 +68,7 @@ export function resolveRanklintOptions(options: ModuleOptions): ResolvedRanklint
           staticEntries: sources.filter((s): s is SitemapSourceEntry => typeof s === 'object' && s !== null),
           fnSources: sources.filter((s): s is SitemapSource => typeof s === 'function'),
           cacheTtl: sitemapObj.cacheTtl ?? 3600,
+          autoRoutes: sitemapObj.autoRoutes !== false,
           routes: [],
         }
       : false,

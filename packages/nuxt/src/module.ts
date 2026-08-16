@@ -48,7 +48,7 @@ export default defineNuxtModule<ModuleOptions>({
 
     if (resolved.sitemap !== false) {
       const pagesDir = join(nuxt.options.srcDir, 'pages')
-      if (existsSync(pagesDir)) {
+      if (resolved.sitemap.autoRoutes && existsSync(pagesDir)) {
         const files = readdirSync(pagesDir, { recursive: true, encoding: 'utf8' })
           .map(file => relative('.', file))
         resolved.sitemap.routes = pageFilesToRoutes(files)

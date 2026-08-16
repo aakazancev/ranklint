@@ -10,6 +10,7 @@ describe('resolveRanklintOptions', () => {
       staticEntries: [],
       fnSources: [],
       cacheTtl: 3600,
+      autoRoutes: true,
       routes: [],
     })
     expect(resolved.robots).toEqual({ mode: 'owner' })
@@ -29,6 +30,13 @@ describe('resolveRanklintOptions', () => {
     expect(resolved.sitemap.staticEntries).toEqual([{ loc: '/static-page' }])
     expect(resolved.sitemap.fnSources).toEqual([asyncSource])
     expect(resolved.sitemap.cacheTtl).toBe(60)
+  })
+
+  it('disables auto page routes with autoRoutes: false', () => {
+    const resolved = resolveRanklintOptions({ sitemap: { autoRoutes: false, sources: [{ loc: '/en/market' }] } })
+    if (resolved.sitemap === false) throw new Error('sitemap disabled')
+    expect(resolved.sitemap.autoRoutes).toBe(false)
+    expect(resolved.sitemap.staticEntries).toEqual([{ loc: '/en/market' }])
   })
 
   it('disables blocks explicitly', () => {

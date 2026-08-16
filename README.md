@@ -39,6 +39,8 @@ export default defineNuxtConfig({
 
 Every block can be disabled with `false` — disabled code is not registered at all.
 
+`sitemap: { autoRoutes: false }` drops the automatic routes collected from `app/pages` — use it with explicit `sources` when routes need locale prefixes or manual curation (i18n / multi-app setups).
+
 A function source is serialized into the server bundle via `toString()`, so it must be self-contained: Nitro globals (`$fetch`) are available, but closures over variables and imports from `nuxt.config` are not.
 
 ```vue
