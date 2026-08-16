@@ -97,6 +97,12 @@
     "crawl": {
       "type": "object",
       "properties": {
+        "entry": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
         "concurrency": {
           "type": "integer",
           "exclusiveMinimum": 0,

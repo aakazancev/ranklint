@@ -306,6 +306,7 @@ export default defineRanklintConfig({
   },
 
   crawl: {
+    entry: ['/en/market'],                 // crawl seed paths (default: the audited URL itself)
     concurrency: 5,                        // parallel tabs
     delay: 0,                              // ms between pages
     maxPages: 1000,                        // stop + truncated: true in the report
@@ -468,7 +469,7 @@ export default defineRanklintConfig({
 <tr><td><code>--cwd</code></td><td>where to look for ranklint.config</td></tr>
 <tr><td><code>--mode monitor</code></td><td>monitoring mode (below)</td></tr>
 </table></div>
-<p>Exit code 1 on error issues. Without a ranklint.config it runs with a minimal config from the URL origin. Flow: config → custom checks → seeds (with <code>strategy: 'sitemap+sample'</code> — a sitemap sample: group by route pattern, up to 5 random URLs per group) → BFS crawl → checks → crawl-budget analysis (parametric URL groups: how many, how many with canonical/noindex — shows where crawl budget leaks) → Lighthouse → report.</p>
+<p>Exit code 1 on error issues. Without a ranklint.config it runs with a minimal config from the URL origin. Flow: config → custom checks → seeds (<code>crawl.entry</code> paths or the audited URL; with <code>strategy: 'sitemap+sample'</code> — a sitemap sample: group by route pattern, up to 5 random URLs per group) → BFS crawl → checks → crawl-budget analysis (parametric URL groups: how many, how many with canonical/noindex — shows where crawl budget leaks) → Lighthouse → report.</p>
 
 <h3>ranklint diff</h3>
 <div class="tbl"><table>
@@ -698,6 +699,7 @@ export default defineRanklintConfig({
   },
 
   crawl: {
+    entry: ['/en/market'],                 // сид-пути краула (по умолчанию — сам проверяемый URL)
     concurrency: 5,                        // параллельных вкладок
     delay: 0,                              // мс между страницами
     maxPages: 1000,                        // стоп + truncated: true в отчёте
@@ -860,7 +862,7 @@ export default defineRanklintConfig({
 <tr><td><code>--cwd</code></td><td>где искать ranklint.config</td></tr>
 <tr><td><code>--mode monitor</code></td><td>режим мониторинга (см. ниже)</td></tr>
 </table></div>
-<p>Exit code 1 при error-issues. Без ranklint.config работает с минимальным конфигом из origin URL. Флоу: конфиг → кастомные чеки → seeds (при <code>strategy: 'sitemap+sample'</code> — выборка из sitemap: группировка по route-pattern, до 5 случайных URL из группы) → BFS-краул → чеки → crawl-budget анализ (группы параметрических URL: сколько, у скольких canonical/noindex — видно, куда утекает краул-бюджет) → Lighthouse → отчёт.</p>
+<p>Exit code 1 при error-issues. Без ranklint.config работает с минимальным конфигом из origin URL. Флоу: конфиг → кастомные чеки → seeds (пути из <code>crawl.entry</code> или сам проверяемый URL; при <code>strategy: 'sitemap+sample'</code> — выборка из sitemap: группировка по route-pattern, до 5 случайных URL из группы) → BFS-краул → чеки → crawl-budget анализ (группы параметрических URL: сколько, у скольких canonical/noindex — видно, куда утекает краул-бюджет) → Lighthouse → отчёт.</p>
 
 <h3>ranklint diff</h3>
 <div class="tbl"><table>

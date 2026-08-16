@@ -28,6 +28,7 @@ export const configSchema = z.object({
   })).optional(),
   rules: z.record(z.string(), ruleValueSchema).optional(),
   crawl: z.object({
+    entry: z.array(z.string()).optional(),
     concurrency: z.number().int().positive().optional(),
     delay: z.number().nonnegative().optional(),
     maxPages: z.number().int().positive().optional(),

@@ -41,4 +41,18 @@ describe('runAudit', () => {
     const report = await runAudit({ url: 'https://site.test/', cwd: '/tmp', fetcher })
     expect(report.meta.url).toBe('https://site.test')
   })
+
+  it('seeds the crawl from crawl.entry paths instead of the base url', async () => {
+    const fetcher = fakeFetcher({
+      '/en/app': '<html><head><title>App page title long enough to pass</title></head><body><h1>App heading long enough here</h1></body></html>',
+    })
+    const report = await runAudit({
+      url: 'https://site.test/',
+      cwd: '/tmp',
+      fetcher,
+      config: { site: { url: 'https://site.test' }, crawl: { entry: ['/en/app'] } },
+    })
+    expect(report.meta.pagesAudited).toBe(1)
+    expect(report.pages).toEqual(['/en/app'])
+  })
 })

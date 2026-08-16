@@ -83,6 +83,8 @@ export default defineRanklintConfig({
 })
 ```
 
+By default the crawl starts from the audited URL itself. With multi-app zones set `crawl.entry` (e.g. `['/en/market']`) so the crawl starts inside your zone — essential with `--start`, where the seed would otherwise be the server root owned by another zone.
+
 ### GitLab CI
 
 ```yaml

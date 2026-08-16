@@ -42,17 +42,20 @@ export async function runAudit(opts: RunAuditOptions): Promise<Report> {
   if (config.crawl?.insecureTls) process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
   const fetcher = opts.fetcher ?? new PlaywrightFetcher({ auth: config.crawl?.auth, viewport, insecureTls: config.crawl?.insecureTls })
   try {
-    let seeds = [opts.url]
+    const baseSeeds = config.crawl?.entry?.length
+      ? config.crawl.entry.map(path => new URL(path, opts.url).href)
+      : [opts.url]
+    let seeds = baseSeeds
     if (config.crawl?.strategy === 'sitemap+sample') {
       try {
         const res = await fetch(`${new URL(config.site.url).origin}/sitemap.xml`)
         if (res.ok) {
           const locs = [...(await res.text()).matchAll(/<loc>([^<]+)<\/loc>/g)].map(m => m[1]!)
           const sampled = sampleUrls(locs)
-          if (sampled.length > 0) seeds = [...new Set([opts.url, ...sampled])]
+          if (sampled.length > 0) seeds = [...new Set([...baseSeeds, ...sampled])]
         }
       } catch {
-        seeds = [opts.url]
+        seeds = baseSeeds
       }
     }
     const crawlResult = await crawl(fetcher, seeds, {
