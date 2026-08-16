@@ -1,5 +1,15 @@
 # @ranklint/checks
 
+## 0.3.0
+
+### Minor Changes
+
+- `i18n:no-locale-leak` now detects Arabic-script text (matched against ar/fa/ur locales), alongside Cyrillic and the en/de/fr/es/it stop-word profiles
+
+### Patch Changes
+
+- @ranklint/core@0.3.0
+
 ## 0.2.0
 
 ### Minor Changes

@@ -1,5 +1,18 @@
 # @ranklint/nuxt
 
+## 0.3.0
+
+### Minor Changes
+
+- Add `sitemap.autoRoutes` option to disable automatic routes collected from `app/pages` (for i18n / multi-app setups where page-file paths do not match public URLs)
+
+### Patch Changes
+
+- Updated dependencies
+  - @ranklint/checks@0.3.0
+  - @ranklint/devtools@0.3.0
+  - @ranklint/core@0.3.0
+
 ## 0.2.0
 
 ### Minor Changes

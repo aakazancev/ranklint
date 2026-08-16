@@ -4,6 +4,7 @@
   "commit": false,
   "access": "public",
   "baseBranch": "main",
+  "fixed": [["ranklint", "@ranklint/*"]],
   "updateInternalDependencies": "patch",
   "ignore": ["ranklint-playground"]
 }

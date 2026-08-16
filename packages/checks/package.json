@@ -1,6 +1,6 @@
 {
   "name": "@ranklint/checks",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "42 built-in SEO rules for ranklint plus Schema.org validation schemas.",
   "keywords": [
     "seo",

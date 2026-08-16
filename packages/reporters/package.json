@@ -1,6 +1,6 @@
 {
   "name": "@ranklint/reporters",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Report formats for ranklint: markdown, json, junit, gitlab, html, github annotations, diff and alert payloads.",
   "keywords": [
     "seo",
