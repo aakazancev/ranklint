@@ -88,6 +88,7 @@ describe('i18n:no-locale-leak', () => {
 describe('i18n:no-locale-leak text heuristic', () => {
   const ruText = 'Это длинный текст на русском языке про автомобили и запчасти, он достаточно длинный, чтобы сработала эвристика определения языка страницы по алфавиту.'
   const enText = 'The quick brown fox jumps over the lazy dog and this text is long enough for the detection with the stopwords that are common in the english language.'
+  const arText = 'هذا نص طويل باللغة العربية عن السيارات وقطع الغيار وهو طويل بما يكفي لكي تعمل خوارزمية تحديد لغة الصفحة حسب الأبجدية المستخدمة في النص المعروض.'
 
   it('flags cyrillic text under /en/ even when lang matches url', async () => {
     const html = `<html lang="en"><head></head><body><p>${ruText}</p></body></html>`
@@ -95,6 +96,22 @@ describe('i18n:no-locale-leak text heuristic', () => {
     expect(issues).toHaveLength(1)
     expect(issues[0]?.selector).toBe('body')
     expect(issues[0]?.message).toContain('cyrillic')
+  })
+
+  it('flags arabic text under /en/ even when lang matches url', async () => {
+    const html = `<html lang="en"><head></head><body><p>${arText}</p></body></html>`
+    const issues = await runCheckOnHtml(noLocaleLeak, html, { url: 'https://x.com/en/page' })
+    expect(issues).toHaveLength(1)
+    expect(issues[0]?.message).toContain('arabic')
+  })
+
+  it('flags english text under /ar/ and passes arabic under /ar/ and /fa/', async () => {
+    const en = `<html lang="ar"><head></head><body><p>${enText}</p></body></html>`
+    expect(await runCheckOnHtml(noLocaleLeak, en, { url: 'https://x.com/ar/page' })).toHaveLength(1)
+    const ar = `<html lang="ar"><head></head><body><p>${arText}</p></body></html>`
+    expect(await runCheckOnHtml(noLocaleLeak, ar, { url: 'https://x.com/ar/page' })).toEqual([])
+    const fa = `<html lang="fa"><head></head><body><p>${arText}</p></body></html>`
+    expect(await runCheckOnHtml(noLocaleLeak, fa, { url: 'https://x.com/fa/page' })).toEqual([])
   })
 
   it('passes matching text and skips unknown url locales', async () => {
@@ -114,6 +131,7 @@ describe('i18n:no-locale-leak text heuristic', () => {
 
   it('detectTextLanguage identifies scripts and stopword languages', () => {
     expect(detectTextLanguage(ruText)).toBe('cyrillic')
+    expect(detectTextLanguage(arText)).toBe('arabic')
     expect(detectTextLanguage(enText)).toBe('en')
     expect(detectTextLanguage('too short')).toBeUndefined()
   })

@@ -447,7 +447,7 @@ export default defineRanklintConfig({
 
 <h2 id="heuristics">Smart heuristics</h2>
 <ul>
-  <li><strong>i18n:no-locale-leak</strong> — two layers: (1) <code>html lang</code> vs the URL prefix locale; (2) the language of the text itself — a body clone without script/style/noscript/template → Cyrillic share &gt;50% or stop-word profiles for en/de/fr/es/it (min 40 letters, best score ≥3 and ≥2× the runner-up; unknown locales aren't flagged). Catches Russian text under <code>/en/</code> even with a correct lang attribute.</li>
+  <li><strong>i18n:no-locale-leak</strong> — two layers: (1) <code>html lang</code> vs the URL prefix locale; (2) the language of the text itself — a body clone without script/style/noscript/template → Cyrillic or Arabic script share &gt;50% (Cyrillic → ru/uk/be/bg/sr/mk/kk, Arabic → ar/fa/ur) or stop-word profiles for en/de/fr/es/it (min 40 letters, best score ≥3 and ≥2× the runner-up; unknown locales aren't flagged). Catches Russian text under <code>/en/</code> even with a correct lang attribute.</li>
   <li><strong>images:no-lazy-above-fold</strong> — Playwright reports the src of images actually inside the viewport (1280×720); matching is per-instance: a lazy duplicate of the same image in the footer isn't flagged. Without data — fallback to "first 3 imgs".</li>
   <li><strong>http:ttfb-budget</strong> — p75 per group: explicit <code>budgets: {'/listing/**': 500}</code> match by route pattern, remaining pages are grouped automatically (segments with ids/uuids → <code>*</code>); an auto group warns only with ≥2 samples — a single cold start is not a signal.</li>
   <li><strong>http:no-soft-404</strong> — HEAD to a deliberately nonexistent path: 200 → the site masks 404s; plus "not found" text patterns on status-200 pages.</li>
@@ -839,7 +839,7 @@ export default defineRanklintConfig({
 
 <h2 id="ru-heuristics">Умные эвристики</h2>
 <ul>
-  <li><strong>i18n:no-locale-leak</strong> — двухслойный: (1) <code>html lang</code> против локали из префикса URL; (2) язык самого текста — клон body без script/style/noscript/template → доля кириллицы &gt;50% либо стоп-словные профили en/de/fr/es/it (минимум 40 букв, лучший скор ≥3 и ≥2× второго места; неизвестные локали не флагаются). Ловит русский текст под <code>/en/</code> даже при правильном lang.</li>
+  <li><strong>i18n:no-locale-leak</strong> — двухслойный: (1) <code>html lang</code> против локали из префикса URL; (2) язык самого текста — клон body без script/style/noscript/template → доля кириллицы или арабской письменности &gt;50% (кириллица → ru/uk/be/bg/sr/mk/kk, арабская → ar/fa/ur) либо стоп-словные профили en/de/fr/es/it (минимум 40 букв, лучший скор ≥3 и ≥2× второго места; неизвестные локали не флагаются). Ловит русский текст под <code>/en/</code> даже при правильном lang.</li>
   <li><strong>images:no-lazy-above-fold</strong> — Playwright присылает src картинок, реально попавших во вьюпорт (1280×720); матчинг поштучный: lazy-дубликат той же картинки в футере не флагается. Без данных — фоллбэк «первые 3 img».</li>
   <li><strong>http:ttfb-budget</strong> — p75 по группам: явные <code>budgets: {'/listing/**': 500}</code> матчатся route-pattern'ом, остальные страницы группируются автоматически (сегменты с id/uuid → <code>*</code>); авто-группа предупреждает только при ≥2 сэмплах — одиночный холодный старт не сигнал.</li>
   <li><strong>http:no-soft-404</strong> — HEAD на заведомо несуществующий путь: 200 → сайт маскирует 404; плюс паттерны «не найдено» в тексте при статусе 200.</li>

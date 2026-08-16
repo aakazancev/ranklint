@@ -5,6 +5,8 @@ const LOCALE_SEGMENT = /^\/([a-z]{2})(?:-[a-z]{2})?(?:\/|$)/i
 
 const CYRILLIC_LOCALES = new Set(['ru', 'uk', 'be', 'bg', 'sr', 'mk', 'kk'])
 
+const ARABIC_LOCALES = new Set(['ar', 'fa', 'ur'])
+
 const STOPWORDS: Record<string, string[]> = {
   en: ['the', 'and', 'for', 'with', 'that', 'this', 'from', 'are'],
   de: ['der', 'die', 'und', 'das', 'nicht', 'ein', 'mit', 'ist'],
@@ -16,9 +18,12 @@ const STOPWORDS: Record<string, string[]> = {
 export function detectTextLanguage(text: string): string | undefined {
   const sample = text.slice(0, 4000)
   const cyrillic = (sample.match(/[Ѐ-ӿ]/g) ?? []).length
+  const arabic = (sample.match(/[؀-ۿ]/g) ?? []).length
   const latin = (sample.match(/[a-z]/gi) ?? []).length
-  if (cyrillic + latin < 40) return undefined
-  if (cyrillic > (cyrillic + latin) * 0.5) return 'cyrillic'
+  const total = cyrillic + arabic + latin
+  if (total < 40) return undefined
+  if (cyrillic > total * 0.5) return 'cyrillic'
+  if (arabic > total * 0.5) return 'arabic'
   const words = sample.toLowerCase().match(/[\p{L}']+/gu) ?? []
   const scores = Object.entries(STOPWORDS)
     .map(([lang, stopwords]) => {
@@ -34,6 +39,7 @@ export function detectTextLanguage(text: string): string | undefined {
 
 function textMatchesLocale(detected: string, locale: string): boolean {
   if (detected === 'cyrillic') return CYRILLIC_LOCALES.has(locale)
+  if (detected === 'arabic') return ARABIC_LOCALES.has(locale)
   return detected === locale
 }
 
@@ -67,12 +73,14 @@ export const noLocaleLeak = defineCheck({
         docs: docsUrl('i18n:no-locale-leak'),
       })
     }
-    const localeKnown = urlLocale in STOPWORDS || CYRILLIC_LOCALES.has(urlLocale)
+    const localeKnown = urlLocale in STOPWORDS || CYRILLIC_LOCALES.has(urlLocale) || ARABIC_LOCALES.has(urlLocale)
     const detected = localeKnown
       ? detectTextLanguage(visibleText(ctx.document?.querySelector('body') ?? null))
       : undefined
     if (detected && !textMatchesLocale(detected, urlLocale)) {
-      const label = detected === 'cyrillic' ? 'a cyrillic-script language' : `"${detected}"`
+      const label = detected === 'cyrillic'
+        ? 'a cyrillic-script language'
+        : detected === 'arabic' ? 'an arabic-script language' : `"${detected}"`
       issues.push({
         checkId: 'i18n:no-locale-leak',
         severity: 'error',
