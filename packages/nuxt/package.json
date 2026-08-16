@@ -1,6 +1,6 @@
 {
   "name": "@ranklint/nuxt",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Nuxt 4 SEO module: sitemap.xml, robots.txt, typed JSON-LD and a live SEO panel in Nuxt DevTools.",
   "keywords": [
     "nuxt",

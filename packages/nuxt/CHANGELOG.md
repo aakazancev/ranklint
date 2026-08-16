@@ -1,5 +1,14 @@
 # @ranklint/nuxt
 
+## 0.4.0
+
+### Patch Changes
+
+- Updated dependencies [27f2451]
+  - @ranklint/core@0.4.0
+  - @ranklint/checks@0.4.0
+  - @ranklint/devtools@0.4.0
+
 ## 0.3.0
 
 ### Minor Changes

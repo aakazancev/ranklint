@@ -1,5 +1,18 @@
 # @ranklint/cli
 
+## 0.4.0
+
+### Minor Changes
+
+- 27f2451: Add `crawl.entry` config option — seed paths for the crawl resolved against the audited URL. Fixes `--start` with multi-app zones, where the implicit server-root seed belongs to a foreign zone and nothing was crawled
+
+### Patch Changes
+
+- Updated dependencies [27f2451]
+  - @ranklint/core@0.4.0
+  - @ranklint/checks@0.4.0
+  - @ranklint/reporters@0.4.0
+
 ## 0.3.0
 
 ### Patch Changes

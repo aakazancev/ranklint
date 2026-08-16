@@ -1,6 +1,6 @@
 {
   "name": "@ranklint/core",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Ranklint engine: crawler, check runner, config loader, diff and report storages. No Nuxt or Playwright dependencies.",
   "keywords": [
     "seo",
