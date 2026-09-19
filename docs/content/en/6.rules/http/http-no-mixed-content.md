@@ -14,7 +14,3 @@ no http resources on an https page
 
 No options.
 <!-- generated:end -->
-
-## Why it matters
-
-## How to fix

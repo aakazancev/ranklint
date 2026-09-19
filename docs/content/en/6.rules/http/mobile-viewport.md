@@ -14,7 +14,3 @@ viewport meta exists
 
 No options.
 <!-- generated:end -->
-
-## Why it matters
-
-## How to fix

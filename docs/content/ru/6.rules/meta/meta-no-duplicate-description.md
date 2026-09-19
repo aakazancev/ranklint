@@ -14,7 +14,3 @@ description: "одинаковые description"
 
 Опций нет.
 <!-- generated:end -->
-
-## Почему это важно
-
-## Как исправить

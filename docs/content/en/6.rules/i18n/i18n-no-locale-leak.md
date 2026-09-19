@@ -14,7 +14,3 @@ content language matches URL locale and html lang
 
 No options.
 <!-- generated:end -->
-
-## Why it matters
-
-## How to fix

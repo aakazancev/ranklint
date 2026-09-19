@@ -14,7 +14,7 @@ export interface RunAuditOptions {
   lighthouseRunner?: LighthouseRunner
 }
 
-const REACHABLE_DOCS = 'https://ranklint.dev/rules/links-reachable'
+const REACHABLE_DOCS = 'https://ranklint.dev/en/cli/zones'
 
 export async function runAudit(opts: RunAuditOptions): Promise<Report> {
   let config: RanklintUserConfig

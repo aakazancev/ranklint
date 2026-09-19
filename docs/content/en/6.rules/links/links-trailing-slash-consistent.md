@@ -14,7 +14,3 @@ trailing-slash consistency
 
 No options.
 <!-- generated:end -->
-
-## Why it matters
-
-## How to fix

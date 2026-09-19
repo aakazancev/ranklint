@@ -14,7 +14,3 @@ internal links aren't 4xx/5xx (HEAD, cached per run)
 
 No options.
 <!-- generated:end -->
-
-## Why it matters
-
-## How to fix

@@ -14,7 +14,3 @@ description: "есть viewport meta"
 
 Опций нет.
 <!-- generated:end -->
-
-## Почему это важно
-
-## Как исправить

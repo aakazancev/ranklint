@@ -13,7 +13,7 @@
     "url": "git+https://github.com/aakazancev/ranklint.git",
     "directory": "packages/preset-default"
   },
-  "homepage": "https://aakazancev.github.io/ranklint/",
+  "homepage": "https://ranklint.dev",
   "bugs": "https://github.com/aakazancev/ranklint/issues",
   "type": "module",
   "engines": {

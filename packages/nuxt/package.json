@@ -16,7 +16,7 @@
     "url": "git+https://github.com/aakazancev/ranklint.git",
     "directory": "packages/nuxt"
   },
-  "homepage": "https://aakazancev.github.io/ranklint/",
+  "homepage": "https://ranklint.dev",
   "bugs": "https://github.com/aakazancev/ranklint/issues",
   "type": "module",
   "engines": {
@@ -42,6 +42,7 @@
   },
   "devDependencies": {
     "@nuxt/module-builder": "^1.0.2",
+    "@nuxt/schema": "^4.4.8",
     "@nuxt/test-utils": "^4.0.3",
     "nuxt": "^4.4.8"
   },

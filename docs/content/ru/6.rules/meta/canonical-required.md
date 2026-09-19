@@ -14,7 +14,3 @@ description: "есть rel=canonical"
 
 Опций нет.
 <!-- generated:end -->
-
-## Почему это важно
-
-## Как исправить

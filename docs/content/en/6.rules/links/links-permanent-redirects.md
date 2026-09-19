@@ -14,7 +14,3 @@ description: "302 where a 301 belongs"
 
 No options.
 <!-- generated:end -->
-
-## Why it matters
-
-## How to fix

@@ -14,7 +14,3 @@ h1s are unique across pages
 
 No options.
 <!-- generated:end -->
-
-## Why it matters
-
-## How to fix

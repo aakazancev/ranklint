@@ -99,7 +99,7 @@ export function checkThresholds(
         message: `${metric} is ${value} on ${path}, threshold ${isScore ? '>=' : '<='} ${limit} (pattern ${pattern})`,
         url: result.url,
         suggestion: result.lcpElement?.suggestion,
-        docs: 'https://ranklint.dev/rules/lighthouse-threshold',
+        docs: 'https://ranklint.dev/en/cli/lighthouse',
       })
     }
   }

@@ -14,7 +14,3 @@ canonical doesn't point to a page with a different canonical
 
 No options.
 <!-- generated:end -->
-
-## Why it matters
-
-## How to fix

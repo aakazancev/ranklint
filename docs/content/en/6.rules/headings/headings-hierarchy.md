@@ -14,7 +14,3 @@ no level skips (h2 → h4)
 
 No options.
 <!-- generated:end -->
-
-## Why it matters
-
-## How to fix

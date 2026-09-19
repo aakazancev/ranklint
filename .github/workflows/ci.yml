@@ -55,8 +55,9 @@ jobs:
         env:
           NUXT_SITE_URL: http://127.0.0.1:4100
       - run: |
-          PORT=4100 node docs/.output/server/index.mjs &
-          for i in $(seq 1 30); do curl -sf http://127.0.0.1:4100/en > /dev/null && break; sleep 1; done
+          PORT=4100 nohup node docs/.output/server/index.mjs > /tmp/docs-server.log 2>&1 &
+          for i in $(seq 1 30); do curl -sf http://127.0.0.1:4100/en >/dev/null && exit 0; sleep 1; done
+          cat /tmp/docs-server.log; exit 1
       - run: pnpm --filter @ranklint/cli exec node ./dist/cli.mjs audit --url http://127.0.0.1:4100/en --cwd ../../docs --reporter github
         env:
           NUXT_SITE_URL: http://127.0.0.1:4100

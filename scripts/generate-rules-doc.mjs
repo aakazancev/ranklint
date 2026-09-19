@@ -15,9 +15,9 @@ const t = {
   ru: { rules: 'Правила', index: 'Все правила', why: 'Почему это важно', fix: 'Как исправить', options: 'Опции', none: 'Опций нет.', category: 'Категория', scope: 'Область', severity: 'Severity по умолчанию', option: 'Опция', type: 'Тип', description: 'Описание', indexDesc: 'Каждое правило принимает `error`, `warn`, `info`, `off` или `[severity, options]` в ranklint.config и отключается на странице через useRanklintIgnore().' },
 }
 
-export function mergeGenerated(existing, frontmatter, generated, locale = 'en') {
+export function mergeGenerated(existing, frontmatter, generated) {
   if (!existing) {
-    return `${frontmatter}\n\n${generated}\n\n## ${t[locale].why}\n\n## ${t[locale].fix}\n`
+    return `${frontmatter}\n\n${generated}\n`
   }
   const start = existing.indexOf(START)
   const end = existing.indexOf(END)
@@ -74,7 +74,7 @@ function build() {
       const path = join(base, check.category, `${slug(check.id)}.md`)
       const existing = existsSync(path) ? readFileSync(path, 'utf8') : undefined
       const { frontmatter, generated } = rulePage(check, locale)
-      out.set(path, mergeGenerated(existing, frontmatter, generated, locale))
+      out.set(path, mergeGenerated(existing, frontmatter, generated))
     }
   }
   return out

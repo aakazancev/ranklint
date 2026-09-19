@@ -2,11 +2,12 @@ import { existsSync, readdirSync } from 'node:fs'
 import { dirname, join, relative } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { addImports, addServerHandler, createResolver, defineNuxtModule, useLogger } from '@nuxt/kit'
+import type { NuxtModule } from '@nuxt/schema'
 import { pageFilesToRoutes, resolveRanklintOptions, type ModuleOptions } from './options'
 
 export type { ModuleOptions, ResolvedRanklintOptions, SitemapSource, SitemapSourceEntry } from './options'
 
-export default defineNuxtModule<ModuleOptions>({
+const ranklintModule: NuxtModule<ModuleOptions> = defineNuxtModule<ModuleOptions>({
   meta: {
     name: '@ranklint/nuxt',
     configKey: 'ranklint',
@@ -106,3 +107,5 @@ export default defineNuxtModule<ModuleOptions>({
     }
   },
 })
+
+export default ranklintModule

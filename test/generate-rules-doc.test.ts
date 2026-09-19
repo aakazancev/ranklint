@@ -15,14 +15,12 @@ describe('mergeGenerated', () => {
   it('creates a page with generated block and empty handwritten sections when nothing exists', () => {
     const out = mergeGenerated(undefined, '---\ntitle: x\n---', generated)
     expect(out.startsWith('---\ntitle: x\n---\n\n<!-- generated:start -->')).toBe(true)
-    expect(out).toContain('## Why it matters')
-    expect(out).toContain('## How to fix')
+    expect(out).not.toContain('## Why it matters')
+    expect(out).not.toContain('## How to fix')
   })
 
-  it('uses localized section titles for new ru pages', () => {
-    const out = mergeGenerated(undefined, '---\ntitle: x\n---', generated, 'ru')
-    expect(out).toContain('## Почему это важно')
-    expect(out).toContain('## Как исправить')
+  it('throws when an existing page has no markers', () => {
+    expect(() => mergeGenerated('no markers here', '---\ntitle: x\n---', generated)).toThrow('page has no generated markers')
   })
 
   it('replaces frontmatter with the generated one', () => {

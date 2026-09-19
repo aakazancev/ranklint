@@ -14,7 +14,3 @@ hreflang targets respond 200
 
 No options.
 <!-- generated:end -->
-
-## Why it matters
-
-## How to fix

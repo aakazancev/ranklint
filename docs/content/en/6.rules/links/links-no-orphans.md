@@ -14,7 +14,3 @@ sitemap pages nobody links to
 
 No options.
 <!-- generated:end -->
-
-## Why it matters
-
-## How to fix

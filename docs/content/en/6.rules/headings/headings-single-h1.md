@@ -14,7 +14,3 @@ exactly one h1
 
 No options.
 <!-- generated:end -->
-
-## Why it matters
-
-## How to fix

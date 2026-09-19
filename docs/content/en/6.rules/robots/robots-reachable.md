@@ -14,7 +14,3 @@ robots.txt responds 200
 
 No options.
 <!-- generated:end -->
-
-## Why it matters
-
-## How to fix

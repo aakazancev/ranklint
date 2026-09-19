@@ -14,7 +14,3 @@ description: "в sitemap нет noindex-страниц"
 
 Опций нет.
 <!-- generated:end -->
-
-## Почему это важно
-
-## Как исправить

@@ -14,7 +14,3 @@ og:title, og:description, og:image — один issue на страницу со
 
 Опций нет.
 <!-- generated:end -->
-
-## Почему это важно
-
-## Как исправить

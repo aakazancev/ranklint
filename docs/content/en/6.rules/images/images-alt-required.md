@@ -14,7 +14,3 @@ content imgs have alt
 
 No options.
 <!-- generated:end -->
-
-## Why it matters
-
-## How to fix

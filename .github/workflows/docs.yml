@@ -8,6 +8,8 @@ on:
       - packages/checks/**
       - scripts/generate-rules-doc.mjs
       - .github/workflows/docs.yml
+      - pnpm-lock.yaml
+      - package.json
   workflow_dispatch:
 
 permissions:
@@ -17,7 +19,7 @@ permissions:
 
 concurrency:
   group: pages
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   build:

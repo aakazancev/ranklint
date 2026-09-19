@@ -14,7 +14,3 @@ no noindex pages in the sitemap
 
 No options.
 <!-- generated:end -->
-
-## Why it matters
-
-## How to fix

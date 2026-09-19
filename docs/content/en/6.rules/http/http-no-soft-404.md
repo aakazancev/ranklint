@@ -14,7 +14,3 @@ description: "404s aren't masked as 200"
 
 No options.
 <!-- generated:end -->
-
-## Why it matters
-
-## How to fix

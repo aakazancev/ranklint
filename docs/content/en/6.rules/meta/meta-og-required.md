@@ -14,7 +14,3 @@ og:title, og:description, og:image — one issue per page listing the missing ta
 
 No options.
 <!-- generated:end -->
-
-## Why it matters
-
-## How to fix

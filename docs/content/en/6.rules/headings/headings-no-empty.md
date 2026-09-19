@@ -14,7 +14,3 @@ no empty headings
 
 No options.
 <!-- generated:end -->
-
-## Why it matters
-
-## How to fix

@@ -14,7 +14,3 @@ canonical responds 200 (network)
 
 No options.
 <!-- generated:end -->
-
-## Why it matters
-
-## How to fix

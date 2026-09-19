@@ -14,7 +14,3 @@ robots.expect expectations hold
 
 No options.
 <!-- generated:end -->
-
-## Why it matters
-
-## How to fix

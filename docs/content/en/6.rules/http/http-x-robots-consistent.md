@@ -14,7 +14,3 @@ X-Robots-Tag doesn't contradict meta robots
 
 No options.
 <!-- generated:end -->
-
-## Why it matters
-
-## How to fix

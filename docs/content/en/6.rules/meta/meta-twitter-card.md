@@ -14,7 +14,3 @@ twitter:card is valid
 
 No options.
 <!-- generated:end -->
-
-## Why it matters
-
-## How to fix
