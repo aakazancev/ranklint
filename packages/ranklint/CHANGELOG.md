@@ -1,5 +1,16 @@
 # ranklint
 
+## 0.5.0
+
+### Patch Changes
+
+- Updated dependencies [c53ad60]
+- Updated dependencies [ce46ae5]
+- Updated dependencies [ce46ae5]
+- Updated dependencies [1635e68]
+- Updated dependencies [1d0dc84]
+  - @ranklint/cli@0.5.0
+
 ## 0.4.1
 
 ### Patch Changes

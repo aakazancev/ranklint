@@ -1,5 +1,26 @@
 # @ranklint/cli
 
+## 0.5.0
+
+### Minor Changes
+
+- 1635e68: `ranklint lighthouse --profile <name>` applies a config profile (e.g. a release profile with Lighthouse enabled); the json output now includes the effective lighthouse config. CI presets gained a profile-driven Lighthouse job
+- 1d0dc84: `ranklint audit --html-output <file>` writes a self-contained html report in both modes and `--json-output` now works in monitor mode; CI presets gained Pages publishing for scheduled monitors (GitLab `.ranklint-pages`, GitHub `monitor.yml` with `pages: true`)
+
+### Patch Changes
+
+- c53ad60: Docs links of the lighthouse-threshold and links:reachable issues point at the documentation site
+- ce46ae5: Crawl progress: `onPage` callback in core, CLI logs each crawled page to stderr (`[ranklint] 5/30 200 1234ms <url>`). Reachability HEAD requests are now wrapped in the crawl timeout — a hanging HEAD stalled the whole crawl forever
+- ce46ae5: Page navigation waits for `domcontentloaded` instead of `networkidle`, then settles best-effort (`load` up to 10s, quiet network up to 5s). On pages with long-polling analytics `networkidle` never fired and every page burned the full 30s timeout with statusCode 0
+- Updated dependencies [ce46ae5]
+- Updated dependencies [c6d7a17]
+- Updated dependencies [454b496]
+- Updated dependencies [45fc2e0]
+- Updated dependencies [9d8b74c]
+  - @ranklint/core@0.5.0
+  - @ranklint/checks@0.5.0
+  - @ranklint/reporters@0.5.0
+
 ## 0.4.1
 
 ### Patch Changes

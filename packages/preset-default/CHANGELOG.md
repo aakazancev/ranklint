@@ -1,5 +1,16 @@
 # @ranklint/preset-default
 
+## 0.5.0
+
+### Patch Changes
+
+- Updated dependencies [ce46ae5]
+- Updated dependencies [c6d7a17]
+- Updated dependencies [454b496]
+- Updated dependencies [9d8b74c]
+  - @ranklint/core@0.5.0
+  - @ranklint/checks@0.5.0
+
 ## 0.4.1
 
 ### Patch Changes

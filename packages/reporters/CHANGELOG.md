@@ -1,5 +1,16 @@
 # @ranklint/reporters
 
+## 0.5.0
+
+### Minor Changes
+
+- 45fc2e0: markdown and html reports group issues by rule (errors first, biggest groups first) instead of one flat table — OG/meta findings for the same rule are now in one place
+
+### Patch Changes
+
+- Updated dependencies [ce46ae5]
+  - @ranklint/core@0.5.0
+
 ## 0.4.1
 
 ### Patch Changes

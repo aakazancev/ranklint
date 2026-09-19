@@ -1,5 +1,18 @@
 # @ranklint/checks
 
+## 0.5.0
+
+### Minor Changes
+
+- 9d8b74c: `sitemap:reachable` gets a `maxProbes` option (default 100, 0 = unlimited) and reports how many sitemap URLs were left unverified instead of skipping them silently
+
+### Patch Changes
+
+- c6d7a17: Rule `docs` links now point at the documentation site (ranklint.dev) with a page per rule
+- 454b496: `meta:og-required` reports all missing og tags in a single issue per page instead of one issue per tag
+- Updated dependencies [ce46ae5]
+  - @ranklint/core@0.5.0
+
 ## 0.4.1
 
 ### Patch Changes

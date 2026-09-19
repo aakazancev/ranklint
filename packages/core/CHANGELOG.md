@@ -1,5 +1,11 @@
 # @ranklint/core
 
+## 0.5.0
+
+### Minor Changes
+
+- ce46ae5: Crawl progress: `onPage` callback in core, CLI logs each crawled page to stderr (`[ranklint] 5/30 200 1234ms <url>`). Reachability HEAD requests are now wrapped in the crawl timeout — a hanging HEAD stalled the whole crawl forever
+
 ## 0.4.1
 
 ## 0.4.0
