@@ -96,6 +96,8 @@ seo:audit:
 
 `ranklint diff --base main` resolves the base report from CI artifacts: in GitLab — from the branch's job artifact, in GitHub Actions — from the `ranklint-report` artifact (zip extraction is built in). A missing base is not an error: diff degrades to a full report.
 
+Monitoring a whole domain from a standalone repo (GitHub/GitLab schedules, report on Pages): see the "Standalone monitor repo" section of the root README.
+
 ## Rules
 
 42 rules across the meta, headings, canonical, links, i18n, structured-data, images, robots, indexability, and http categories — see the full reference in [docs/rules.md](docs/rules.md).

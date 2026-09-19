@@ -4,7 +4,7 @@ import { join } from 'node:path'
 import type { Report } from '@ranklint/core'
 import { runCommand } from 'citty'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { audit } from '../src/commands/audit'
+import { audit, writeExtras } from '../src/commands/audit'
 import { diff } from '../src/commands/diff'
 import { generate } from '../src/commands/generate'
 import { lighthouse } from '../src/commands/lighthouse'
@@ -107,5 +107,22 @@ describe('lighthouse command', () => {
     const dir = await mkdtemp(join(tmpdir(), 'ranklint-lh-'))
     await writeFile(join(dir, 'ranklint.config.mjs'), `export default { site: { url: 'https://x.com' } }\n`)
     await expect(runCommand(lighthouse, { rawArgs: ['--url', 'https://x.com/', '--cwd', dir, '--profile', 'nope'] })).rejects.toThrow('Unknown profile "nope"')
+  })
+})
+
+describe('audit extra outputs', () => {
+  it('writes json and html files from the full report', async () => {
+    const dir = await mkdtemp(join(tmpdir(), 'ranklint-extras-'))
+    const jsonOutput = join(dir, 'r.json')
+    const htmlOutput = join(dir, 'r.html')
+    await writeExtras(report([brokenTitle]), { jsonOutput, htmlOutput })
+    expect(JSON.parse(await readFile(jsonOutput, 'utf8')).issues).toHaveLength(1)
+    const html = await readFile(htmlOutput, 'utf8')
+    expect(html).toContain('<!doctype html>')
+    expect(html).toContain('meta:title-required')
+  })
+
+  it('writes nothing when no paths are given', async () => {
+    await expect(writeExtras(report([]), {})).resolves.toBeUndefined()
   })
 })

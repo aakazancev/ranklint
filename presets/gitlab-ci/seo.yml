@@ -2,6 +2,7 @@
   image: node:22
   variables:
     PLAYWRIGHT_BROWSERS_PATH: $CI_PROJECT_DIR/.cache/ms-playwright
+    RANKLINT_PROFILE: ""
   cache:
     key: ranklint-playwright
     paths:
@@ -55,8 +56,6 @@
 
 .ranklint-lighthouse:
   extends: .ranklint-base
-  variables:
-    RANKLINT_PROFILE: ""
   script:
     - >
       ranklint lighthouse
@@ -78,7 +77,10 @@
       ranklint audit
       --url "$RANKLINT_URL"
       --mode monitor
+      ${RANKLINT_PROFILE:+--profile "$RANKLINT_PROFILE"}
       --output ranklint-monitor.md
+      --json-output ranklint-monitor.json
+      --html-output ranklint-monitor.html
   cache:
     - key: ranklint-playwright
       paths:
@@ -90,3 +92,17 @@
     when: always
     paths:
       - ranklint-monitor.md
+      - ranklint-monitor.json
+      - ranklint-monitor.html
+
+.ranklint-pages:
+  image: alpine:latest
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+  script:
+    - mkdir -p public
+    - cp ranklint-monitor.html public/index.html
+    - cp ranklint-monitor.json public/report.json
+  artifacts:
+    paths:
+      - public

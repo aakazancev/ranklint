@@ -122,6 +122,63 @@ seo:audit:
 
 `ranklint diff --base main` resolves the base report from CI artifacts: in GitLab — from the branch's job artifact, in GitHub Actions — from the `ranklint-report` artifact (zip extraction is built in). A missing base is not an error: diff degrades to a full report.
 
+### Standalone monitor repo (any stack)
+
+The CLI does not depend on Nuxt: a tiny repo with a config and a scheduled job monitors a whole domain, whatever it is built with, and publishes the latest report to Pages.
+
+```
+seo-monitor/
+  package.json          { "devDependencies": { "ranklint": "^0.5.0" } }
+  ranklint.config.ts
+  .github/workflows/monitor.yml   or   .gitlab-ci.yml
+```
+
+```ts
+import { defineRanklintConfig } from '@ranklint/core'
+
+export default defineRanklintConfig({
+  site: { url: 'https://example.com' },
+  crawl: { maxPages: 2000, ignore: ['/admin/**', '/api/**'] },
+  robots: { mode: 'external', expect: { indexable: true, sitemaps: ['https://example.com/sitemap.xml'] } },
+  monitor: { storage: 'fs', dir: '.ranklint/reports', keep: 60 },
+})
+```
+
+GitHub Actions (report at `https://<owner>.github.io/<repo>/`, enable Pages → Source: GitHub Actions once):
+
+```yaml
+on:
+  schedule: [{ cron: '0 6 * * *' }]
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+jobs:
+  seo:
+    uses: aakazancev/ranklint/.github/workflows/monitor.yml@main
+    with: { url: 'https://example.com', pages: true }
+    secrets: inherit
+```
+
+GitLab CI (report at the project's Pages URL; the job must be named `pages`):
+
+```yaml
+include:
+  - remote: 'https://raw.githubusercontent.com/aakazancev/ranklint/main/presets/gitlab-ci/seo.yml'
+
+seo:monitor:
+  extends: .ranklint-monitor
+  variables:
+    RANKLINT_URL: https://example.com
+
+pages:
+  extends: .ranklint-pages
+  needs: [seo:monitor]
+```
+
+Add a pipeline schedule (CI/CD → Schedules) — both jobs run only on `schedule`. Monitor mode never fails the pipeline: it diffs against the previous stored report and alerts (Slack/Telegram via `RANKLINT_SLACK_WEBHOOK`, `RANKLINT_TELEGRAM_BOT_TOKEN` + `RANKLINT_TELEGRAM_CHAT_ID`) only on new issues. `--html-output` / `--json-output` write the full report next to the diff; `ranklint history --dir .ranklint/reports` prints the trend. A trend dashboard with charts is planned separately.
+
 ## Rules
 
 42 rules across the meta, headings, canonical, links, i18n, structured-data, images, robots, indexability, and http categories — see the full reference in [docs/rules.md](docs/rules.md).
@@ -192,5 +249,6 @@ export default defineRanklintConfig({
 | `@ranklint/reporters` | markdown / junit / json |
 | `@ranklint/devtools` | Vue panel for Nuxt DevTools: live checks of the current page |
 | `@ranklint/preset-default` | Preset with the built-in rules for `extends` |
+| `ranklint` | Alias of `@ranklint/cli` — `npm i -D ranklint` gives the `ranklint` binary |
 
 Requirements: Nuxt `^4.0.0`, Node.js `>= 20`. MIT license.

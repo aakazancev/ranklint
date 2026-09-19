@@ -1,0 +1,87 @@
+name: ranklint-monitor
+
+on:
+  workflow_call:
+    inputs:
+      url:
+        description: Production URL to monitor
+        required: true
+        type: string
+      profile:
+        description: ranklint.config profile to apply
+        required: false
+        type: string
+        default: ""
+      pages:
+        description: Publish the html report to GitHub Pages (caller needs permissions pages:write, id-token:write)
+        required: false
+        type: boolean
+        default: false
+    secrets:
+      RANKLINT_SLACK_WEBHOOK:
+        required: false
+      RANKLINT_TELEGRAM_BOT_TOKEN:
+        required: false
+      RANKLINT_TELEGRAM_CHAT_ID:
+        required: false
+
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm i -g @ranklint/cli
+      - uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: ranklint-playwright-${{ runner.os }}
+      - run: npx playwright install --with-deps chromium
+      - uses: actions/cache@v4
+        with:
+          path: .ranklint/reports
+          key: ranklint-monitor-reports-${{ github.run_id }}
+          restore-keys: ranklint-monitor-reports-
+      - name: Monitor
+        env:
+          RANKLINT_SLACK_WEBHOOK: ${{ secrets.RANKLINT_SLACK_WEBHOOK }}
+          RANKLINT_TELEGRAM_BOT_TOKEN: ${{ secrets.RANKLINT_TELEGRAM_BOT_TOKEN }}
+          RANKLINT_TELEGRAM_CHAT_ID: ${{ secrets.RANKLINT_TELEGRAM_CHAT_ID }}
+        run: >
+          ranklint audit
+          --url "${{ inputs.url }}"
+          --mode monitor
+          ${{ inputs.profile != '' && format('--profile "{0}"', inputs.profile) || '' }}
+          --output ranklint-monitor.md
+          --json-output ranklint-monitor.json
+          --html-output ranklint-monitor.html
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ranklint-monitor
+          path: |
+            ranklint-monitor.md
+            ranklint-monitor.json
+            ranklint-monitor.html
+      - if: inputs.pages
+        run: mkdir -p public && cp ranklint-monitor.html public/index.html && cp ranklint-monitor.json public/report.json
+      - if: inputs.pages
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: public
+
+  pages:
+    if: inputs.pages
+    needs: monitor
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - id: deploy
+        uses: actions/deploy-pages@v4

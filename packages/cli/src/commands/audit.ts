@@ -1,9 +1,15 @@
 import { writeFile } from 'node:fs/promises'
 import { defineCommand } from 'citty'
+import type { Report } from '@ranklint/core'
 import { reporters, type ReporterName } from '@ranklint/reporters'
 import { exitCodeFor } from '../exit-code'
 import { runAudit } from '../run-audit'
 import { startServer } from '../start-server'
+
+export async function writeExtras(report: Report, paths: { jsonOutput?: string, htmlOutput?: string }): Promise<void> {
+  if (paths.jsonOutput) await writeFile(paths.jsonOutput, reporters.json(report))
+  if (paths.htmlOutput) await writeFile(paths.htmlOutput, reporters.html(report))
+}
 
 export const audit = defineCommand({
   meta: {
@@ -14,9 +20,10 @@ export const audit = defineCommand({
     url: { type: 'string', description: 'URL of a running site to audit' },
     start: { type: 'string', description: 'Path to a built server entry (.output/server/index.mjs) to launch and audit' },
     profile: { type: 'string', description: 'Profile from ranklint.config to apply' },
-    reporter: { type: 'string', default: 'markdown', description: 'Output format: markdown | json | junit' },
+    reporter: { type: 'string', default: 'markdown', description: 'Output format: markdown | json | junit | html | gitlab | github' },
     output: { type: 'string', description: 'Write the report to a file instead of stdout' },
     jsonOutput: { type: 'string', description: 'Additionally write the raw json report to a file (input for ranklint diff)' },
+    htmlOutput: { type: 'string', description: 'Additionally write a self-contained html report (e.g. to publish on Pages)' },
     cwd: { type: 'string', description: 'Directory to look up ranklint.config in' },
     mode: { type: 'string', description: 'Set to "monitor" for scheduled prod runs: exit 0, diff against last stored report, alert on new issues only' },
   },
@@ -41,6 +48,7 @@ export const audit = defineCommand({
         const { markdownDiff } = await import('@ranklint/reporters')
         const result = await runMonitor({ url, cwd: args.cwd, profile: args.profile })
         const output = result.diff ? markdownDiff(result.diff) : reporter(result.report)
+        await writeExtras(result.report, args)
         if (args.output) await writeFile(args.output, output)
         else process.stdout.write(output)
         if (result.notified.length > 0) process.stdout.write(`\nnotified: ${result.notified.join(', ')}\n`)
@@ -54,7 +62,7 @@ export const audit = defineCommand({
         profile: args.profile,
       })
       const output = reporter(report)
-      if (args.jsonOutput) await writeFile(args.jsonOutput, reporters.json(report))
+      await writeExtras(report, args)
       if (args.output) await writeFile(args.output, output)
       else process.stdout.write(output)
       process.exitCode = exitCodeFor(report)
