@@ -10,7 +10,7 @@ describe('registry', () => {
 
   it('every check carries docs and suggestion-producing run', () => {
     for (const check of allChecks) {
-      expect(check.docs).toMatch(/^https:\/\/ranklint\.dev\/rules\//)
+      expect(check.docs).toMatch(/^https:\/\/ranklint\.dev\/en\/rules\//)
     }
   })
 

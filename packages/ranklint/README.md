@@ -11,4 +11,4 @@ npx playwright install chromium
 npx ranklint audit --url https://uat.example.com
 ```
 
-Full documentation: [aakazancev.github.io/ranklint](https://aakazancev.github.io/ranklint/) · [GitHub](https://github.com/aakazancev/ranklint). MIT.
+Full documentation: [ranklint.dev](https://ranklint.dev) · [GitHub](https://github.com/aakazancev/ranklint). MIT.

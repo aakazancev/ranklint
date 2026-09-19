@@ -8,4 +8,4 @@ Custom rules use the same contract:
 import { defineCheck } from '@ranklint/checks'
 ```
 
-Rules reference: [aakazancev.github.io/ranklint](https://aakazancev.github.io/ranklint/#rules). MIT.
+Rules reference: [ranklint.dev/en/rules](https://ranklint.dev/en/rules). MIT.

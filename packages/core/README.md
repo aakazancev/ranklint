@@ -11,4 +11,4 @@ export default defineRanklintConfig({
 })
 ```
 
-Full documentation: [aakazancev.github.io/ranklint](https://aakazancev.github.io/ranklint/). MIT.
+Full documentation: [ranklint.dev](https://ranklint.dev). MIT.

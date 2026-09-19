@@ -2,6 +2,8 @@
 
 > Lint your SEO before Google does.
 
+Docs: https://ranklint.dev
+
 SEO toolkit for Nuxt 4: sitemap/robots/JSON-LD generation out of the box, an SEO linter in dev via DevTools, and regression control in CI.
 
 - **Runtime** — the module serves `sitemap.xml`, `robots.txt`, and typed JSON-LD by itself
@@ -181,7 +183,7 @@ Add a pipeline schedule (CI/CD → Schedules) — both jobs run only on `schedul
 
 ## Rules
 
-42 rules across the meta, headings, canonical, links, i18n, structured-data, images, robots, indexability, and http categories — see the full reference in [docs/rules.md](docs/rules.md).
+42 rules across the meta, headings, canonical, links, i18n, structured-data, images, robots, indexability, and http categories — see the full reference at [ranklint.dev/en/rules](https://ranklint.dev/en/rules).
 
 Every rule accepts `'error' | 'warn' | 'off'` or `[severity, options]`. Inline suppression on a page — `useRanklintIgnore([...])`.
 

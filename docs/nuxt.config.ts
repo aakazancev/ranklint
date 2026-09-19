@@ -9,6 +9,7 @@ export default defineNuxtConfig({
     url: process.env.NUXT_SITE_URL ?? 'https://ranklint.dev',
   },
   i18n: {
+    baseUrl: process.env.NUXT_SITE_URL ?? 'https://ranklint.dev',
     defaultLocale: 'en',
     locales: [
       { code: 'en', name: 'English', language: 'en-US' },

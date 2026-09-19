@@ -100,7 +100,7 @@ Monitoring a whole domain from a standalone repo (GitHub/GitLab schedules, repor
 
 ## Rules
 
-42 rules across the meta, headings, canonical, links, i18n, structured-data, images, robots, indexability, and http categories — see the full reference in [docs/rules.md](docs/rules.md).
+42 rules across the meta, headings, canonical, links, i18n, structured-data, images, robots, indexability, and http categories — see the full reference at [ranklint.dev/en/rules](https://ranklint.dev/en/rules).
 
 Every rule accepts `'error' | 'warn' | 'off'` or `[severity, options]`. Inline suppression on a page — `useRanklintIgnore([...])`.
 
