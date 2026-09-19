@@ -34,9 +34,11 @@ export class PlaywrightFetcher implements PageFetcher {
     const page = await context.newPage()
     try {
       const start = performance.now()
-      const response = await page.goto(url, { waitUntil: 'networkidle', timeout: 30_000 })
+      const response = await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30_000 })
       if (!response) throw new Error(`No response for ${url}`)
       const ttfb = Math.round(performance.now() - start)
+      await page.waitForLoadState('load', { timeout: 10_000 }).catch(() => {})
+      await page.waitForLoadState('networkidle', { timeout: 5_000 }).catch(() => {})
       const ssrHtml = await response.text()
       const html = await page.content()
       const links = await page.$$eval('a[href]', anchors => anchors.map(a => ({

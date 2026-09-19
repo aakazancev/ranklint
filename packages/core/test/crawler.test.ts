@@ -84,4 +84,27 @@ describe('crawl', () => {
     expect(result.issues).toHaveLength(1)
     expect(result.issues[0]?.checkId).toBe('crawl:timeout')
   })
+
+  it('reports crawl progress via onPage', async () => {
+    const fetcher = fakeFetcher({ '/': ['/a'], '/a': [] })
+    const events: { url: string, statusCode: number, visited: number }[] = []
+    await crawl(fetcher, [site], {
+      siteUrl: site,
+      onPage: e => events.push({ url: e.url, statusCode: e.statusCode, visited: e.visited }),
+    })
+    expect(events).toHaveLength(2)
+    expect(events[0]).toMatchObject({ statusCode: 200, visited: 1 })
+    expect(events.map(e => new URL(e.url).pathname).sort()).toEqual(['/', '/a'])
+  })
+
+  it('does not stall on a hanging head request', async () => {
+    const fetcher = fakeFetcher({ '/market': ['/other'], '/market/a': [] })
+    fetcher.head = () => new Promise(() => {})
+    const result = await crawl(fetcher, [`${site}/market`], {
+      siteUrl: site,
+      timeout: 50,
+      apps: { self: { paths: ['/market/**'] }, main: { paths: ['/**'], owner: 'external' } },
+    })
+    expect(result.reachability).toEqual([{ url: `${site}/other`, zone: 'main', statusCode: 0 }])
+  })
 })

@@ -8,6 +8,14 @@ export interface CrawlOptions extends ZoneConfig {
   maxPages?: number
   timeout?: number
   userAgent?: string
+  onPage?: (event: CrawlProgressEvent) => void
+}
+
+export interface CrawlProgressEvent {
+  url: string
+  statusCode: number
+  ms: number
+  visited: number
 }
 
 export interface CrawlResult {
@@ -65,7 +73,7 @@ export async function crawl(
     }
     if (cls.action === 'reachability') {
       try {
-        const r = await fetcher.head(url)
+        const r = await withTimeout(fetcher.head(url), timeout)
         reachability.push({ url, zone: cls.zone, statusCode: r.statusCode })
       } catch {
         reachability.push({ url, zone: cls.zone, statusCode: 0 })
@@ -77,6 +85,7 @@ export async function crawl(
       return
     }
     let snapshot: PageSnapshot
+    const started = Date.now()
     try {
       snapshot = await withTimeout(fetcher.fetch(url, { userAgent: options.userAgent }), timeout)
     } catch (e) {
@@ -90,6 +99,7 @@ export async function crawl(
     }
     snapshots.push(snapshot)
     stats.visited++
+    options.onPage?.({ url, statusCode: snapshot.statusCode, ms: Date.now() - started, visited: stats.visited })
     for (const link of snapshot.links) enqueue(link.href, url)
     if (delay > 0) await sleep(delay)
   }

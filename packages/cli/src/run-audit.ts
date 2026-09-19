@@ -60,6 +60,7 @@ export async function runAudit(opts: RunAuditOptions): Promise<Report> {
         seeds = baseSeeds
       }
     }
+    process.stderr.write(`[ranklint] crawling from ${seeds.join(', ')}\n`)
     const crawlResult = await crawl(fetcher, seeds, {
       siteUrl: config.site.url,
       apps: config.apps,
@@ -68,7 +69,9 @@ export async function runAudit(opts: RunAuditOptions): Promise<Report> {
       maxPages: config.crawl?.maxPages,
       delay: config.crawl?.delay,
       userAgent: config.crawl?.userAgent,
+      onPage: e => process.stderr.write(`[ranklint] ${e.visited}${config.crawl?.maxPages ? `/${config.crawl.maxPages}` : ''} ${e.statusCode} ${e.ms}ms ${e.url}\n`),
     })
+    process.stderr.write(`[ranklint] crawl done: ${crawlResult.stats.visited} pages, running checks\n`)
     const crawlIssues = [...crawlResult.issues]
     const reachableRule = rules.get('links:reachable')
     if (reachableRule && reachableRule !== 'off') {

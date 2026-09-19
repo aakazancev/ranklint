@@ -31,7 +31,10 @@ export const audit = defineCommand({
     }
     let server: Awaited<ReturnType<typeof startServer>> | undefined
     try {
-      if (args.start) server = await startServer(args.start)
+      if (args.start) {
+        server = await startServer(args.start)
+        process.stderr.write(`[ranklint] server ready at ${server.url}\n`)
+      }
       const url = server?.url ?? args.url!
       if (args.mode === 'monitor') {
         const { runMonitor } = await import('../run-monitor')
