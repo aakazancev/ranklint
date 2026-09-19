@@ -12,6 +12,8 @@
     "docs:dev": "pnpm --filter ranklint-docs dev",
     "docs:generate": "pnpm --filter ranklint-docs generate",
     "test": "vitest run",
+    "landing:shots": "node scripts/landing-shots.mjs",
+    "landing:gate": "node scripts/landing-gate.mjs",
     "lint": "eslint .",
     "typecheck": "pnpm -r --filter './packages/*' typecheck",
     "publint": "pnpm -r --filter './packages/*' exec publint"

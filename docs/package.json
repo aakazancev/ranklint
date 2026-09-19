@@ -18,6 +18,7 @@
     "nuxt": "^4.4.8"
   },
   "devDependencies": {
+    "@ranklint/checks": "workspace:*",
     "@ranklint/core": "workspace:*"
   }
 }

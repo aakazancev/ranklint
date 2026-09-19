@@ -7,7 +7,22 @@ export default defineAppConfig({
       github: 'aakazancev/ranklint',
     },
   },
+  header: {
+    title: 'ranklint',
+  },
   seo: {
     titleTemplate: '%s · ranklint',
+    schema: {
+      type: 'SoftwareApplication',
+      applicationCategory: 'DeveloperApplication',
+      operatingSystem: 'Web',
+      price: 0,
+      priceCurrency: 'USD',
+      sameAs: ['https://github.com/aakazancev/ranklint'],
+      organization: {
+        name: 'ranklint',
+        sameAs: ['https://github.com/aakazancev/ranklint'],
+      },
+    },
   },
 })

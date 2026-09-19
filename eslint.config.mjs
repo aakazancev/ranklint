@@ -5,7 +5,7 @@ export default createConfigForNuxt().append(
     ignores: ['**/dist/**', '**/.nuxt/**', '**/.output/**'],
   },
   {
-    files: ['playground/app/**/*.vue'],
+    files: ['playground/app/**/*.vue', 'docs/app/components/OgImage/*.vue'],
     rules: { 'vue/multi-word-component-names': 'off' },
   },
 )

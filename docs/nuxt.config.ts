@@ -1,3 +1,5 @@
+import { fileURLToPath } from 'node:url'
+
 export default defineNuxtConfig({
   extends: ['docus'],
   modules: [
@@ -10,8 +12,28 @@ export default defineNuxtConfig({
       })
     },
   ],
+  css: ['~/og-fonts.css'],
   app: {
     baseURL: process.env.NUXT_APP_BASE_URL ?? '/',
+    head: {
+      link: [
+        { rel: 'icon', type: 'image/png', sizes: '32x32', href: '/favicon-32.png' },
+        { rel: 'apple-touch-icon', sizes: '180x180', href: '/apple-touch-icon.png' },
+      ],
+    },
+  },
+  vite: {
+    $client: {
+      resolve: {
+        alias: {
+          '@ranklint/core': fileURLToPath(new URL('./app/utils/core-shim.ts', import.meta.url)),
+        },
+      },
+    },
+  },
+  ogImage: {
+    zeroRuntime: false,
+    fontSubsets: ['latin', 'cyrillic'],
   },
   routeRules: {
     '/': { redirect: '/en' },
@@ -32,7 +54,7 @@ export default defineNuxtConfig({
     site: { url: process.env.NUXT_SITE_URL ?? 'https://ranklint.dev', name: 'ranklint' },
     sitemap: false,
     robots: false,
-    jsonLd: false,
+    jsonLd: true,
     devtools: true,
   },
 })
