@@ -32,3 +32,24 @@ jobs:
       - run: pnpm publint
       - run: node scripts/generate-config-schema.mjs --check
       - run: node scripts/bundle-guard.mjs
+
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm dev:prepare
+      - uses: actions/cache@v6
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+      - run: pnpm --filter @ranklint/cli exec playwright install --with-deps chromium
+      - run: pnpm build
+      - run: node scripts/generate-rules-doc.mjs --check
+      - run: pnpm --filter ranklint-docs build
+      - run: pnpm --filter @ranklint/cli exec node ./dist/cli.mjs audit --start ../../docs/.output/server/index.mjs --cwd ../../docs --reporter github
