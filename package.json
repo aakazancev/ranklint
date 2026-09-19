@@ -8,7 +8,9 @@
   "packageManager": "pnpm@10.33.2",
   "scripts": {
     "build": "pnpm -r --filter './packages/*' build",
-    "dev:prepare": "pnpm -r --filter './packages/*' dev:prepare && pnpm --filter ranklint-playground exec nuxt prepare",
+    "dev:prepare": "pnpm -r --filter './packages/*' dev:prepare && pnpm --filter ranklint-playground exec nuxt prepare && pnpm --filter ranklint-docs dev:prepare",
+    "docs:dev": "pnpm --filter ranklint-docs dev",
+    "docs:generate": "pnpm --filter ranklint-docs generate",
     "test": "vitest run",
     "lint": "eslint .",
     "typecheck": "pnpm -r --filter './packages/*' typecheck",
@@ -21,5 +23,10 @@
     "publint": "^0.3.21",
     "typescript": "^6.0.3",
     "vitest": "^4.1.10"
+  },
+  "pnpm": {
+    "overrides": {
+      "@nuxt/schema": "4.4.8"
+    }
   }
 }

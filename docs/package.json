@@ -1,0 +1,23 @@
+{
+  "name": "ranklint-docs",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "nuxt dev --extends docus",
+    "build": "nuxt build --extends docus",
+    "generate": "nuxt generate --extends docus",
+    "preview": "nuxt preview --extends docus",
+    "dev:prepare": "nuxt prepare --extends docus"
+  },
+  "dependencies": {
+    "@nuxtjs/i18n": "^10.2.1",
+    "@ranklint/nuxt": "workspace:*",
+    "better-sqlite3": "^12.5.0",
+    "docus": "^5.13.0",
+    "h3": "^1.15.11",
+    "nuxt": "^4.4.8"
+  },
+  "devDependencies": {
+    "@ranklint/core": "workspace:*"
+  }
+}
