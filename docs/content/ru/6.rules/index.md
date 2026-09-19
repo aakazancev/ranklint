@@ -33,12 +33,12 @@ description: 42 built-in rules generated from the check registry.
 | [`links:no-redirect-chain`](/ru/rules/links/links-no-redirect-chain) | links | page | warn | цепочки редиректов; { maxHops } |
 | [`links:permanent-redirects`](/ru/rules/links/links-permanent-redirects) | links | page | warn | 302 там, где должен быть 301 |
 | [`links:trailing-slash-consistent`](/ru/rules/links/links-trailing-slash-consistent) | links | site | warn | единообразие завершающего слеша |
-| [`meta:description-length`](/ru/rules/meta/meta-description-length) | meta | page | warn | длина; { min, max } |
+| [`meta:description-length`](/ru/rules/meta/meta-description-length) | meta | page | warn | длина meta description, по умолчанию 70–160 символов; { min, max } |
 | [`meta:description-required`](/ru/rules/meta/meta-description-required) | meta | page | error | есть meta description |
 | [`meta:no-duplicate-description`](/ru/rules/meta/meta-no-duplicate-description) | meta | site | error | одинаковые description |
 | [`meta:no-duplicate-title`](/ru/rules/meta/meta-no-duplicate-title) | meta | site | error | одинаковые title на разных страницах |
 | [`meta:og-required`](/ru/rules/meta/meta-og-required) | meta | page | warn | og:title, og:description, og:image — один issue на страницу со списком отсутствующих |
-| [`meta:title-length`](/ru/rules/meta/meta-title-length) | meta | page | warn | длина; { min, max } |
+| [`meta:title-length`](/ru/rules/meta/meta-title-length) | meta | page | warn | длина title, по умолчанию 30–60 символов; { min, max } |
 | [`meta:title-required`](/ru/rules/meta/meta-title-required) | meta | page | error | есть <title> |
 | [`meta:twitter-card`](/ru/rules/meta/meta-twitter-card) | meta | page | warn | twitter:card корректен |
 | [`mobile:viewport`](/ru/rules/http/mobile-viewport) | http | page | error | есть viewport meta |

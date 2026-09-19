@@ -52,4 +52,11 @@ jobs:
       - run: pnpm build
       - run: node scripts/generate-rules-doc.mjs --check
       - run: pnpm --filter ranklint-docs build
-      - run: pnpm --filter @ranklint/cli exec node ./dist/cli.mjs audit --start ../../docs/.output/server/index.mjs --cwd ../../docs --reporter github
+        env:
+          NUXT_SITE_URL: http://127.0.0.1:4100
+      - run: |
+          PORT=4100 node docs/.output/server/index.mjs &
+          for i in $(seq 1 30); do curl -sf http://127.0.0.1:4100/en > /dev/null && break; sleep 1; done
+      - run: pnpm --filter @ranklint/cli exec node ./dist/cli.mjs audit --url http://127.0.0.1:4100/en --cwd ../../docs --reporter github
+        env:
+          NUXT_SITE_URL: http://127.0.0.1:4100

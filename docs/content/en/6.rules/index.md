@@ -33,12 +33,12 @@ Every rule accepts `error`, `warn`, `info`, `off` or `[severity, options]` in ra
 | [`links:no-redirect-chain`](/en/rules/links/links-no-redirect-chain) | links | page | warn | redirect chains; { maxHops } |
 | [`links:permanent-redirects`](/en/rules/links/links-permanent-redirects) | links | page | warn | 302 where a 301 belongs |
 | [`links:trailing-slash-consistent`](/en/rules/links/links-trailing-slash-consistent) | links | site | warn | trailing-slash consistency |
-| [`meta:description-length`](/en/rules/meta/meta-description-length) | meta | page | warn | length; { min, max } |
+| [`meta:description-length`](/en/rules/meta/meta-description-length) | meta | page | warn | meta description length, 70–160 chars by default; { min, max } |
 | [`meta:description-required`](/en/rules/meta/meta-description-required) | meta | page | error | meta description exists |
 | [`meta:no-duplicate-description`](/en/rules/meta/meta-no-duplicate-description) | meta | site | error | identical descriptions |
 | [`meta:no-duplicate-title`](/en/rules/meta/meta-no-duplicate-title) | meta | site | error | identical titles across pages |
 | [`meta:og-required`](/en/rules/meta/meta-og-required) | meta | page | warn | og:title, og:description, og:image — one issue per page listing the missing tags |
-| [`meta:title-length`](/en/rules/meta/meta-title-length) | meta | page | warn | length; { min, max } |
+| [`meta:title-length`](/en/rules/meta/meta-title-length) | meta | page | warn | title length, 30–60 chars by default; { min, max } |
 | [`meta:title-required`](/en/rules/meta/meta-title-required) | meta | page | error | <title> exists |
 | [`meta:twitter-card`](/en/rules/meta/meta-twitter-card) | meta | page | warn | twitter:card is valid |
 | [`mobile:viewport`](/en/rules/http/mobile-viewport) | http | page | error | viewport meta exists |

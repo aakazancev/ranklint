@@ -1,7 +1,7 @@
 import { defineRanklintConfig } from '@ranklint/core'
 
 export default defineRanklintConfig({
-  site: { url: 'https://ranklint.dev' },
+  site: { url: process.env.NUXT_SITE_URL ?? 'https://ranklint.dev' },
   crawl: { maxPages: 300 },
   rules: {
     'meta:og-required': 'warn',

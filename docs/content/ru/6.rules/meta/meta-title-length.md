@@ -1,6 +1,6 @@
 ---
 title: "meta:title-length"
-description: "длина; { min, max }"
+description: "длина title, по умолчанию 30–60 символов; { min, max }"
 ---
 
 <!-- generated:start -->
@@ -8,7 +8,7 @@ description: "длина; { min, max }"
 | --- | --- | --- |
 | meta | page | warn |
 
-длина; { min, max }
+длина title, по умолчанию 30–60 символов; { min, max }
 
 ### Опции
 

@@ -104,8 +104,8 @@
     "ru": "единообразие завершающего слеша"
   },
   "meta:description-length": {
-    "en": "length; { min, max }",
-    "ru": "длина; { min, max }"
+    "en": "meta description length, 70–160 chars by default; { min, max }",
+    "ru": "длина meta description, по умолчанию 70–160 символов; { min, max }"
   },
   "meta:description-required": {
     "en": "meta description exists",
@@ -124,8 +124,8 @@
     "ru": "og:title, og:description, og:image — один issue на страницу со списком отсутствующих"
   },
   "meta:title-length": {
-    "en": "length; { min, max }",
-    "ru": "длина; { min, max }"
+    "en": "title length, 30–60 chars by default; { min, max }",
+    "ru": "длина title, по умолчанию 30–60 символов; { min, max }"
   },
   "meta:title-required": {
     "en": "<title> exists",

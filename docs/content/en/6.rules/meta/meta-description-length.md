@@ -1,6 +1,6 @@
 ---
 title: "meta:description-length"
-description: "length; { min, max }"
+description: "meta description length, 70–160 chars by default; { min, max }"
 ---
 
 <!-- generated:start -->
@@ -8,7 +8,7 @@ description: "length; { min, max }"
 | --- | --- | --- |
 | meta | page | warn |
 
-length; { min, max }
+meta description length, 70–160 chars by default; { min, max }
 
 ### Options
 

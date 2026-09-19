@@ -1,8 +1,20 @@
 export default defineNuxtConfig({
   extends: ['docus'],
-  modules: ['@nuxtjs/i18n', '@ranklint/nuxt'],
+  modules: [
+    '@nuxtjs/i18n',
+    '@ranklint/nuxt',
+    (_options, nuxt) => {
+      nuxt.hook('pages:extend', (pages) => {
+        const landing = pages.find(page => page.name === 'lang-index')
+        if (landing) landing.path = '/:lang(en|ru)?'
+      })
+    },
+  ],
   app: {
     baseURL: process.env.NUXT_APP_BASE_URL ?? '/',
+  },
+  routeRules: {
+    '/': { redirect: '/en' },
   },
   site: {
     name: 'ranklint',

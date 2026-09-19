@@ -1,6 +1,6 @@
 ---
 title: "meta:description-length"
-description: "длина; { min, max }"
+description: "длина meta description, по умолчанию 70–160 символов; { min, max }"
 ---
 
 <!-- generated:start -->
@@ -8,7 +8,7 @@ description: "длина; { min, max }"
 | --- | --- | --- |
 | meta | page | warn |
 
-длина; { min, max }
+длина meta description, по умолчанию 70–160 символов; { min, max }
 
 ### Опции
 

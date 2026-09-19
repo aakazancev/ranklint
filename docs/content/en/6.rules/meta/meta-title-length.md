@@ -1,6 +1,6 @@
 ---
 title: "meta:title-length"
-description: "length; { min, max }"
+description: "title length, 30–60 chars by default; { min, max }"
 ---
 
 <!-- generated:start -->
@@ -8,7 +8,7 @@ description: "length; { min, max }"
 | --- | --- | --- |
 | meta | page | warn |
 
-length; { min, max }
+title length, 30–60 chars by default; { min, max }
 
 ### Options
 
