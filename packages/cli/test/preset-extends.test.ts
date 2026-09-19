@@ -12,4 +12,10 @@ describe('presets via extends', () => {
     expect(config.rules?.['meta:title-length']).toEqual(['warn', { min: 20, max: 70 }])
     expect(config.rules?.['images:alt-required']).toBe('error')
   })
+
+  it('carries customChecks from a preset layer', async () => {
+    const config = await loadRanklintConfig({ cwd })
+    expect(config.customChecks?.map(c => c.id)).toEqual(['agency:no-lorem'])
+    expect(config.rules?.['agency:no-lorem']).toBe('warn')
+  })
 })

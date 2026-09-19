@@ -147,6 +147,8 @@ export default defineRanklintConfig({
 
 Custom rules are first-class alongside built-ins: configured via `rules`, disabled with `'off'` and `useRanklintIgnore`. The `CheckContext` contract is stable within a major version.
 
+A rule package is just a preset: publish an npm package (or keep a local file) whose default export has `customChecks` and `rules`, and plug it in via `extends: ['@myteam/ranklint-rules']`. Rules from every layer are merged; the config itself wins on conflicts.
+
 Presets are plugged in via `extends` (native c12): `@ranklint/preset-default` pins all built-in rules at their default severities. Earlier layers take precedence over later ones, and `ranklint.config` itself overrides all layers:
 
 ```ts
