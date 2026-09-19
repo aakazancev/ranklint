@@ -2,6 +2,25 @@ import type { Issue, Report, Severity } from '@ranklint/core'
 
 const order: Record<Severity, number> = { error: 0, warn: 1, info: 2 }
 
+export interface RuleGroup {
+  checkId: string
+  severity: Severity
+  issues: Issue[]
+}
+
+export function groupByRule(issues: Issue[]): RuleGroup[] {
+  const map = new Map<string, RuleGroup>()
+  for (const issue of issues) {
+    const group = map.get(issue.checkId) ?? { checkId: issue.checkId, severity: issue.severity, issues: [] }
+    group.issues.push(issue)
+    map.set(issue.checkId, group)
+  }
+  const groups = [...map.values()]
+  for (const group of groups) group.issues.sort((a, b) => a.url.localeCompare(b.url))
+  return groups.sort((a, b) =>
+    order[a.severity] - order[b.severity] || b.issues.length - a.issues.length || a.checkId.localeCompare(b.checkId))
+}
+
 function cell(value: string | undefined): string {
   return (value ?? '').replace(/\|/g, '\\|').replace(/\n/g, ' ')
 }
@@ -73,14 +92,16 @@ export function markdown(report: Report): string {
     return lines.join('\n')
   }
 
-  const sorted = [...report.issues].sort((a: Issue, b: Issue) =>
-    order[a.severity] - order[b.severity] || a.url.localeCompare(b.url) || a.checkId.localeCompare(b.checkId))
-
-  lines.push('| Severity | Check | URL | Message | Suggestion |')
-  lines.push('| --- | --- | --- | --- | --- |')
-  for (const issue of sorted) {
-    lines.push(`| ${issue.severity} | \`${issue.checkId}\` | ${cell(issue.url)} | ${cell(issue.message)} | ${cell(issue.suggestion)} |`)
+  for (const group of groupByRule(report.issues)) {
+    const noun = group.issues.length === 1 ? 'issue' : 'issues'
+    lines.push(`### \`${group.checkId}\` — ${group.severity} · ${group.issues.length} ${noun}`)
+    lines.push('')
+    lines.push('| URL | Message | Suggestion |')
+    lines.push('| --- | --- | --- |')
+    for (const issue of group.issues) {
+      lines.push(`| ${cell(issue.url)} | ${cell(issue.message)} | ${cell(issue.suggestion)} |`)
+    }
+    lines.push('')
   }
-  lines.push('')
   return lines.join('\n')
 }

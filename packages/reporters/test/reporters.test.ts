@@ -33,12 +33,23 @@ describe('json reporter', () => {
 })
 
 describe('markdown reporter', () => {
-  it('renders summary and issue table sorted by severity', () => {
-    const out = markdown(report())
-    expect(out).toContain('**1 errors, 1 warnings, 0 info**')
-    expect(out).toContain('| Severity | Check | URL | Message | Suggestion |')
+  it('groups issues by rule, errors first, biggest groups first', () => {
+    const out = markdown(report({
+      issues: [
+        { checkId: 'meta:title-length', severity: 'warn', message: 'Title is 4 chars', url: 'https://x.com/a', suggestion: 'Make it longer' },
+        { checkId: 'meta:title-length', severity: 'warn', message: 'Title is 5 chars', url: 'https://x.com/b', suggestion: 'Make it longer' },
+        { checkId: 'headings:single-h1', severity: 'error', message: 'Page has 2 <h1> & more', url: 'https://x.com/b' },
+        { checkId: 'meta:og-required', severity: 'warn', message: 'Page has no og:image', url: 'https://x.com/a' },
+      ],
+    }))
+    expect(out).toContain('**1 errors, 3 warnings, 0 info**')
+    expect(out).toContain('### `headings:single-h1` — error · 1 issue')
+    expect(out).toContain('### `meta:title-length` — warn · 2 issues')
+    expect(out).toContain('| URL | Message | Suggestion |')
     expect(out.indexOf('headings:single-h1')).toBeLessThan(out.indexOf('meta:title-length'))
-    expect(out).toContain('Make it longer')
+    expect(out.indexOf('### `meta:title-length`')).toBeLessThan(out.indexOf('### `meta:og-required`'))
+    expect(out).toContain('| https://x.com/a | Title is 4 chars | Make it longer |')
+    expect(out).not.toContain('| Severity | Check |')
   })
 
   it('renders empty state and truncation note', () => {

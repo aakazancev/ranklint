@@ -1,4 +1,5 @@
-import type { Report, Severity } from '@ranklint/core'
+import type { Report } from '@ranklint/core'
+import { groupByRule } from './markdown'
 
 function esc(value: string): string {
   return value
@@ -8,20 +9,20 @@ function esc(value: string): string {
     .replace(/"/g, '&quot;')
 }
 
-const order: Record<Severity, number> = { error: 0, warn: 1, info: 2 }
-
 export function html(report: Report): string {
   const counts = { error: 0, warn: 0, info: 0 }
   for (const issue of report.issues) counts[issue.severity]++
-  const sorted = [...report.issues].sort((a, b) =>
-    order[a.severity] - order[b.severity] || a.url.localeCompare(b.url))
 
-  const rows = sorted.map(issue => `<tr class="${issue.severity}">
-    <td><span class="badge ${issue.severity}">${issue.severity}</span></td>
-    <td><code>${esc(issue.checkId)}</code></td>
+  const sections = groupByRule(report.issues).map(group => `<h2 class="rule"><code>${esc(group.checkId)}</code> <span class="badge ${group.severity}">${group.severity}</span> <small>${group.issues.length}</small></h2>
+<table>
+<thead><tr><th>URL</th><th>Message</th></tr></thead>
+<tbody>
+${group.issues.map(issue => `<tr class="${issue.severity}">
     <td class="url">${esc(issue.url)}</td>
     <td>${esc(issue.message)}${issue.suggestion ? `<div class="hint">💡 ${esc(issue.suggestion)}</div>` : ''}</td>
-  </tr>`).join('\n')
+  </tr>`).join('\n')}
+</tbody>
+</table>`).join('\n')
 
   return `<!doctype html>
 <html lang="en">
@@ -43,6 +44,8 @@ export function html(report: Report): string {
   .badge.info { background: #e8f0fe; color: #2b6cb0; }
   .url { word-break: break-all; max-width: 280px; }
   .hint { color: #666; font-size: 12px; margin-top: 4px; }
+  h2.rule { font-size: 15px; margin: 24px 0 8px; }
+  h2.rule small { color: #666; font-weight: 400; }
 </style>
 </head>
 <body>
@@ -53,14 +56,7 @@ export function html(report: Report): string {
   <div class="stat"><b>${counts.warn}</b> warnings</div>
   <div class="stat"><b>${counts.info}</b> info</div>
 </div>
-${report.issues.length === 0
-  ? '<p>No issues found 🎉</p>'
-  : `<table>
-<thead><tr><th>Severity</th><th>Check</th><th>URL</th><th>Message</th></tr></thead>
-<tbody>
-${rows}
-</tbody>
-</table>`}
+${report.issues.length === 0 ? '<p>No issues found 🎉</p>' : sections}
 </body>
 </html>
 `

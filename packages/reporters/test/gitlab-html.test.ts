@@ -42,6 +42,8 @@ describe('html reporter', () => {
     expect(out).toContain('<b>1</b> errors')
     expect(out).toContain('💡 Keep one h1')
     expect(out).not.toContain('2 <h1> tags')
+    expect(out).toContain('<h2 class="rule"><code>headings:single-h1</code>')
+    expect(out.indexOf('headings:single-h1')).toBeLessThan(out.indexOf('meta:title-length'))
   })
 
   it('renders empty state', () => {
