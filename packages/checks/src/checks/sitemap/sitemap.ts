@@ -1,8 +1,7 @@
 import type { CheckContext, Issue } from '@ranklint/core'
 import { getDocument } from '@ranklint/core'
+import { z } from 'zod'
 import { defineCheck, docsUrl } from '../../define'
-
-const MAX_UNCRAWLED_PROBES = 100
 
 function crawlOrigin(ctx: CheckContext): string {
   return new URL(ctx.pages?.[0]?.url ?? ctx.site.url).origin
@@ -72,17 +71,23 @@ export const sitemapReachable = defineCheck({
   severity: 'error',
   scope: 'site',
   docs: docsUrl('sitemap:reachable'),
+  optionsSchema: z.object({ maxProbes: z.number().int().nonnegative().optional() }),
   async run(ctx) {
+    const { maxProbes = 100 } = ctx.config.options as { maxProbes?: number }
     const locs = await sitemapPaths(ctx)
     if (locs.length === 0) return []
     const origin = crawlOrigin(ctx)
     const byPath = new Map((ctx.pages ?? []).map(page => [pathOf(page.url), page.statusCode]))
     const issues: Issue[] = []
     let probes = 0
+    let skipped = 0
     for (const loc of locs) {
       let status = byPath.get(loc)
       if (status === undefined) {
-        if (probes >= MAX_UNCRAWLED_PROBES) continue
+        if (maxProbes > 0 && probes >= maxProbes) {
+          skipped++
+          continue
+        }
         probes++
         try {
           status = (await ctx.fetcher.head(`${origin}${loc}`)).statusCode
@@ -90,13 +95,23 @@ export const sitemapReachable = defineCheck({
           status = 0
         }
       }
-      if (status !== undefined && status < 400 && status !== 0) continue
+      if (status < 400 && status !== 0) continue
       issues.push({
         checkId: 'sitemap:reachable',
         severity: 'error',
         message: `Sitemap lists ${loc} but it responds with ${status || 'network error'}`,
         url: `${origin}${loc}`,
         suggestion: 'Remove dead URLs from the sitemap — search engines treat them as low sitemap quality',
+        docs: docsUrl('sitemap:reachable'),
+      })
+    }
+    if (skipped > 0) {
+      issues.push({
+        checkId: 'sitemap:reachable',
+        severity: 'error',
+        message: `Sitemap lists ${skipped} URLs that were neither crawled nor probed (maxProbes: ${maxProbes})`,
+        url: `${origin}/sitemap.xml`,
+        suggestion: `Raise 'sitemap:reachable' maxProbes (0 = unlimited) or crawl.maxPages so every sitemap URL is verified`,
         docs: docsUrl('sitemap:reachable'),
       })
     }

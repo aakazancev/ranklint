@@ -62,4 +62,23 @@ describe('sitemap:reachable', () => {
     expect(issues.map(i => new URL(i.url).pathname).sort()).toEqual(['/gone', '/uncrawled-dead'])
     expect(issues.find(i => i.url.includes('gone'))?.message).toContain('404')
   })
+
+  it('reports uncrawled urls beyond maxProbes as one issue', async () => {
+    const locs = ['/a', '/b', '/c', '/d']
+    const fetcher = fetcherWithSitemap(locs, { '/a': 404 })
+    const context = { ...ctx([], fetcher), config: { severity: 'error' as const, options: { maxProbes: 2 } } }
+    const issues = await sitemapReachable.run(context)
+    const paths = issues.map(i => new URL(i.url).pathname)
+    expect(paths).toContain('/a')
+    expect(paths).toContain('/sitemap.xml')
+    expect(issues.find(i => i.url.endsWith('/sitemap.xml'))?.message).toBe('Sitemap lists 2 URLs that were neither crawled nor probed (maxProbes: 2)')
+  })
+
+  it('probes everything with maxProbes 0', async () => {
+    const locs = Array.from({ length: 150 }, (_, i) => `/p${i}`)
+    const fetcher = fetcherWithSitemap(locs, { '/p149': 404 })
+    const context = { ...ctx([], fetcher), config: { severity: 'error' as const, options: { maxProbes: 0 } } }
+    const issues = await sitemapReachable.run(context)
+    expect(issues.map(i => new URL(i.url).pathname)).toEqual(['/p149'])
+  })
 })
