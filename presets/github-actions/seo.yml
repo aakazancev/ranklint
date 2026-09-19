@@ -12,6 +12,11 @@ on:
         required: false
         type: string
         default: ranklint-report
+      lighthouse-profile:
+        description: ranklint.config profile with lighthouse enabled; empty skips the Lighthouse job
+        required: false
+        type: string
+        default: ""
 
 jobs:
   audit:
@@ -67,3 +72,23 @@ jobs:
           path: |
             ranklint-report.json
             ranklint-diff.md
+
+  lighthouse:
+    if: inputs.lighthouse-profile != ''
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm i -g @ranklint/cli
+      - run: >
+          ranklint lighthouse
+          --url "${{ inputs.url }}"
+          --profile "${{ inputs.lighthouse-profile }}"
+          --output ranklint-lighthouse.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ranklint-lighthouse
+          path: ranklint-lighthouse.json

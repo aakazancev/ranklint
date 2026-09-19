@@ -55,10 +55,13 @@
 
 .ranklint-lighthouse:
   extends: .ranklint-base
+  variables:
+    RANKLINT_PROFILE: ""
   script:
     - >
       ranklint lighthouse
       --url "$RANKLINT_URL"
+      ${RANKLINT_PROFILE:+--profile "$RANKLINT_PROFILE"}
       --output ranklint-lighthouse.json
   artifacts:
     when: always

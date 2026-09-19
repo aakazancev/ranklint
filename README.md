@@ -85,11 +85,33 @@ export default defineRanklintConfig({
 
 By default the crawl starts from the audited URL itself. With multi-app zones set `crawl.entry` (e.g. `['/en/market']`) so the crawl starts inside your zone — essential with `--start`, where the seed would otherwise be the server root owned by another zone.
 
+### Profiles and one-off Lighthouse
+
+`profiles` are patched over the base config with `--profile <name>` (defu). Keep Lighthouse off in the regular PR audit and enable it in a release profile that runs on tags or manually:
+
+```ts
+export default defineRanklintConfig({
+  site: { url: 'https://example.com' },
+  lighthouse: { enabled: false },
+  profiles: {
+    uat: { site: { url: 'https://uat.example.com' } },
+    release: { lighthouse: { enabled: true, runs: 5, thresholds: { '/**': { performance: 85 } } } },
+  },
+})
+```
+
+```bash
+ranklint audit --url https://uat.example.com --profile uat        # every PR, seconds
+ranklint lighthouse --url https://example.com --profile release     # after a release
+```
+
+In the GitLab preset set `RANKLINT_PROFILE: release` on a job extending `.ranklint-lighthouse` with `rules: [{ if: $CI_COMMIT_TAG }]`; in the GitHub preset pass `lighthouse-profile: release`.
+
 ### GitLab CI
 
 ```yaml
 include:
-  - remote: 'https://raw.githubusercontent.com/ranklint/ranklint/main/presets/gitlab-ci/seo.yml'
+  - remote: 'https://raw.githubusercontent.com/aakazancev/ranklint/main/presets/gitlab-ci/seo.yml'
 
 seo:audit:
   extends: .ranklint-audit

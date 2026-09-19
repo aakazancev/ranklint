@@ -7,6 +7,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { audit } from '../src/commands/audit'
 import { diff } from '../src/commands/diff'
 import { generate } from '../src/commands/generate'
+import { lighthouse } from '../src/commands/lighthouse'
 
 function report(issues: Report['issues']): Report {
   return {
@@ -83,5 +84,28 @@ describe('audit command argument validation', () => {
   it('rejects unknown reporters', async () => {
     await expect(runCommand(audit, { rawArgs: ['--url', 'https://x.com', '--reporter', 'nope'] }))
       .rejects.toThrow('Unknown reporter')
+  })
+})
+
+describe('lighthouse command', () => {
+  it('applies --profile from ranklint.config', async () => {
+    const dir = await mkdtemp(join(tmpdir(), 'ranklint-lh-'))
+    await writeFile(join(dir, 'ranklint.config.mjs'), `export default {
+  site: { url: 'https://x.com' },
+  lighthouse: { enabled: false, runs: 1 },
+  profiles: { release: { lighthouse: { enabled: true, runs: 3 } } },
+}
+`)
+    vi.stubEnv('RANKLINT_LIGHTHOUSE_DRY', '1')
+    await runCommand(lighthouse, { rawArgs: ['--url', 'https://x.com/', '--cwd', dir, '--profile', 'release', '--output', join(dir, 'out.json')] })
+    const out = JSON.parse(await readFile(join(dir, 'out.json'), 'utf8'))
+    expect(out.config.runs).toBe(3)
+    expect(out.config.enabled).toBe(true)
+  })
+
+  it('rejects unknown profile', async () => {
+    const dir = await mkdtemp(join(tmpdir(), 'ranklint-lh-'))
+    await writeFile(join(dir, 'ranklint.config.mjs'), `export default { site: { url: 'https://x.com' } }\n`)
+    await expect(runCommand(lighthouse, { rawArgs: ['--url', 'https://x.com/', '--cwd', dir, '--profile', 'nope'] })).rejects.toThrow('Unknown profile "nope"')
   })
 })
