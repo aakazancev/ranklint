@@ -15,13 +15,17 @@ describe('meta:og-required', () => {
     expect(await runCheckOnHtml(ogRequired, head(fullOg))).toEqual([])
   })
 
-  it('flags each missing og tag', async () => {
+  it('reports all missing og tags in one issue', async () => {
     const issues = await runCheckOnHtml(ogRequired, head(''))
-    expect(issues.map(i => i.message)).toEqual([
-      'Page has no og:title',
-      'Page has no og:description',
-      'Page has no og:image',
-    ])
+    expect(issues).toHaveLength(1)
+    expect(issues[0]?.message).toBe('Page has no og:title, og:description, og:image')
+    expect(issues[0]?.suggestion).toContain('useSeoMeta({ ogTitle, ogDescription, ogImage })')
+  })
+
+  it('lists only the missing tags', async () => {
+    const issues = await runCheckOnHtml(ogRequired, head('<meta property="og:title" content="T">'))
+    expect(issues).toHaveLength(1)
+    expect(issues[0]?.message).toBe('Page has no og:description, og:image')
   })
 
   it('flags relative og:image', async () => {

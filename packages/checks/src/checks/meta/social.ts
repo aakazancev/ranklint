@@ -25,14 +25,18 @@ export const ogRequired = defineCheck({
       suggestion,
       docs: docsUrl('meta:og-required'),
     })
-    const title = metaContent(doc, 'og:title')
-    const description = metaContent(doc, 'og:description')
+    const missing: { tag: string, key: string }[] = []
+    if (!metaContent(doc, 'og:title')) missing.push({ tag: 'og:title', key: 'ogTitle' })
+    if (!metaContent(doc, 'og:description')) missing.push({ tag: 'og:description', key: 'ogDescription' })
     const image = metaContent(doc, 'og:image')
-    if (!title) push('Page has no og:title', 'Add og:title — social shares fall back to arbitrary text without it')
-    if (!description) push('Page has no og:description', 'Add og:description for the share snippet')
-    if (!image) {
-      push('Page has no og:image', 'Add og:image — links without an image get drastically less engagement')
-    } else if (!/^https?:\/\//.test(image)) {
+    if (!image) missing.push({ tag: 'og:image', key: 'ogImage' })
+    if (missing.length > 0) {
+      push(
+        `Page has no ${missing.map(m => m.tag).join(', ')}`,
+        `Add ${missing.map(m => m.tag).join(', ')} via useSeoMeta({ ${missing.map(m => m.key).join(', ')} }) — social shares fall back to arbitrary text and get less engagement without them`,
+      )
+    }
+    if (image && !/^https?:\/\//.test(image)) {
       push(
         `og:image must be an absolute URL, got "${image}"`,
         'Social crawlers do not resolve relative og:image URLs — use the full https:// address',
