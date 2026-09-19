@@ -43,7 +43,7 @@ export const descriptionLength = defineCheck({
     return [{
       checkId: 'meta:description-length',
       severity: 'warn',
-      message: `Meta description is ${description.length} chars, expected ${min}–${max}`,
+      message: `Meta description is ${description.length} chars, expected ${min}-${max}`,
       url: ctx.page!.url,
       selector: 'meta[name="description"]',
       suggestion: description.length < min

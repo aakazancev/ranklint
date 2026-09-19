@@ -99,7 +99,7 @@ export const h1Length = defineCheck({
     return [{
       checkId: 'headings:h1-length',
       severity: 'warn',
-      message: `H1 is ${text.length} chars, expected ${min}–${max}`,
+      message: `H1 is ${text.length} chars, expected ${min}-${max}`,
       url: ctx.page!.url,
       selector: 'h1',
       suggestion: text.length < min

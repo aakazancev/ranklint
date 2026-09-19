@@ -59,6 +59,12 @@ export const schemaOrgSchemas = {
     hiringOrganization: z.unknown(),
     datePosted: z.string().optional(),
   }),
+  SoftwareApplication: z.looseObject({
+    name: z.string().min(1),
+    applicationCategory: z.string().min(1),
+    operatingSystem: z.string().optional(),
+    offers: z.looseObject({ price: z.union([z.string(), z.number()]), priceCurrency: z.string() }).optional(),
+  }),
 } as const
 
 export type SchemaOrgType = keyof typeof schemaOrgSchemas

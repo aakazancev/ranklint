@@ -1,6 +1,6 @@
 # @ranklint/checks
 
-The 42 built-in SEO rules for [ranklint](https://github.com/aakazancev/ranklint) plus Schema.org validation schemas (Product, Article, BreadcrumbList, Organization, WebSite, FAQPage, Event, LocalBusiness, JobPosting).
+The 42 built-in SEO rules for [ranklint](https://github.com/aakazancev/ranklint) plus Schema.org validation schemas (Product, Article, BreadcrumbList, Organization, WebSite, FAQPage, Event, LocalBusiness, JobPosting, SoftwareApplication).
 
 Custom rules use the same contract:
 

@@ -24,6 +24,19 @@ describe('validateSchemaOrg', () => {
     expect(issues[0]?.path).toContain('position')
   })
 
+  it('validates SoftwareApplication', () => {
+    expect(validateSchemaOrg('SoftwareApplication', {
+      name: 'ranklint',
+      applicationCategory: 'DeveloperApplication',
+      offers: { price: 0, priceCurrency: 'USD' },
+    })).toEqual([])
+  })
+
+  it('reports missing SoftwareApplication fields', () => {
+    const issues = validateSchemaOrg('SoftwareApplication', {})
+    expect(issues.map(i => i.path)).toEqual(expect.arrayContaining(['name', 'applicationCategory']))
+  })
+
   it('rejects unknown types with a hint', () => {
     const issues = validateSchemaOrg('SpaceStation', {})
     expect(issues[0]?.message).toContain('Unknown schema.org type')

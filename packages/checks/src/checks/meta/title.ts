@@ -43,7 +43,7 @@ export const titleLength = defineCheck({
     return [{
       checkId: 'meta:title-length',
       severity: 'warn',
-      message: `Title is ${title.length} chars, expected ${min}–${max}`,
+      message: `Title is ${title.length} chars, expected ${min}-${max}`,
       url: ctx.page!.url,
       selector: 'title',
       suggestion: title.length < min

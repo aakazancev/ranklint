@@ -55,5 +55,6 @@ describe('headings:h1-length', () => {
     const issues = await runCheckOnHtml(h1Length, body('<h1>Short</h1>'))
     expect(issues).toHaveLength(1)
     expect(issues[0]?.message).toContain('5 chars')
+    expect(issues[0]?.message).toContain('expected 20-70')
   })
 })
