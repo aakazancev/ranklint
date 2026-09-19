@@ -1,0 +1,170 @@
+{
+  "canonical:no-chain": {
+    "en": "canonical doesn't point to a page with a different canonical",
+    "ru": "canonical не ведёт на страницу с другим canonical"
+  },
+  "canonical:required": {
+    "en": "rel=canonical exists",
+    "ru": "есть rel=canonical"
+  },
+  "canonical:valid": {
+    "en": "canonical responds 200 (network)",
+    "ru": "canonical отвечает 200 (сетевой)"
+  },
+  "headings:h1-length": {
+    "en": "h1 length; { min, max }",
+    "ru": "длина h1; { min, max }"
+  },
+  "headings:hierarchy": {
+    "en": "no level skips (h2 → h4)",
+    "ru": "без перескоков уровней (h2 → h4)"
+  },
+  "headings:no-empty": {
+    "en": "no empty headings",
+    "ru": "нет пустых заголовков"
+  },
+  "headings:single-h1": {
+    "en": "exactly one h1",
+    "ru": "ровно один h1"
+  },
+  "headings:unique-h1": {
+    "en": "h1s are unique across pages",
+    "ru": "h1 уникальны между страницами"
+  },
+  "hreflang:symmetric": {
+    "en": "hreflang links are reciprocal",
+    "ru": "взаимность hreflang-ссылок"
+  },
+  "hreflang:valid-targets": {
+    "en": "hreflang targets respond 200",
+    "ru": "hreflang-цели отвечают 200"
+  },
+  "http:no-mixed-content": {
+    "en": "no http resources on an https page",
+    "ru": "нет http-ресурсов на https-странице"
+  },
+  "http:no-soft-404": {
+    "en": "404s aren't masked as 200",
+    "ru": "404 не маскируются под 200"
+  },
+  "http:ttfb-budget": {
+    "en": "p75 TTFB per group; { p75, budgets }",
+    "ru": "p75 TTFB по группам; { p75, budgets }"
+  },
+  "http:x-robots-consistent": {
+    "en": "X-Robots-Tag doesn't contradict meta robots",
+    "ru": "X-Robots-Tag не противоречит meta robots"
+  },
+  "i18n:no-locale-leak": {
+    "en": "content language matches URL locale and html lang",
+    "ru": "язык контента соответствует локали URL и html lang"
+  },
+  "images:alt-required": {
+    "en": "content imgs have alt",
+    "ru": "у контентных img есть alt"
+  },
+  "images:dimensions-required": {
+    "en": "width/height against CLS",
+    "ru": "width/height против CLS"
+  },
+  "images:no-lazy-above-fold": {
+    "en": "no loading=lazy in the viewport; { firstImages }",
+    "ru": "нет loading=lazy во вьюпорте; { firstImages }"
+  },
+  "indexability:ssr-content": {
+    "en": "content exists in SSR, not only after hydration; { minRatio }",
+    "ru": "контент есть в SSR, а не только после гидрации; { minRatio }"
+  },
+  "jsonld:parseable": {
+    "en": "JSON-LD parses",
+    "ru": "JSON-LD парсится"
+  },
+  "jsonld:valid-schema": {
+    "en": "validity against Schema.org schemas; { schemas } — your own",
+    "ru": "валидность по Schema.org-схемам; { schemas } — свои схемы"
+  },
+  "links:no-broken": {
+    "en": "internal links aren't 4xx/5xx (HEAD, cached per run)",
+    "ru": "внутренние ссылки не 4xx/5xx (HEAD с кешем на прогон)"
+  },
+  "links:no-orphans": {
+    "en": "sitemap pages nobody links to",
+    "ru": "страницы sitemap, на которые никто не ссылается"
+  },
+  "links:no-redirect-chain": {
+    "en": "redirect chains; { maxHops }",
+    "ru": "цепочки редиректов; { maxHops }"
+  },
+  "links:permanent-redirects": {
+    "en": "302 where a 301 belongs",
+    "ru": "302 там, где должен быть 301"
+  },
+  "links:trailing-slash-consistent": {
+    "en": "trailing-slash consistency",
+    "ru": "единообразие завершающего слеша"
+  },
+  "meta:description-length": {
+    "en": "length; { min, max }",
+    "ru": "длина; { min, max }"
+  },
+  "meta:description-required": {
+    "en": "meta description exists",
+    "ru": "есть meta description"
+  },
+  "meta:no-duplicate-description": {
+    "en": "identical descriptions",
+    "ru": "одинаковые description"
+  },
+  "meta:no-duplicate-title": {
+    "en": "identical titles across pages",
+    "ru": "одинаковые title на разных страницах"
+  },
+  "meta:og-required": {
+    "en": "og:title, og:description, og:image — one issue per page listing the missing tags",
+    "ru": "og:title, og:description, og:image — один issue на страницу со списком отсутствующих"
+  },
+  "meta:title-length": {
+    "en": "length; { min, max }",
+    "ru": "длина; { min, max }"
+  },
+  "meta:title-required": {
+    "en": "<title> exists",
+    "ru": "есть <title>"
+  },
+  "meta:twitter-card": {
+    "en": "twitter:card is valid",
+    "ru": "twitter:card корректен"
+  },
+  "mobile:viewport": {
+    "en": "viewport meta exists",
+    "ru": "есть viewport meta"
+  },
+  "robots:env-policy": {
+    "en": "prod open / non-prod closed",
+    "ru": "prod открыт / не-prod закрыт"
+  },
+  "robots:expected-disallow": {
+    "en": "robots.expect expectations hold",
+    "ru": "ожидания из robots.expect выполняются"
+  },
+  "robots:reachable": {
+    "en": "robots.txt responds 200",
+    "ru": "robots.txt отвечает 200"
+  },
+  "robots:sitemap-declared": {
+    "en": "Sitemap directive declared",
+    "ru": "Sitemap-директива объявлена"
+  },
+  "robots:zone-not-blocked": {
+    "en": "own zone isn't Disallow'ed",
+    "ru": "своя зона не закрыта Disallow"
+  },
+  "sitemap:no-noindex": {
+    "en": "no noindex pages in the sitemap",
+    "ru": "в sitemap нет noindex-страниц"
+  },
+  "sitemap:reachable": {
+    "en": "every sitemap URL responds < 400 (crawl result or HEAD probe, maxProbes: 100, 0 = unlimited); unverified leftovers are reported",
+    "ru": "каждый URL из sitemap отвечает < 400 (из краула или HEAD-пробой, maxProbes: 100, 0 = без лимита); непроверенный остаток попадает в отчёт"
+  }
+}
