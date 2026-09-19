@@ -11,8 +11,8 @@ const START = '<!-- generated:start -->'
 const END = '<!-- generated:end -->'
 
 const t = {
-  en: { rules: 'Rules', index: 'All rules', why: 'Why it matters', fix: 'How to fix', options: 'Options', none: 'No options.', category: 'Category', scope: 'Scope', severity: 'Default severity', option: 'Option', type: 'Type', description: 'Description', indexDesc: 'Every rule accepts `error`, `warn`, `info`, `off` or `[severity, options]` in ranklint.config and can be suppressed per page with useRanklintIgnore().' },
-  ru: { rules: 'Правила', index: 'Все правила', why: 'Почему это важно', fix: 'Как исправить', options: 'Опции', none: 'Опций нет.', category: 'Категория', scope: 'Область', severity: 'Severity по умолчанию', option: 'Опция', type: 'Тип', description: 'Описание', indexDesc: 'Каждое правило принимает `error`, `warn`, `info`, `off` или `[severity, options]` в ranklint.config и отключается на странице через useRanklintIgnore().' },
+  en: { folders: { headings: 'Headings', http: 'HTTP', i18n: 'i18n', images: 'Images', indexability: 'Indexability', links: 'Links', meta: 'Meta', robots: 'Robots', 'structured-data': 'Structured data' }, rules: 'Rules', index: 'All rules', why: 'Why it matters', fix: 'How to fix', options: 'Options', none: 'No options.', category: 'Category', scope: 'Scope', severity: 'Default severity', option: 'Option', type: 'Type', description: 'Description', indexDesc: 'Every rule accepts `error`, `warn`, `info`, `off` or `[severity, options]` in ranklint.config and can be suppressed per page with useRanklintIgnore().' },
+  ru: { folders: { headings: 'Заголовки', http: 'HTTP', i18n: 'i18n', images: 'Изображения', indexability: 'Индексируемость', links: 'Ссылки', meta: 'Мета', robots: 'Robots', 'structured-data': 'Структурированные данные' }, rules: 'Правила', index: 'Все правила', why: 'Почему это важно', fix: 'Как исправить', options: 'Опции', none: 'Опций нет.', category: 'Категория', scope: 'Область', severity: 'Severity по умолчанию', option: 'Опция', type: 'Тип', description: 'Описание', indexDesc: 'Каждое правило принимает `error`, `warn`, `info`, `off` или `[severity, options]` в ranklint.config и отключается на странице через useRanklintIgnore().' },
 }
 
 export function mergeGenerated(existing, frontmatter, generated) {
@@ -64,8 +64,29 @@ function indexPage(locale) {
   return `---\ntitle: ${t[locale].index}\ndescription: ${allChecks.length} built-in rules generated from the check registry.\n---\n\n${t[locale].indexDesc}\n\n| Rule | ${t[locale].category} | ${t[locale].scope} | ${t[locale].severity} | ${t[locale].description} |\n| --- | --- | --- | --- | --- |\n${rows.join('\n')}\n`
 }
 
+export function buildRulesIndex() {
+  const byFolder = new Map()
+  for (const check of [...allChecks].sort((a, b) => a.id.localeCompare(b.id))) {
+    if (!byFolder.has(check.category)) byFolder.set(check.category, [])
+    byFolder.get(check.category).push(check)
+  }
+  const groups = [...byFolder.keys()].sort().map((folder) => {
+    const checks = byFolder.get(folder)
+    return {
+      folder,
+      count: checks.length,
+      first: `/rules/${folder}/${slug(checks[0].id)}`,
+      samples: checks.slice(0, 2).map(c => c.id),
+      ids: checks.map(c => c.id),
+      title: { en: t.en.folders[folder], ru: t.ru.folders[folder] },
+    }
+  })
+  return { total: allChecks.length, groups }
+}
+
 function build() {
   const out = new Map()
+  out.set(join(root, 'docs/rules-index.json'), `${JSON.stringify(buildRulesIndex(), null, 2)}\n`)
   for (const locale of ['en', 'ru']) {
     const base = join(root, 'docs/content', locale, '6.rules')
     out.set(join(base, '.navigation.yml'), `title: ${t[locale].rules}\nicon: i-lucide-list-checks\n`)

@@ -1,0 +1,182 @@
+{
+  "total": 42,
+  "groups": [
+    {
+      "folder": "headings",
+      "count": 5,
+      "first": "/rules/headings/headings-h1-length",
+      "samples": [
+        "headings:h1-length",
+        "headings:hierarchy"
+      ],
+      "ids": [
+        "headings:h1-length",
+        "headings:hierarchy",
+        "headings:no-empty",
+        "headings:single-h1",
+        "headings:unique-h1"
+      ],
+      "title": {
+        "en": "Headings",
+        "ru": "Заголовки"
+      }
+    },
+    {
+      "folder": "http",
+      "count": 5,
+      "first": "/rules/http/http-no-mixed-content",
+      "samples": [
+        "http:no-mixed-content",
+        "http:no-soft-404"
+      ],
+      "ids": [
+        "http:no-mixed-content",
+        "http:no-soft-404",
+        "http:ttfb-budget",
+        "http:x-robots-consistent",
+        "mobile:viewport"
+      ],
+      "title": {
+        "en": "HTTP",
+        "ru": "HTTP"
+      }
+    },
+    {
+      "folder": "i18n",
+      "count": 3,
+      "first": "/rules/i18n/hreflang-symmetric",
+      "samples": [
+        "hreflang:symmetric",
+        "hreflang:valid-targets"
+      ],
+      "ids": [
+        "hreflang:symmetric",
+        "hreflang:valid-targets",
+        "i18n:no-locale-leak"
+      ],
+      "title": {
+        "en": "i18n",
+        "ru": "i18n"
+      }
+    },
+    {
+      "folder": "images",
+      "count": 3,
+      "first": "/rules/images/images-alt-required",
+      "samples": [
+        "images:alt-required",
+        "images:dimensions-required"
+      ],
+      "ids": [
+        "images:alt-required",
+        "images:dimensions-required",
+        "images:no-lazy-above-fold"
+      ],
+      "title": {
+        "en": "Images",
+        "ru": "Изображения"
+      }
+    },
+    {
+      "folder": "indexability",
+      "count": 3,
+      "first": "/rules/indexability/indexability-ssr-content",
+      "samples": [
+        "indexability:ssr-content",
+        "sitemap:no-noindex"
+      ],
+      "ids": [
+        "indexability:ssr-content",
+        "sitemap:no-noindex",
+        "sitemap:reachable"
+      ],
+      "title": {
+        "en": "Indexability",
+        "ru": "Индексируемость"
+      }
+    },
+    {
+      "folder": "links",
+      "count": 5,
+      "first": "/rules/links/links-no-broken",
+      "samples": [
+        "links:no-broken",
+        "links:no-orphans"
+      ],
+      "ids": [
+        "links:no-broken",
+        "links:no-orphans",
+        "links:no-redirect-chain",
+        "links:permanent-redirects",
+        "links:trailing-slash-consistent"
+      ],
+      "title": {
+        "en": "Links",
+        "ru": "Ссылки"
+      }
+    },
+    {
+      "folder": "meta",
+      "count": 11,
+      "first": "/rules/meta/canonical-no-chain",
+      "samples": [
+        "canonical:no-chain",
+        "canonical:required"
+      ],
+      "ids": [
+        "canonical:no-chain",
+        "canonical:required",
+        "canonical:valid",
+        "meta:description-length",
+        "meta:description-required",
+        "meta:no-duplicate-description",
+        "meta:no-duplicate-title",
+        "meta:og-required",
+        "meta:title-length",
+        "meta:title-required",
+        "meta:twitter-card"
+      ],
+      "title": {
+        "en": "Meta",
+        "ru": "Мета"
+      }
+    },
+    {
+      "folder": "robots",
+      "count": 5,
+      "first": "/rules/robots/robots-env-policy",
+      "samples": [
+        "robots:env-policy",
+        "robots:expected-disallow"
+      ],
+      "ids": [
+        "robots:env-policy",
+        "robots:expected-disallow",
+        "robots:reachable",
+        "robots:sitemap-declared",
+        "robots:zone-not-blocked"
+      ],
+      "title": {
+        "en": "Robots",
+        "ru": "Robots"
+      }
+    },
+    {
+      "folder": "structured-data",
+      "count": 2,
+      "first": "/rules/structured-data/jsonld-parseable",
+      "samples": [
+        "jsonld:parseable",
+        "jsonld:valid-schema"
+      ],
+      "ids": [
+        "jsonld:parseable",
+        "jsonld:valid-schema"
+      ],
+      "title": {
+        "en": "Structured data",
+        "ru": "Структурированные данные"
+      }
+    }
+  ]
+}
