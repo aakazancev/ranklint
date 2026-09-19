@@ -85,7 +85,7 @@ export default defineRanklintConfig({
 
 ```yaml
 include:
-  - remote: 'https://raw.githubusercontent.com/ranklint/ranklint/main/presets/gitlab-ci/seo.yml'
+  - remote: 'https://raw.githubusercontent.com/aakazancev/ranklint/main/presets/gitlab-ci/seo.yml'
 
 seo:audit:
   extends: .ranklint-audit

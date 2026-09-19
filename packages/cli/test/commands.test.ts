@@ -9,6 +9,10 @@ import { diff } from '../src/commands/diff'
 import { generate } from '../src/commands/generate'
 import { lighthouse } from '../src/commands/lighthouse'
 
+vi.mock('../src/real-lighthouse', () => ({
+  realLighthouseRunner: async () => ({ metrics: { performance: 90, seo: 100, accessibility: 100, bestPractices: 100, lcp: 1000, cls: 0, tbt: 0 } }),
+}))
+
 function report(issues: Report['issues']): Report {
   return {
     formatVersion: 1,
@@ -96,11 +100,11 @@ describe('lighthouse command', () => {
   profiles: { release: { lighthouse: { enabled: true, runs: 3 } } },
 }
 `)
-    vi.stubEnv('RANKLINT_LIGHTHOUSE_DRY', '1')
     await runCommand(lighthouse, { rawArgs: ['--url', 'https://x.com/', '--cwd', dir, '--profile', 'release', '--output', join(dir, 'out.json')] })
     const out = JSON.parse(await readFile(join(dir, 'out.json'), 'utf8'))
     expect(out.config.runs).toBe(3)
     expect(out.config.enabled).toBe(true)
+    expect(out.results).toHaveLength(1)
   })
 
   it('rejects unknown profile', async () => {

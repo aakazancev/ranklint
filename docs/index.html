@@ -468,6 +468,7 @@ export default defineRanklintConfig({
 <tr><td><code>--reporter</code></td><td>markdown (default) | json | junit | gitlab | html | github — markdown and html group issues by rule: errors first, biggest groups first</td></tr>
 <tr><td><code>--output</code></td><td>report to a file instead of stdout</td></tr>
 <tr><td><code>--json-output</code></td><td>additionally the raw json (input for diff)</td></tr>
+<tr><td><code>--html-output</code></td><td>additionally a self-contained html report (e.g. for Pages)</td></tr>
 <tr><td><code>--cwd</code></td><td>where to look for ranklint.config</td></tr>
 <tr><td><code>--mode monitor</code></td><td>monitoring mode (below)</td></tr>
 </table></div>
@@ -508,7 +509,7 @@ export default defineRanklintConfig({
 <h2 id="diff">Diff &amp; CI</h2>
 <p>Issue key: <code>checkId + url without origin + selector</code> — stable across environments (UAT compares against prod). <code>diffReports</code> → newIssues / fixedIssues / pagesDelta.</p>
 <p>Base report storages (<code>ReportStorage</code>): <strong>fs</strong> (a JSON directory, latest by mtime), <strong>GitLab artifacts</strong> (read-only, branch job artifact), <strong>GitHub artifacts</strong> (read-only: list by name, branch filter, zip download — a built-in minimal zip reader: EOCD → central directory → inflateRawSync; corrupt input → null, not an exception), <strong>S3</strong> (for the monitor; the SDK is an optional peer, any S3-compatible endpoint).</p>
-<p>Ready-made CI presets: <code>presets/gitlab-ci/seo.yml</code> (jobs <code>.ranklint-audit</code>, <code>.ranklint-diff</code> with an automatic MR comment, <code>.ranklint-lighthouse</code>, <code>.ranklint-monitor</code> with Playwright and report caches) and <code>presets/github-actions/seo.yml</code> and <code>presets/github-actions/monitor.yml</code> (scheduled monitor with report cache). The <code>github</code> reporter emits PR annotations.</p>
+<p>Ready-made CI presets: <code>presets/gitlab-ci/seo.yml</code> (jobs <code>.ranklint-audit</code>, <code>.ranklint-diff</code> with an automatic MR comment, <code>.ranklint-lighthouse</code>, <code>.ranklint-monitor</code> with Playwright and report caches) and <code>presets/github-actions/seo.yml</code>, <code>presets/github-actions/monitor.yml</code> (scheduled monitor with report cache). The <code>github</code> reporter emits PR annotations.</p>
 
 <h2 id="monitor">Production monitoring</h2>
 <p><code>ranklint audit --url https://prod --mode monitor</code> — for cron/schedules. <strong>Exit is always 0</strong>: prod monitoring never fails the pipeline, it alerts instead. Flow: audit → enrichment → diff against the last stored report → save by timestamp → alerts only when <code>newIssues &gt; 0</code>.</p>
@@ -866,6 +867,7 @@ export default defineRanklintConfig({
 <tr><td><code>--reporter</code></td><td>markdown (default) | json | junit | gitlab | html | github — markdown и html группируют issues по правилу: сначала error, затем самые большие группы</td></tr>
 <tr><td><code>--output</code></td><td>отчёт в файл вместо stdout</td></tr>
 <tr><td><code>--json-output</code></td><td>дополнительно сырой json (вход для diff)</td></tr>
+<tr><td><code>--html-output</code></td><td>дополнительно self-contained html-отчёт (например, для Pages)</td></tr>
 <tr><td><code>--cwd</code></td><td>где искать ranklint.config</td></tr>
 <tr><td><code>--mode monitor</code></td><td>режим мониторинга (см. ниже)</td></tr>
 </table></div>
@@ -906,7 +908,7 @@ export default defineRanklintConfig({
 <h2 id="ru-diff">Diff и CI</h2>
 <p>Ключ проблемы: <code>checkId + url без origin + selector</code> — стабилен между окружениями (UAT сравнивается с prod). <code>diffReports</code> → newIssues / fixedIssues / pagesDelta.</p>
 <p>Хранилища базовых отчётов (<code>ReportStorage</code>): <strong>fs</strong> (директория JSON, latest по mtime), <strong>GitLab artifacts</strong> (read-only, по job-артефакту ветки), <strong>GitHub artifacts</strong> (read-only: список по имени, фильтр по ветке, скачивание zip — свой минимальный zip-ридер: EOCD → central directory → inflateRawSync; битый вход → null, не исключение), <strong>S3</strong> (для монитора; SDK — опциональный peer, любой S3-совместимый endpoint).</p>
-<p>Готовые CI-пресеты: <code>presets/gitlab-ci/seo.yml</code> (джобы <code>.ranklint-audit</code>, <code>.ranklint-diff</code> с автокомментом в MR, <code>.ranklint-lighthouse</code>, <code>.ranklint-monitor</code> с кешем Playwright и отчётов) и <code>presets/github-actions/seo.yml</code> и <code>presets/github-actions/monitor.yml</code> (монитор по расписанию с кешем отчётов). Репортер <code>github</code> — аннотации в PR.</p>
+<p>Готовые CI-пресеты: <code>presets/gitlab-ci/seo.yml</code> (джобы <code>.ranklint-audit</code>, <code>.ranklint-diff</code> с автокомментом в MR, <code>.ranklint-lighthouse</code>, <code>.ranklint-monitor</code> с кешем Playwright и отчётов) и <code>presets/github-actions/seo.yml</code>, <code>presets/github-actions/monitor.yml</code> (монитор по расписанию с кешем отчётов). Репортер <code>github</code> — аннотации в PR.</p>
 
 <h2 id="ru-monitor">Мониторинг прода</h2>
 <p><code>ranklint audit --url https://prod --mode monitor</code> — для крона/schedule. <strong>Exit всегда 0</strong>: прод-мониторинг не роняет пайплайн, вместо этого алертит. Флоу: аудит → обогащение → diff против последнего сохранённого отчёта → сохранение по timestamp → алерты только при <code>newIssues &gt; 0</code>.</p>

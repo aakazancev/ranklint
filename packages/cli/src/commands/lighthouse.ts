@@ -26,12 +26,6 @@ export const lighthouse = defineCommand({
       config = { site: { url: new URL(args.url).origin } }
     }
     const lhConfig = { ...config.lighthouse, ...(args.runs ? { runs: Number(args.runs) } : {}) }
-    if (process.env.RANKLINT_LIGHTHOUSE_DRY) {
-      const output = JSON.stringify({ config: lhConfig, results: [], issues: [] }, null, 2)
-      if (args.output) await writeFile(args.output, output)
-      else process.stdout.write(output)
-      return
-    }
     const results = await collectLighthouse([args.url], lhConfig, realLighthouseRunner)
     const issues = checkThresholds(results, lhConfig.thresholds)
     const output = JSON.stringify({ config: lhConfig, results, issues }, null, 2)
