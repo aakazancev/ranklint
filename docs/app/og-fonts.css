@@ -1,13 +1,20 @@
 @font-face {
-  font-family: 'Geist OG';
+  font-family: 'Unbounded OG';
   font-style: normal;
-  font-weight: 400;
-  src: url('/fonts/geist-og-400.ttf') format('truetype');
+  font-weight: 600;
+  src: url('/fonts/unbounded-og-600.ttf') format('truetype');
 }
 
 @font-face {
-  font-family: 'Geist OG';
+  font-family: 'Golos OG';
   font-style: normal;
-  font-weight: 600;
-  src: url('/fonts/geist-og-600.ttf') format('truetype');
+  font-weight: 400;
+  src: url('/fonts/golos-og-400.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Mono OG';
+  font-style: normal;
+  font-weight: 700;
+  src: url('/fonts/jetbrains-og-700.ttf') format('truetype');
 }

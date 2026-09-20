@@ -1,13 +1,3 @@
-export interface DemoLabels {
-  inputLabel: string
-  emptyLabel: string
-  cleanLabel: string
-  errorLabel: string
-  foundLabel: string
-  moreLabel: string
-  footnote: string
-}
-
 export const DEMO_SAMPLE = `<!doctype html>
 <html lang="en">
 <head>

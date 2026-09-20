@@ -7,12 +7,16 @@ export default defineNuxtConfig({
     '@ranklint/nuxt',
     (_options, nuxt) => {
       nuxt.hook('pages:extend', (pages) => {
-        const landing = pages.find(page => page.name === 'lang-index')
+        const landing = pages.find(page => page.name === 'index')
         if (landing) landing.path = '/:lang(en|ru)?'
       })
     },
   ],
   css: ['~/og-fonts.css'],
+  components: [
+    { path: '~/components/landing', pathPrefix: false },
+    '~/components',
+  ],
   app: {
     baseURL: process.env.NUXT_APP_BASE_URL ?? '/',
     head: {
@@ -45,9 +49,17 @@ export default defineNuxtConfig({
   i18n: {
     baseUrl: process.env.NUXT_SITE_URL ?? 'https://ranklint.dev',
     defaultLocale: 'en',
+    langDir: 'locales',
     locales: [
-      { code: 'en', name: 'English', language: 'en-US' },
-      { code: 'ru', name: 'Русский', language: 'ru-RU' },
+      { code: 'en', name: 'English', language: 'en-US', file: 'en.json' },
+      { code: 'ru', name: 'Русский', language: 'ru-RU', file: 'ru.json' },
+    ],
+  },
+  fonts: {
+    families: [
+      { name: 'Unbounded', provider: 'google', weights: [600, 700] },
+      { name: 'Golos Text', provider: 'google', weights: [400, 500, 600, 700] },
+      { name: 'JetBrains Mono', provider: 'google', weights: [400, 500, 600, 700] },
     ],
   },
   ranklint: {

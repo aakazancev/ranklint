@@ -15,31 +15,49 @@ const summary = computed(() => {
 
 <template>
   <div
-class="flex h-full w-full flex-col bg-neutral-950 px-[80px] py-[72px]"
-    style="font-family: 'Geist OG'">
-    <div class="flex items-center">
-      <span class="text-[32px] font-bold tracking-tight text-white">rank</span>
-      <span class="text-[32px] font-bold tracking-tight text-emerald-500">lint</span>
+    class="flex h-full w-full flex-col px-[80px] py-[72px]"
+    style="background-color: #0a0b0d; font-family: 'Golos OG'"
+  >
+    <div
+      class="flex items-center"
+      style="font-family: 'Mono OG'"
+    >
+      <span
+        class="text-[32px] font-bold tracking-tight"
+        style="color: #edeff2"
+      >rank</span>
+      <span
+        class="text-[32px] font-bold tracking-tight"
+        style="color: #b4f13c"
+      >lint▌</span>
     </div>
 
-    <div class="mt-[56px] flex h-[6px] w-[96px] bg-emerald-500" />
+    <div
+      class="mt-[56px] flex h-[6px] w-[96px]"
+      style="background-color: #b4f13c"
+    />
 
     <h1
       v-if="title"
-      class="mt-[36px] flex max-w-[940px] text-[76px] leading-[1.12] font-semibold tracking-tight text-white"
+      class="mt-[36px] flex max-w-[940px] text-[76px] leading-[1.12] font-semibold tracking-tight"
+      style="font-family: 'Unbounded OG'; color: #edeff2"
     >
       {{ title.slice(0, 64) }}
     </h1>
 
     <p
       v-if="summary"
-      class="mt-[28px] flex max-w-[900px] text-[28px] leading-[1.4] text-neutral-400"
+      class="mt-[28px] flex max-w-[900px] text-[28px] leading-[1.4]"
+      style="color: #a8afb9"
     >
       {{ summary }}
     </p>
 
     <div class="mt-auto flex">
-      <span class="text-[24px] text-neutral-500">ranklint.dev</span>
+      <span
+        class="text-[24px]"
+        style="color: #7c848f"
+      >ranklint.dev</span>
     </div>
   </div>
 </template>

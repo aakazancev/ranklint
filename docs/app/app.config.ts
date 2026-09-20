@@ -1,5 +1,6 @@
 export default defineAppConfig({
   docus: {
+    colorMode: 'dark',
     name: 'ranklint',
     description: 'Lint your SEO before Google does. Nuxt 4 module, CLI crawler and CI regression control.',
     url: 'https://ranklint.dev',
@@ -9,6 +10,11 @@ export default defineAppConfig({
   },
   header: {
     title: 'ranklint',
+  },
+  ui: {
+    colors: {
+      primary: 'acid',
+    },
   },
   seo: {
     titleTemplate: '%s · ranklint',

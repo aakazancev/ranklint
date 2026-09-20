@@ -33,6 +33,7 @@ const links = computed(() => [
       color="primary"
       size="sm"
       :to="`${prefix}/getting-started/installation`"
+      :ui="{ base: 'rounded-xl' }"
       class="landing-cta ml-1 hidden shrink-0 whitespace-nowrap lg:inline-flex"
     >
       {{ text.cta }}

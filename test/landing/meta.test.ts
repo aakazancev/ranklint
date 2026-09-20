@@ -5,18 +5,14 @@ import { describe, expect, it } from 'vitest'
 const root = fileURLToPath(new URL('../..', import.meta.url))
 const locales = ['en', 'ru'] as const
 
-function seo(locale: string) {
-  const source = readFileSync(`${root}docs/content/${locale}/index.md`, 'utf8')
-  const frontmatter = source.split('---')[1] ?? ''
-  const read = (key: string) => {
-    const value = frontmatter.match(new RegExp(`^\\s+${key}:\\s*(.*)$`, 'm'))?.[1] ?? ''
-    return value.trim().replace(/^["']|["']$/g, '')
+function messages(locale: string) {
+  return JSON.parse(readFileSync(`${root}docs/i18n/locales/${locale}.json`, 'utf8')) as {
+    landing: { meta: { title: string, description: string } }
   }
-  return { title: read('title'), description: read('description') }
 }
 
-describe.each(locales)('landing seo frontmatter (%s)', (locale) => {
-  const { title, description } = seo(locale)
+describe.each(locales)('landing seo strings (%s)', (locale) => {
+  const { title, description } = messages(locale).landing.meta
 
   it('has a title of at most 60 characters', () => {
     expect(title.length).toBeGreaterThan(0)
@@ -35,6 +31,27 @@ describe.each(locales)('landing seo frontmatter (%s)', (locale) => {
 
   it('leaves the brand to the title template', () => {
     expect(title.toLowerCase()).not.toContain('ranklint')
+  })
+})
+
+describe.each(locales)('landing messages (%s)', (locale) => {
+  const landing = messages(locale).landing as unknown as Record<string, unknown>
+
+  it('carries every section the page renders', () => {
+    const sections = ['nav', 'hero', 'facts', 'pillars', 'demo', 'devtools', 'rules', 'ci', 'stack', 'monitor', 'seotext', 'faq', 'cta', 'footer']
+    expect(sections.filter(key => !(key in landing))).toEqual([])
+  })
+})
+
+describe('landing messages match across locales', () => {
+  function keys(value: unknown, prefix = ''): string[] {
+    if (!value || typeof value !== 'object' || Array.isArray(value)) return [prefix]
+    return Object.entries(value as Record<string, unknown>).flatMap(([key, child]) =>
+      keys(child, prefix ? `${prefix}.${key}` : key))
+  }
+
+  it('uses the same key set in en and ru', () => {
+    expect(keys(messages('ru').landing)).toEqual(keys(messages('en').landing))
   })
 })
 

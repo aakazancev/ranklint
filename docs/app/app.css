@@ -1,12 +1,71 @@
 @theme static {
-  --font-sans: 'Geist', ui-sans-serif, system-ui, sans-serif;
-  --font-mono: 'Geist Mono', ui-monospace, monospace;
+  --font-sans: 'Golos Text', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', monospace;
+  --font-display: 'Unbounded', 'Golos Text', system-ui, sans-serif;
+
+  --color-ink-950: #0a0b0d;
+  --color-ink-900: #0e1014;
+  --color-ink-880: #101217;
+  --color-ink-850: #111419;
+  --color-ink-800: #171a20;
+  --color-ink-750: #1e222a;
+
+  --color-line-soft: #1a1d24;
+  --color-line: #1f232b;
+  --color-line-strong: #2e333c;
+
+  --color-fg: #edeff2;
+  --color-fg-soft: #d3d8de;
+  --color-fg-muted: #a8afb9;
+  --color-fg-dim: #7c848f;
+  --color-fg-faint: #6e7681;
+
+  --color-acid-50: #f7fde9;
+  --color-acid-100: #eefbcf;
+  --color-acid-200: #ddf7a1;
+  --color-acid-300: #cbf470;
+  --color-acid-400: #bff24f;
+  --color-acid-500: #b4f13c;
+  --color-acid-600: #96cf22;
+  --color-acid-700: #74a418;
+  --color-acid-800: #587c16;
+  --color-acid-900: #3d5613;
+  --color-acid-950: #1e2a0a;
+
+  --color-acid: #b4f13c;
+  --color-acid-bright: #d4ff7e;
+  --color-acid-line: #2a3320;
+
+  --color-sev-error: #ff5f56;
+  --color-sev-error-fg: #ff7b73;
+  --color-sev-warn: #f5a524;
+  --color-sev-warn-fg: #f5b54b;
+  --color-sev-info: #6ea8fe;
+  --color-sev-info-fg: #8fbcff;
 }
 
 :root {
-  --ui-radius: 0.3333rem;
+  --ui-radius: 0.25rem;
   --default-font-family: var(--font-sans);
   --default-mono-font-family: var(--font-mono);
+}
+
+.dark {
+  --ui-bg: var(--color-ink-950);
+  --ui-bg-muted: var(--color-ink-900);
+  --ui-bg-elevated: var(--color-ink-850);
+  --ui-bg-accented: var(--color-ink-800);
+  --ui-bg-inverted: var(--color-fg);
+  --ui-border: var(--color-line);
+  --ui-border-muted: var(--color-line-soft);
+  --ui-border-accented: var(--color-line-strong);
+  --ui-border-inverted: var(--color-fg);
+  --ui-text-highlighted: var(--color-fg);
+  --ui-text: var(--color-fg-soft);
+  --ui-text-toned: var(--color-fg-soft);
+  --ui-text-muted: var(--color-fg-muted);
+  --ui-text-dimmed: var(--color-fg-dim);
+  --ui-text-inverted: var(--color-ink-950);
 }
 
 .landing-cta {
@@ -17,43 +76,30 @@
   transform: scale(0.98);
 }
 
-.landing-bleed {
-  mask-image: linear-gradient(to bottom, #000 72%, transparent 100%);
+.rl-landing {
+  color-scheme: dark;
+  background-color: var(--color-ink-950);
+  color: var(--color-fg);
+  -webkit-font-smoothing: antialiased;
 }
 
-.reveal {
-  opacity: 1;
+.rl-landing :focus-visible {
+  outline: 2px solid var(--color-acid);
+  outline-offset: 2px;
+  border-radius: 4px;
 }
 
-@media (prefers-reduced-motion: no-preference) and (scripting: enabled) {
-  .reveal {
-    opacity: 0;
-    transform: translateY(14px);
-    transition: opacity 500ms cubic-bezier(0.16, 1, 0.3, 1), transform 500ms cubic-bezier(0.16, 1, 0.3, 1);
-    transition-delay: var(--reveal-delay, 0ms);
+@utility container-page {
+  margin-inline: auto;
+  width: 100%;
+  max-width: 90rem;
+  padding-inline: 1rem;
+
+  @variant sm {
+    padding-inline: 1.5rem;
   }
 
-  .reveal.is-visible {
-    opacity: 1;
-    transform: none;
-  }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .rise {
-    animation: rl-rise 600ms cubic-bezier(0.16, 1, 0.3, 1) both;
-    animation-delay: var(--rise-delay, 0ms);
-  }
-}
-
-@keyframes rl-rise {
-  from {
-    opacity: 0;
-    transform: translateY(14px);
-  }
-
-  to {
-    opacity: 1;
-    transform: none;
+  @variant lg {
+    padding-inline: 2rem;
   }
 }
