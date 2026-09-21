@@ -98,7 +98,7 @@ function versionTitle(version, locale) {
 
 function versionDescription(v, locale) {
   return locale === 'ru'
-    ? `Что изменилось в ranklint ${v.version}: ${v.entries.length} записей, полный список правок релиза.`
+    ? `Что изменилось в ranklint ${v.version}: ломающие изменения, новое и исправления релиза со ссылками на коммиты.`
     : truncate(stripMarkdown(v.entries[0].text))
 }
 

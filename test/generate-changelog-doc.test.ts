@@ -144,11 +144,17 @@ describe('render', () => {
     expect(generated).not.toContain('**@ranklint/core**')
   })
 
-  it('renders ru headings, title and a counted description', () => {
+  it('renders ru headings, title and a version-specific description', () => {
     const { frontmatter, generated } = renderVersionPage(v, '2026-09-21', 'ru', ['@ranklint/core'])
     expect(frontmatter).toContain('title: "ranklint 1.0.0: что изменилось"')
-    expect(frontmatter).toContain('description: "Что изменилось в ranklint 1.0.0: 1 записей, полный список правок релиза."')
+    expect(frontmatter).toContain('description: "Что изменилось в ranklint 1.0.0: ломающие изменения, новое и исправления релиза со ссылками на коммиты."')
     expect(generated).toContain('## Ломающие изменения')
+  })
+
+  it('gives the ru version page a description of 70 to 160 characters', () => {
+    const description = renderVersionPage(v, '2026-09-21', 'ru', ['@ranklint/core']).frontmatter.match(/description: "(.*)"/)![1]!
+    expect(description.length).toBeGreaterThanOrEqual(70)
+    expect(description.length).toBeLessThanOrEqual(160)
   })
 
   it('wraps ru bullet lists in an english language block', () => {
