@@ -43,10 +43,16 @@ function textMatchesLocale(detected: string, locale: string): boolean {
   return detected === locale
 }
 
-function visibleText(body: Element | null): string {
+function visibleText(body: Element | null, pageLang: string): string {
   if (!body) return ''
   const clone = body.cloneNode(true) as Element
   for (const el of clone.querySelectorAll('script, style, noscript, template, pre, code')) el.remove()
+  if (pageLang) {
+    for (const el of clone.querySelectorAll('[lang]')) {
+      const lang = el.getAttribute('lang')?.toLowerCase().split('-')[0]
+      if (lang && lang !== pageLang) el.remove()
+    }
+  }
   return clone.textContent ?? ''
 }
 
@@ -75,7 +81,7 @@ export const noLocaleLeak = defineCheck({
     }
     const localeKnown = urlLocale in STOPWORDS || CYRILLIC_LOCALES.has(urlLocale) || ARABIC_LOCALES.has(urlLocale)
     const detected = localeKnown
-      ? detectTextLanguage(visibleText(ctx.document?.querySelector('body') ?? null))
+      ? detectTextLanguage(visibleText(ctx.document?.querySelector('body') ?? null, htmlLang.split('-')[0] ?? ''))
       : undefined
     if (detected && !textMatchesLocale(detected, urlLocale)) {
       const label = detected === 'cyrillic'

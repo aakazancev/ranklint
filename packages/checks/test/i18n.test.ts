@@ -135,6 +135,26 @@ describe('i18n:no-locale-leak text heuristic', () => {
     expect(await runCheckOnHtml(noLocaleLeak, html, { url: 'https://x.com/ru/page' })).toEqual([])
   })
 
+  it('flags english text under /ru/ when no lang attribute marks it', async () => {
+    const html = `<html lang="ru"><head></head><body><p>${enText}</p></body></html>`
+    const issues = await runCheckOnHtml(noLocaleLeak, html, { url: 'https://x.com/ru/page' })
+    expect(issues).toHaveLength(1)
+    expect(issues[0]?.selector).toBe('body')
+    expect(issues[0]?.message).toContain('"en"')
+  })
+
+  it('ignores a subtree whose lang differs from the page lang', async () => {
+    const html = `<html lang="ru"><head></head><body><p>${ruText}</p><div lang="en"><p>${enText.repeat(5)}</p></div></body></html>`
+    expect(await runCheckOnHtml(noLocaleLeak, html, { url: 'https://x.com/ru/page' })).toEqual([])
+  })
+
+  it('still flags a subtree whose lang equals the page lang', async () => {
+    const html = `<html lang="ru"><head></head><body><div lang="ru"><p>${enText}</p></div></body></html>`
+    const issues = await runCheckOnHtml(noLocaleLeak, html, { url: 'https://x.com/ru/page' })
+    expect(issues).toHaveLength(1)
+    expect(issues[0]?.selector).toBe('body')
+  })
+
   it('detectTextLanguage identifies scripts and stopword languages', () => {
     expect(detectTextLanguage(ruText)).toBe('cyrillic')
     expect(detectTextLanguage(arText)).toBe('arabic')
