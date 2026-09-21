@@ -1,6 +1,6 @@
 {
   "name": "@ranklint/preset-default",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Ranklint preset that pins all built-in rules at their default severities.",
   "keywords": [
     "seo",

@@ -1,5 +1,13 @@
 # @ranklint/preset-default
 
+## 1.0.1
+
+### Patch Changes
+
+- Updated dependencies [660be37]
+  - @ranklint/checks@1.0.1
+  - @ranklint/core@1.0.1
+
 ## 1.0.0
 
 ### Major Changes

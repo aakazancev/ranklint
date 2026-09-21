@@ -5,6 +5,16 @@ description: "Все релизы ranklint: ломающие изменения,
 
 <!-- generated:start -->
 
+## ranklint 1.0.1
+
+Дата: 2026-09-21 · [Подробнее](/ru/changelog/v1.0.1)
+
+::div{lang="en"}
+
+i18n:no-locale-leak ignores subtrees whose lang attribute differs from the page language
+
+::
+
 ## ranklint 1.0.0
 
 Дата: 2026-09-21 · [Подробнее](/ru/changelog/v1.0.0)
