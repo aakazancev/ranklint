@@ -1,5 +1,11 @@
 # @ranklint/core
 
+## 1.0.0
+
+### Major Changes
+
+- 3f5d9fb: ranklint 1.0.0: stable public API for defineCheck and the config, ranklint init, SARIF reporter, sticky PR comments, automated releases
+
 ## 0.5.0
 
 ### Minor Changes

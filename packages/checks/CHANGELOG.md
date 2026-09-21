@@ -1,5 +1,20 @@
 # @ranklint/checks
 
+## 1.0.0
+
+### Major Changes
+
+- 3f5d9fb: ranklint 1.0.0: stable public API for defineCheck and the config, ranklint init, SARIF reporter, sticky PR comments, automated releases
+
+### Patch Changes
+
+- 1992080: Duplicate title and description checks skip hreflang alternates
+- 5809dcb: Use a plain hyphen in length range messages
+- 0f30951: Ignore pre and code blocks in the i18n:no-locale-leak text heuristic
+- 5809dcb: Add the built-in SoftwareApplication schema to JSON-LD validation
+- Updated dependencies [3f5d9fb]
+  - @ranklint/core@1.0.0
+
 ## 0.5.0
 
 ### Minor Changes
