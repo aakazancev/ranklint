@@ -60,11 +60,12 @@ In dev, JSON-LD is validated against Schema.org schemas (Product, Article, Bread
 npm i -D @ranklint/cli
 npx playwright install chromium
 
+ranklint init                                          # generate ranklint.config.ts and a CI snippet
 ranklint audit --url https://uat.example.com          # audit a live site
 ranklint audit --start .output/server/index.mjs        # or self-contained from a build
 ```
 
-Exit code 1 when errors are found. Reporters: `markdown` (default), `json`, `junit` (`--reporter`, `--output`).
+Exit code 1 when errors are found. Reporters: `markdown` (default), `json`, `junit`, `html`, `gitlab`, `github`, `sarif` (`--reporter`, `--output`).
 
 Rules are configured in `ranklint.config.ts` with ESLint semantics:
 
