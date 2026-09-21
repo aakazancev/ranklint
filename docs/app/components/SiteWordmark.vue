@@ -4,7 +4,7 @@ withDefaults(defineProps<{ size?: string }>(), { size: 'text-lg' })
 
 <template>
   <span
-    class="flex items-center font-mono leading-none font-bold tracking-tight text-highlighted"
+    class="flex items-center font-mono leading-none font-bold tracking-tight text-fg"
     :class="size"
   >
     rank<span class="text-acid">lint</span><span

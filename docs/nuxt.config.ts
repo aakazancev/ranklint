@@ -46,6 +46,10 @@ export default defineNuxtConfig({
     name: 'ranklint',
     url: process.env.NUXT_SITE_URL ?? 'https://ranklint.dev',
   },
+  colorMode: {
+    preference: 'dark',
+    fallback: 'dark',
+  },
   i18n: {
     baseUrl: process.env.NUXT_SITE_URL ?? 'https://ranklint.dev',
     defaultLocale: 'en',
