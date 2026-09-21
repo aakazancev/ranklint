@@ -2,7 +2,7 @@ import { execFileSync } from 'node:child_process'
 import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { END, START, mergeGenerated } from './lib/generated-md.mjs'
+import { END, START, mergeGenerated, tailOf } from './lib/generated-md.mjs'
 
 const root = fileURLToPath(new URL('..', import.meta.url))
 const LOCALES = ['en', 'ru']
@@ -10,8 +10,8 @@ const REPO = 'https://github.com/aakazancev/ranklint'
 const DEP_BUMP = /^@?[\w./-]+@\d+\.\d+\.\d+\S*$/
 const KIND = { major: 'breaking', minor: 'feature', patch: 'fix' }
 const t = {
-  en: { index: 'Changelog', indexDesc: 'What changed in every ranklint release.', date: 'Released', breaking: 'Breaking', feature: 'Features', fix: 'Fixes' },
-  ru: { index: 'Изменения', indexDesc: 'Что изменилось в каждом релизе ranklint.', date: 'Дата', breaking: 'Ломающие изменения', feature: 'Новое', fix: 'Исправления' },
+  en: { index: 'ranklint changelog and release notes', indexDesc: 'Every ranklint release with breaking changes, features and fixes, newest first, with links to the commits behind them.', date: 'Released', more: 'Release notes', breaking: 'Breaking', feature: 'Features', fix: 'Fixes' },
+  ru: { index: 'Изменения и релизы ranklint', indexDesc: 'Все релизы ranklint: ломающие изменения, новое и исправления, от новых к старым, со ссылками на коммиты.', date: 'Дата', more: 'Подробнее', breaking: 'Ломающие изменения', feature: 'Новое', fix: 'Исправления' },
 }
 
 export function parseChangelog(text) {
@@ -88,9 +88,27 @@ function truncate(text, max = 160) {
   return text.length <= max ? text : `${text.slice(0, max - 1).trimEnd()}…`
 }
 
+function stripMarkdown(text) {
+  return text.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1').replace(/`/g, '')
+}
+
+function versionTitle(version, locale) {
+  return locale === 'ru' ? `ranklint ${version}: что изменилось` : `ranklint ${version} release notes`
+}
+
+function versionDescription(v, locale) {
+  return locale === 'ru'
+    ? `Что изменилось в ranklint ${v.version}: ${v.entries.length} записей, полный список правок релиза.`
+    : truncate(stripMarkdown(v.entries[0].text))
+}
+
+function foreignBlock(lines, locale) {
+  return locale === 'ru' ? ['::div{lang="en"}', '', ...lines, '', '::'] : lines
+}
+
 export function renderVersionPage(v, date, locale, allPackages) {
   const l = t[locale]
-  const frontmatter = ['---', `title: ${JSON.stringify(`ranklint ${v.version}`)}`, `description: ${JSON.stringify(truncate(v.entries[0].text))}`, `date: ${date}`, 'navigation: false', '---'].join('\n')
+  const frontmatter = ['---', `title: ${JSON.stringify(versionTitle(v.version, locale))}`, `description: ${JSON.stringify(versionDescription(v, locale))}`, `date: ${date}`, 'navigation: false', '---'].join('\n')
   const sections = ['breaking', 'feature', 'fix'].flatMap((kind) => {
     const entries = v.entries.filter(e => e.kind === kind)
     if (!entries.length) return []
@@ -99,7 +117,7 @@ export function renderVersionPage(v, date, locale, allPackages) {
       const link = e.hash ? ` ([${e.hash}](${REPO}/commit/${e.hash}))` : ''
       return `- ${badge}${e.text}${link}`
     })
-    return [`### ${l[kind]}`, '', ...lines, '']
+    return [`## ${l[kind]}`, '', ...foreignBlock(lines, locale), '']
   })
   const generated = [START, '', `${l.date}: ${date}`, '', ...sections, END].join('\n')
   return { frontmatter, generated }
@@ -108,7 +126,14 @@ export function renderVersionPage(v, date, locale, allPackages) {
 export function renderIndex(items, locale) {
   const l = t[locale]
   const frontmatter = ['---', `title: ${JSON.stringify(l.index)}`, `description: ${JSON.stringify(l.indexDesc)}`, '---'].join('\n')
-  const body = items.flatMap(i => [`## [ranklint ${i.version}](/${locale}/changelog/v${i.version})`, '', `${l.date}: ${i.date}`, '', i.summary, ''])
+  const body = items.flatMap(i => [
+    `## ranklint ${i.version}`,
+    '',
+    `${l.date}: ${i.date} · [${l.more}](/${locale}/changelog/v${i.version})`,
+    '',
+    ...(i.fromTail ? [i.summary] : foreignBlock([i.summary], locale)),
+    '',
+  ])
   return mergeGenerated(undefined, frontmatter, [START, '', ...body, END].join('\n'))
 }
 
@@ -130,12 +155,6 @@ function gitDate(version, files, isLatest) {
   return resolveDate(out, isLatest, version)
 }
 
-function tailOf(existing) {
-  if (!existing) return ''
-  const end = existing.indexOf(END)
-  return end === -1 ? '' : existing.slice(end + END.length)
-}
-
 export function build() {
   const inputs = readPackages()
   const allPackages = inputs.map(i => i.pkg)
@@ -150,7 +169,8 @@ export function build() {
       const date = readDate(existing) ?? gitDate(v.version, changelogs, v.version === versions[0].version)
       const { frontmatter, generated } = renderVersionPage(v, date, locale, allPackages)
       out.set(path, mergeGenerated(existing, frontmatter, generated))
-      return { version: v.version, date, summary: firstParagraph(tailOf(existing)) || v.entries[0].text }
+      const summary = firstParagraph(tailOf(existing))
+      return { version: v.version, date, summary: summary || v.entries[0].text, fromTail: Boolean(summary) }
     })
     out.set(join(base, 'index.md'), renderIndex(items, locale))
   }

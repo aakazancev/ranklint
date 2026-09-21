@@ -126,16 +126,17 @@ describe('tails', () => {
 })
 
 describe('render', () => {
-  const v = { version: '1.0.0', entries: [{ kind: 'breaking' as const, hash: '3f5d9fb', text: 'Stable API: done', packages: ['@ranklint/core'] }] }
+  const v = { version: '1.0.0', entries: [{ kind: 'breaking' as const, hash: '3f5d9fb', text: 'Stable `API`: [done](https://x.com/a)', packages: ['@ranklint/core'] }] }
 
   it('renders a version page with quoted frontmatter and grouped entries', () => {
     const { frontmatter, generated } = renderVersionPage(v, '2026-09-21', 'en', ['@ranklint/core', '@ranklint/cli'])
-    expect(frontmatter).toContain('title: "ranklint 1.0.0"')
+    expect(frontmatter).toContain('title: "ranklint 1.0.0 release notes"')
     expect(frontmatter).toContain('description: "Stable API: done"')
     expect(frontmatter).toContain('date: 2026-09-21')
     expect(frontmatter).toContain('navigation: false')
-    expect(generated).toContain('### Breaking')
-    expect(generated).toContain('**@ranklint/core**: Stable API: done ([3f5d9fb](https://github.com/aakazancev/ranklint/commit/3f5d9fb))')
+    expect(generated).toContain('## Breaking')
+    expect(generated).not.toContain('### Breaking')
+    expect(generated).toContain('**@ranklint/core**: Stable `API`: [done](https://x.com/a) ([3f5d9fb](https://github.com/aakazancev/ranklint/commit/3f5d9fb))')
   })
 
   it('omits the package badge when an entry touches every package', () => {
@@ -143,14 +144,44 @@ describe('render', () => {
     expect(generated).not.toContain('**@ranklint/core**')
   })
 
-  it('renders ru headings', () => {
-    expect(renderVersionPage(v, '2026-09-21', 'ru', ['@ranklint/core']).generated).toContain('### Ломающие изменения')
+  it('renders ru headings, title and a counted description', () => {
+    const { frontmatter, generated } = renderVersionPage(v, '2026-09-21', 'ru', ['@ranklint/core'])
+    expect(frontmatter).toContain('title: "ranklint 1.0.0: что изменилось"')
+    expect(frontmatter).toContain('description: "Что изменилось в ranklint 1.0.0: 1 записей, полный список правок релиза."')
+    expect(generated).toContain('## Ломающие изменения')
   })
 
-  it('renders the index newest first with links to v-prefixed pages', () => {
-    const out = renderIndex([{ version: '1.0.0', date: '2026-09-21', summary: 'Stable' }, { version: '0.5.0', date: '2026-09-19', summary: 'Progress' }], 'en')
+  it('wraps ru bullet lists in an english language block', () => {
+    const { generated } = renderVersionPage(v, '2026-09-21', 'ru', ['@ranklint/core'])
+    expect(generated).toContain('::div{lang="en"}')
+    expect(generated.indexOf('## Ломающие изменения')).toBeLessThan(generated.indexOf('::div{lang="en"}'))
+    expect(generated).toContain('Дата: 2026-09-21')
+    expect(generated.indexOf('Дата: 2026-09-21')).toBeLessThan(generated.indexOf('::div{lang="en"}'))
+    expect(renderVersionPage(v, '2026-09-21', 'en', ['@ranklint/core']).generated).not.toContain('::div')
+  })
+
+  it('renders the index newest first with a link line under each heading', () => {
+    const out = renderIndex([{ version: '1.0.0', date: '2026-09-21', summary: 'Stable', fromTail: true }, { version: '0.5.0', date: '2026-09-19', summary: 'Progress', fromTail: false }], 'en')
     expect(out.indexOf('v1.0.0')).toBeLessThan(out.indexOf('v0.5.0'))
-    expect(out).toContain('## [ranklint 1.0.0](/en/changelog/v1.0.0)')
+    expect(out).toContain('## ranklint 1.0.0')
+    expect(out).not.toContain('## [ranklint 1.0.0]')
+    expect(out).toContain('Released: 2026-09-21 · [Release notes](/en/changelog/v1.0.0)')
     expect(out).toContain('<!-- generated:start -->')
+  })
+
+  it('renders the ru index and wraps only summaries taken from changesets', () => {
+    const out = renderIndex([{ version: '1.0.0', date: '2026-09-21', summary: 'Стабильно', fromTail: true }, { version: '0.5.0', date: '2026-09-19', summary: 'Progress', fromTail: false }], 'ru')
+    expect(out).toContain('title: "Изменения и релизы ranklint"')
+    expect(out).toContain('Дата: 2026-09-21 · [Подробнее](/ru/changelog/v1.0.0)')
+    expect(out).toContain('::div{lang="en"}\n\nProgress\n\n::')
+    expect(out).not.toContain('::div{lang="en"}\n\nСтабильно')
+  })
+
+  it('gives both index pages a description of 70 to 160 characters', () => {
+    for (const locale of ['en', 'ru'] as const) {
+      const description = renderIndex([{ version: '1.0.0', date: '2026-09-21', summary: 'x', fromTail: true }], locale).match(/description: "(.*)"/)![1]!
+      expect(description.length).toBeGreaterThanOrEqual(70)
+      expect(description.length).toBeLessThanOrEqual(160)
+    }
   })
 })

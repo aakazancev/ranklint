@@ -1,6 +1,12 @@
 export const START = '<!-- generated:start -->'
 export const END = '<!-- generated:end -->'
 
+export function tailOf(existing) {
+  if (!existing) return ''
+  const end = existing.indexOf(END)
+  return end === -1 ? '' : existing.slice(end + END.length)
+}
+
 export function mergeGenerated(existing, frontmatter, generated) {
   if (!existing) {
     return `${frontmatter}\n\n${generated}\n`
