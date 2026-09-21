@@ -56,8 +56,8 @@
     "ru": "X-Robots-Tag не противоречит meta robots"
   },
   "i18n:no-locale-leak": {
-    "en": "content language matches URL locale and html lang",
-    "ru": "язык контента соответствует локали URL и html lang"
+    "en": "content language matches URL locale and html lang; code blocks are ignored",
+    "ru": "язык контента соответствует локали URL и html lang; блоки кода не учитываются"
   },
   "images:alt-required": {
     "en": "content imgs have alt",

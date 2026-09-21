@@ -46,7 +46,7 @@ function textMatchesLocale(detected: string, locale: string): boolean {
 function visibleText(body: Element | null): string {
   if (!body) return ''
   const clone = body.cloneNode(true) as Element
-  for (const el of clone.querySelectorAll('script, style, noscript, template')) el.remove()
+  for (const el of clone.querySelectorAll('script, style, noscript, template, pre, code')) el.remove()
   return clone.textContent ?? ''
 }
 

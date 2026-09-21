@@ -21,7 +21,7 @@ description: 42 built-in rules generated from the check registry.
 | [`http:no-soft-404`](/ru/rules/http/http-no-soft-404) | http | site | error | 404 не маскируются под 200 |
 | [`http:ttfb-budget`](/ru/rules/http/http-ttfb-budget) | http | site | warn | p75 TTFB по группам; { p75, budgets } |
 | [`http:x-robots-consistent`](/ru/rules/http/http-x-robots-consistent) | http | page | error | X-Robots-Tag не противоречит meta robots |
-| [`i18n:no-locale-leak`](/ru/rules/i18n/i18n-no-locale-leak) | i18n | page | error | язык контента соответствует локали URL и html lang |
+| [`i18n:no-locale-leak`](/ru/rules/i18n/i18n-no-locale-leak) | i18n | page | error | язык контента соответствует локали URL и html lang; блоки кода не учитываются |
 | [`images:alt-required`](/ru/rules/images/images-alt-required) | images | page | warn | у контентных img есть alt |
 | [`images:dimensions-required`](/ru/rules/images/images-dimensions-required) | images | page | warn | width/height против CLS |
 | [`images:no-lazy-above-fold`](/ru/rules/images/images-no-lazy-above-fold) | images | page | warn | нет loading=lazy во вьюпорте; { firstImages } |

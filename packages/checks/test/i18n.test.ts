@@ -129,6 +129,12 @@ describe('i18n:no-locale-leak text heuristic', () => {
     expect(await runCheckOnHtml(noLocaleLeak, html, { url: 'https://x.com/ru/page' })).toEqual([])
   })
 
+  it('ignores code blocks when detecting the language', async () => {
+    const code = 'name: seo\non: [pull_request]\njobs:\n  seo:\n    uses: aakazancev/ranklint/.github/workflows/seo.yml@main\n    with: { url: https://example.com }\n'.repeat(12)
+    const html = `<html lang="ru"><head></head><body><p>${ruText}</p><pre><code>${code}</code></pre><p>Флаг <code>--yes</code> для скриптов.</p></body></html>`
+    expect(await runCheckOnHtml(noLocaleLeak, html, { url: 'https://x.com/ru/page' })).toEqual([])
+  })
+
   it('detectTextLanguage identifies scripts and stopword languages', () => {
     expect(detectTextLanguage(ruText)).toBe('cyrillic')
     expect(detectTextLanguage(arText)).toBe('arabic')

@@ -21,7 +21,7 @@ Every rule accepts `error`, `warn`, `info`, `off` or `[severity, options]` in ra
 | [`http:no-soft-404`](/en/rules/http/http-no-soft-404) | http | site | error | 404s aren't masked as 200 |
 | [`http:ttfb-budget`](/en/rules/http/http-ttfb-budget) | http | site | warn | p75 TTFB per group; { p75, budgets } |
 | [`http:x-robots-consistent`](/en/rules/http/http-x-robots-consistent) | http | page | error | X-Robots-Tag doesn't contradict meta robots |
-| [`i18n:no-locale-leak`](/en/rules/i18n/i18n-no-locale-leak) | i18n | page | error | content language matches URL locale and html lang |
+| [`i18n:no-locale-leak`](/en/rules/i18n/i18n-no-locale-leak) | i18n | page | error | content language matches URL locale and html lang; code blocks are ignored |
 | [`images:alt-required`](/en/rules/images/images-alt-required) | images | page | warn | content imgs have alt |
 | [`images:dimensions-required`](/en/rules/images/images-dimensions-required) | images | page | warn | width/height against CLS |
 | [`images:no-lazy-above-fold`](/en/rules/images/images-no-lazy-above-fold) | images | page | warn | no loading=lazy in the viewport; { firstImages } |

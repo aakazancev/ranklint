@@ -1,6 +1,6 @@
 ---
 title: "i18n:no-locale-leak"
-description: "content language matches URL locale and html lang"
+description: "content language matches URL locale and html lang; code blocks are ignored"
 ---
 
 <!-- generated:start -->
@@ -8,7 +8,7 @@ description: "content language matches URL locale and html lang"
 | --- | --- | --- |
 | i18n | page | error |
 
-content language matches URL locale and html lang
+content language matches URL locale and html lang; code blocks are ignored
 
 ### Options
 
