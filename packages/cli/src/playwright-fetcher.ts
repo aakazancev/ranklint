@@ -9,7 +9,7 @@ export interface PlaywrightFetcherOptions {
 }
 
 export class PlaywrightFetcher implements PageFetcher {
-  private browser?: Browser
+  private browser?: Promise<Browser>
   private http: HttpFetcher
   private auth?: FetchAuth
   private viewport?: { width: number, height: number }
@@ -23,9 +23,10 @@ export class PlaywrightFetcher implements PageFetcher {
   }
 
   async fetch(url: string, opts?: { userAgent?: string }): Promise<PageSnapshot> {
-    this.browser ??= await chromium.launch()
+    this.browser ??= chromium.launch()
+    const browser = await this.browser
     const headers = authHeaders(this.auth)
-    const context = await this.browser.newContext({
+    const context = await browser.newContext({
       ...(opts?.userAgent ? { userAgent: opts.userAgent } : {}),
       ...(Object.keys(headers).length > 0 ? { extraHTTPHeaders: headers } : {}),
       ...(this.viewport ? { viewport: this.viewport } : {}),
@@ -73,8 +74,9 @@ export class PlaywrightFetcher implements PageFetcher {
   }
 
   async close() {
-    await this.browser?.close()
+    const browser = await this.browser
     this.browser = undefined
+    await browser?.close()
     await this.http.close()
   }
 }
