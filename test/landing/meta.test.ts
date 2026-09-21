@@ -91,15 +91,8 @@ describe.each(locales)('landing links to the guide and the changelog (%s)', (loc
 })
 
 describe('landing link targets', () => {
-  const source = readFileSync(`${root}docs/app/composables/useLandingLinks.ts`, 'utf8')
-
   it.each(locales)('ships the pages the links point at in %s', (locale) => {
     const pages = [`docs/content/${locale}/8.changelog`, `docs/content/${locale}/7.guides/1.seo-checklist-nuxt.md`]
     expect(pages.filter(path => !existsSync(`${root}${path}`))).toEqual([])
-  })
-
-  it('exposes a changelog and a guide link', () => {
-    expect(source).toContain('changelog: `${prefix.value}/changelog`')
-    expect(source).toContain('guide: `${prefix.value}/guides/seo-checklist-nuxt`')
   })
 })
