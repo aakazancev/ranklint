@@ -88,6 +88,15 @@ describe('mergeChangelogs', () => {
     expect(merged.map(v => v.version)).toEqual(['1.0.0', '0.4.1', '0.4.0'])
     expect(mergeChangelogs([{ pkg: 'x', text: '# x\n\n## 0.2.0\n\n## 0.1.0\n\n### Patch Changes\n\n- a\n' }]).map(v => v.version)).toEqual(['0.1.0'])
   })
+
+  it('keeps two bullets sharing a hash in one package', () => {
+    const a = '# a\n\n## 2.0.0\n\n### Minor Changes\n\n- abc1234: First change\n- abc1234: Second change\n'
+    const b = '# b\n\n## 2.0.0\n\n### Minor Changes\n\n- abc1234: First change\n'
+    expect(mergeChangelogs([{ pkg: 'a', text: a }, { pkg: 'b', text: b }])[0]!.entries).toEqual([
+      { kind: 'feature', hash: 'abc1234', text: 'First change', packages: ['a', 'b'] },
+      { kind: 'feature', hash: 'abc1234', text: 'Second change', packages: ['a'] },
+    ])
+  })
 })
 
 describe('tails', () => {

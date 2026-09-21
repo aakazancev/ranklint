@@ -61,7 +61,7 @@ export function mergeChangelogs(inputs) {
       byVersion.set(version, entries)
       for (const [group, bullets] of Object.entries(groups)) {
         for (const bullet of bullets) {
-          const key = bullet.hash ?? bullet.text
+          const key = `${bullet.hash ?? ''}:${bullet.text}`
           const entry = entries.get(key) ?? { kind: KIND[group], hash: bullet.hash, text: bullet.text, packages: [] }
           entry.packages.push(pkg)
           entries.set(key, entry)
@@ -115,12 +115,14 @@ export function renderIndex(items, locale) {
 function readPackages() {
   return readdirSync(join(root, 'packages'), { withFileTypes: true })
     .filter(e => e.isDirectory() && existsSync(join(root, 'packages', e.name, 'CHANGELOG.md')))
-    .map(e => ({ pkg: JSON.parse(readFileSync(join(root, 'packages', e.name, 'package.json'), 'utf8')).name, text: readFileSync(join(root, 'packages', e.name, 'CHANGELOG.md'), 'utf8') }))
+    .map(e => ({ pkg: JSON.parse(readFileSync(join(root, 'packages', e.name, 'package.json'), 'utf8')).name, changelog: `packages/${e.name}/CHANGELOG.md`, text: readFileSync(join(root, 'packages', e.name, 'CHANGELOG.md'), 'utf8') }))
 }
 
-function gitDate(version) {
-  const out = execFileSync('git', ['log', '--format=%ad', '--date=short', `-S## ${version}`, '--', 'packages/ranklint/CHANGELOG.md'], { cwd: root, encoding: 'utf8' }).trim().split('\n').filter(Boolean)
-  return out.at(-1) ?? new Date().toISOString().slice(0, 10)
+function gitDate(version, files) {
+  const out = execFileSync('git', ['log', '--format=%ad', '--date=short', `-S## ${version}`, '--', ...files], { cwd: root, encoding: 'utf8' }).trim().split('\n').filter(Boolean)
+  const date = out.at(-1)
+  if (!date) throw new Error(`no release date found for ${version} in packages/*/CHANGELOG.md`)
+  return date
 }
 
 function tailOf(existing) {
@@ -132,6 +134,7 @@ function tailOf(existing) {
 export function build() {
   const inputs = readPackages()
   const allPackages = inputs.map(i => i.pkg)
+  const changelogs = inputs.map(i => i.changelog)
   const versions = mergeChangelogs(inputs)
   const out = new Map()
   for (const locale of LOCALES) {
@@ -139,7 +142,7 @@ export function build() {
     const items = versions.map((v) => {
       const path = join(base, `v${v.version}.md`)
       const existing = existsSync(path) ? readFileSync(path, 'utf8') : undefined
-      const date = readDate(existing) ?? gitDate(v.version)
+      const date = readDate(existing) ?? gitDate(v.version, changelogs)
       const { frontmatter, generated } = renderVersionPage(v, date, locale, allPackages)
       out.set(path, mergeGenerated(existing, frontmatter, generated))
       return { version: v.version, date, summary: firstParagraph(tailOf(existing)) || v.entries[0].text }
