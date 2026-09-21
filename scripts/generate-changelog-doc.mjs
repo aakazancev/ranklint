@@ -1,5 +1,11 @@
+import { execFileSync } from 'node:child_process'
+import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs'
+import { dirname, join } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { END, START, mergeGenerated } from './lib/generated-md.mjs'
 
+const root = fileURLToPath(new URL('..', import.meta.url))
+const LOCALES = ['en', 'ru']
 const REPO = 'https://github.com/aakazancev/ranklint'
 const DEP_BUMP = /^@?[\w./-]+@\d+\.\d+\.\d+\S*$/
 const KIND = { major: 'breaking', minor: 'feature', patch: 'fix' }
@@ -104,4 +110,70 @@ export function renderIndex(items, locale) {
   const frontmatter = ['---', `title: ${JSON.stringify(l.index)}`, `description: ${JSON.stringify(l.indexDesc)}`, '---'].join('\n')
   const body = items.flatMap(i => [`## [ranklint ${i.version}](/${locale}/changelog/v${i.version})`, '', `${l.date}: ${i.date}`, '', i.summary, ''])
   return mergeGenerated(undefined, frontmatter, [START, '', ...body, END].join('\n'))
+}
+
+function readPackages() {
+  return readdirSync(join(root, 'packages'), { withFileTypes: true })
+    .filter(e => e.isDirectory() && existsSync(join(root, 'packages', e.name, 'CHANGELOG.md')))
+    .map(e => ({ pkg: JSON.parse(readFileSync(join(root, 'packages', e.name, 'package.json'), 'utf8')).name, text: readFileSync(join(root, 'packages', e.name, 'CHANGELOG.md'), 'utf8') }))
+}
+
+function gitDate(version) {
+  const out = execFileSync('git', ['log', '--format=%ad', '--date=short', `-S## ${version}`, '--', 'packages/ranklint/CHANGELOG.md'], { cwd: root, encoding: 'utf8' }).trim().split('\n').filter(Boolean)
+  return out.at(-1) ?? new Date().toISOString().slice(0, 10)
+}
+
+function tailOf(existing) {
+  if (!existing) return ''
+  const end = existing.indexOf(END)
+  return end === -1 ? '' : existing.slice(end + END.length)
+}
+
+export function build() {
+  const inputs = readPackages()
+  const allPackages = inputs.map(i => i.pkg)
+  const versions = mergeChangelogs(inputs)
+  const out = new Map()
+  for (const locale of LOCALES) {
+    const base = join(root, 'docs/content', locale, '8.changelog')
+    const items = versions.map((v) => {
+      const path = join(base, `v${v.version}.md`)
+      const existing = existsSync(path) ? readFileSync(path, 'utf8') : undefined
+      const date = readDate(existing) ?? gitDate(v.version)
+      const { frontmatter, generated } = renderVersionPage(v, date, locale, allPackages)
+      out.set(path, mergeGenerated(existing, frontmatter, generated))
+      return { version: v.version, date, summary: firstParagraph(tailOf(existing)) || v.entries[0].text }
+    })
+    out.set(join(base, 'index.md'), renderIndex(items, locale))
+  }
+  return out
+}
+
+function listExisting() {
+  return LOCALES.flatMap((locale) => {
+    const base = join(root, 'docs/content', locale, '8.changelog')
+    return existsSync(base) ? readdirSync(base).filter(f => f.endsWith('.md')).map(f => join(base, f)) : []
+  })
+}
+
+const isMain = process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]
+if (isMain) {
+  const pages = build()
+  if (process.argv.includes('--check')) {
+    const stale = [...pages].filter(([path, content]) => !existsSync(path) || readFileSync(path, 'utf8') !== content).map(([p]) => p)
+    const orphans = listExisting().filter(p => !pages.has(p))
+    if (stale.length || orphans.length) {
+      console.error(`changelog docs are stale — run: node scripts/generate-changelog-doc.mjs\n${[...stale, ...orphans.map(o => `orphan: ${o}`)].join('\n')}`)
+      process.exit(1)
+    }
+    console.log(`changelog docs are up to date (${pages.size} files)`)
+  }
+  else {
+    for (const orphan of listExisting().filter(p => !pages.has(p))) rmSync(orphan)
+    for (const [path, content] of pages) {
+      mkdirSync(dirname(path), { recursive: true })
+      writeFileSync(path, content)
+    }
+    console.log(`changelog docs written (${pages.size} files)`)
+  }
 }

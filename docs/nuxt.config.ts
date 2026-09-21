@@ -1,4 +1,9 @@
+import { readdirSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
+
+const changelogRoutes = readdirSync(new URL('./content/en/8.changelog', import.meta.url))
+  .filter(f => f.startsWith('v') && f.endsWith('.md'))
+  .flatMap(f => ['en', 'ru'].map(locale => `/${locale}/changelog/${f.slice(0, -3)}`))
 
 export default defineNuxtConfig({
   extends: ['docus'],
@@ -38,6 +43,11 @@ export default defineNuxtConfig({
   ogImage: {
     zeroRuntime: false,
     fontSubsets: ['latin', 'cyrillic'],
+  },
+  nitro: {
+    prerender: {
+      routes: changelogRoutes,
+    },
   },
   routeRules: {
     '/': { redirect: '/en' },

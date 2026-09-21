@@ -31,6 +31,7 @@ jobs:
       - run: pnpm dev:prepare
       - run: pnpm build
       - run: node scripts/generate-rules-doc.mjs --check
+      - run: node scripts/generate-changelog-doc.mjs --check
       - run: pnpm docs:generate
         env:
           NUXT_SITE_URL: https://ranklint.dev

@@ -51,6 +51,7 @@ jobs:
       - run: pnpm --filter @ranklint/cli exec playwright install --with-deps chromium
       - run: pnpm build
       - run: node scripts/generate-rules-doc.mjs --check
+      - run: node scripts/generate-changelog-doc.mjs --check
       - run: pnpm --filter ranklint-docs build
         env:
           NUXT_SITE_URL: http://127.0.0.1:4100

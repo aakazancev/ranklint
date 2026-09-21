@@ -17,7 +17,7 @@
     "lint": "eslint .",
     "typecheck": "pnpm -r --filter './packages/*' typecheck",
     "publint": "pnpm -r --filter './packages/*' exec publint",
-    "release:version": "changeset version && pnpm install --no-frozen-lockfile"
+    "release:version": "changeset version && pnpm install --no-frozen-lockfile && node scripts/generate-changelog-doc.mjs"
   },
   "devDependencies": {
     "@changesets/cli": "^2.31.0",
