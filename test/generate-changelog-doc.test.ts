@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { firstParagraph, mergeChangelogs, parseChangelog, readDate, renderIndex, renderVersionPage } from '../scripts/generate-changelog-doc.mjs'
+import { firstParagraph, mergeChangelogs, parseChangelog, readDate, renderIndex, renderVersionPage, resolveDate } from '../scripts/generate-changelog-doc.mjs'
 
 const core = `# @ranklint/core
 
@@ -96,6 +96,20 @@ describe('mergeChangelogs', () => {
       { kind: 'feature', hash: 'abc1234', text: 'First change', packages: ['a', 'b'] },
       { kind: 'feature', hash: 'abc1234', text: 'Second change', packages: ['a'] },
     ])
+  })
+})
+
+describe('resolveDate', () => {
+  it('takes the earliest commit date when git knows the version', () => {
+    expect(resolveDate(['2026-09-21', '2026-08-15'], false, '0.1.0')).toBe('2026-08-15')
+  })
+
+  it('falls back to today for the newest version released but not yet committed', () => {
+    expect(resolveDate([], true, '1.1.0')).toBe(new Date().toISOString().slice(0, 10))
+  })
+
+  it('throws for an older version with no commit', () => {
+    expect(() => resolveDate([], false, '0.3.0')).toThrow('0.3.0')
   })
 })
 

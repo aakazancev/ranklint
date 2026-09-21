@@ -118,11 +118,16 @@ function readPackages() {
     .map(e => ({ pkg: JSON.parse(readFileSync(join(root, 'packages', e.name, 'package.json'), 'utf8')).name, changelog: `packages/${e.name}/CHANGELOG.md`, text: readFileSync(join(root, 'packages', e.name, 'CHANGELOG.md'), 'utf8') }))
 }
 
-function gitDate(version, files) {
+export function resolveDate(gitDates, isLatest, version) {
+  const date = gitDates.at(-1)
+  if (date) return date
+  if (!isLatest) throw new Error(`no release date found for ${version} in packages/*/CHANGELOG.md`)
+  return new Date().toISOString().slice(0, 10)
+}
+
+function gitDate(version, files, isLatest) {
   const out = execFileSync('git', ['log', '--format=%ad', '--date=short', `-S## ${version}`, '--', ...files], { cwd: root, encoding: 'utf8' }).trim().split('\n').filter(Boolean)
-  const date = out.at(-1)
-  if (!date) throw new Error(`no release date found for ${version} in packages/*/CHANGELOG.md`)
-  return date
+  return resolveDate(out, isLatest, version)
 }
 
 function tailOf(existing) {
@@ -142,7 +147,7 @@ export function build() {
     const items = versions.map((v) => {
       const path = join(base, `v${v.version}.md`)
       const existing = existsSync(path) ? readFileSync(path, 'utf8') : undefined
-      const date = readDate(existing) ?? gitDate(v.version, changelogs)
+      const date = readDate(existing) ?? gitDate(v.version, changelogs, v.version === versions[0].version)
       const { frontmatter, generated } = renderVersionPage(v, date, locale, allPackages)
       out.set(path, mergeGenerated(existing, frontmatter, generated))
       return { version: v.version, date, summary: firstParagraph(tailOf(existing)) || v.entries[0].text }
