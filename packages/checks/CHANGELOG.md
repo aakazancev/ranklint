@@ -1,5 +1,12 @@
 # @ranklint/checks
 
+## 1.0.1
+
+### Patch Changes
+
+- 660be37: i18n:no-locale-leak ignores subtrees whose lang attribute differs from the page language
+  - @ranklint/core@1.0.1
+
 ## 1.0.0
 
 ### Major Changes

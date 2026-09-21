@@ -5,6 +5,12 @@ description: "Every ranklint release with breaking changes, features and fixes, 
 
 <!-- generated:start -->
 
+## ranklint 1.0.1
+
+Released: 2026-09-21 · [Release notes](/en/changelog/v1.0.1)
+
+i18n:no-locale-leak ignores subtrees whose lang attribute differs from the page language
+
 ## ranklint 1.0.0
 
 Released: 2026-09-21 · [Release notes](/en/changelog/v1.0.0)
