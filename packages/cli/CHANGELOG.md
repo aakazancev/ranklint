@@ -1,5 +1,30 @@
 # @ranklint/cli
 
+## 1.0.0
+
+### Major Changes
+
+- 3f5d9fb: ranklint 1.0.0: stable public API for defineCheck and the config, ranklint init, SARIF reporter, sticky PR comments, automated releases
+
+### Minor Changes
+
+- 35c48a3: Add ranklint init: interactive and non-interactive config wizard with CI snippets and Nuxt detection
+- 0fd9138: Add SARIF reporter for GitHub Code Scanning
+
+### Patch Changes
+
+- 18b18bb: audit exits cleanly with multiple crawl entries
+- Updated dependencies [1992080]
+- Updated dependencies [5809dcb]
+- Updated dependencies [0f30951]
+- Updated dependencies [0fd9138]
+- Updated dependencies [5809dcb]
+- Updated dependencies [0fd9138]
+- Updated dependencies [3f5d9fb]
+  - @ranklint/checks@1.0.0
+  - @ranklint/reporters@1.0.0
+  - @ranklint/core@1.0.0
+
 ## 0.5.0
 
 ### Minor Changes

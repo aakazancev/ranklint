@@ -1,5 +1,21 @@
 # @ranklint/reporters
 
+## 1.0.0
+
+### Major Changes
+
+- 3f5d9fb: ranklint 1.0.0: stable public API for defineCheck and the config, ranklint init, SARIF reporter, sticky PR comments, automated releases
+
+### Minor Changes
+
+- 0fd9138: Add SARIF reporter for GitHub Code Scanning
+
+### Patch Changes
+
+- 0fd9138: Mark markdown diff output for sticky PR/MR comments
+- Updated dependencies [3f5d9fb]
+  - @ranklint/core@1.0.0
+
 ## 0.5.0
 
 ### Minor Changes
