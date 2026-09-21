@@ -1,6 +1,6 @@
 ---
 title: "meta:no-duplicate-title"
-description: "identical titles across pages"
+description: "identical titles across pages; mutual hreflang alternates are not counted as duplicates"
 ---
 
 <!-- generated:start -->
@@ -8,7 +8,7 @@ description: "identical titles across pages"
 | --- | --- | --- |
 | meta | site | error |
 
-identical titles across pages
+identical titles across pages; mutual hreflang alternates are not counted as duplicates
 
 ### Options
 

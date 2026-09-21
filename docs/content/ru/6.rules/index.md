@@ -35,8 +35,8 @@ description: 42 built-in rules generated from the check registry.
 | [`links:trailing-slash-consistent`](/ru/rules/links/links-trailing-slash-consistent) | links | site | warn | единообразие завершающего слеша |
 | [`meta:description-length`](/ru/rules/meta/meta-description-length) | meta | page | warn | длина meta description, по умолчанию 70–160 символов; { min, max } |
 | [`meta:description-required`](/ru/rules/meta/meta-description-required) | meta | page | error | есть meta description |
-| [`meta:no-duplicate-description`](/ru/rules/meta/meta-no-duplicate-description) | meta | site | error | одинаковые description |
-| [`meta:no-duplicate-title`](/ru/rules/meta/meta-no-duplicate-title) | meta | site | error | одинаковые title на разных страницах |
+| [`meta:no-duplicate-description`](/ru/rules/meta/meta-no-duplicate-description) | meta | site | error | одинаковые description; взаимные hreflang-альтернативы дублями не считаются |
+| [`meta:no-duplicate-title`](/ru/rules/meta/meta-no-duplicate-title) | meta | site | error | одинаковые title на разных страницах; взаимные hreflang-альтернативы дублями не считаются |
 | [`meta:og-required`](/ru/rules/meta/meta-og-required) | meta | page | warn | og:title, og:description, og:image — один issue на страницу со списком отсутствующих |
 | [`meta:title-length`](/ru/rules/meta/meta-title-length) | meta | page | warn | длина title, по умолчанию 30–60 символов; { min, max } |
 | [`meta:title-required`](/ru/rules/meta/meta-title-required) | meta | page | error | есть <title> |

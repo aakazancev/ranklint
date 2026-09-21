@@ -35,8 +35,8 @@ Every rule accepts `error`, `warn`, `info`, `off` or `[severity, options]` in ra
 | [`links:trailing-slash-consistent`](/en/rules/links/links-trailing-slash-consistent) | links | site | warn | trailing-slash consistency |
 | [`meta:description-length`](/en/rules/meta/meta-description-length) | meta | page | warn | meta description length, 70–160 chars by default; { min, max } |
 | [`meta:description-required`](/en/rules/meta/meta-description-required) | meta | page | error | meta description exists |
-| [`meta:no-duplicate-description`](/en/rules/meta/meta-no-duplicate-description) | meta | site | error | identical descriptions |
-| [`meta:no-duplicate-title`](/en/rules/meta/meta-no-duplicate-title) | meta | site | error | identical titles across pages |
+| [`meta:no-duplicate-description`](/en/rules/meta/meta-no-duplicate-description) | meta | site | error | identical descriptions; mutual hreflang alternates are not counted as duplicates |
+| [`meta:no-duplicate-title`](/en/rules/meta/meta-no-duplicate-title) | meta | site | error | identical titles across pages; mutual hreflang alternates are not counted as duplicates |
 | [`meta:og-required`](/en/rules/meta/meta-og-required) | meta | page | warn | og:title, og:description, og:image — one issue per page listing the missing tags |
 | [`meta:title-length`](/en/rules/meta/meta-title-length) | meta | page | warn | title length, 30–60 chars by default; { min, max } |
 | [`meta:title-required`](/en/rules/meta/meta-title-required) | meta | page | error | <title> exists |

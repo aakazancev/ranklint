@@ -112,12 +112,12 @@
     "ru": "есть meta description"
   },
   "meta:no-duplicate-description": {
-    "en": "identical descriptions",
-    "ru": "одинаковые description"
+    "en": "identical descriptions; mutual hreflang alternates are not counted as duplicates",
+    "ru": "одинаковые description; взаимные hreflang-альтернативы дублями не считаются"
   },
   "meta:no-duplicate-title": {
-    "en": "identical titles across pages",
-    "ru": "одинаковые title на разных страницах"
+    "en": "identical titles across pages; mutual hreflang alternates are not counted as duplicates",
+    "ru": "одинаковые title на разных страницах; взаимные hreflang-альтернативы дублями не считаются"
   },
   "meta:og-required": {
     "en": "og:title, og:description, og:image — one issue per page listing the missing tags",

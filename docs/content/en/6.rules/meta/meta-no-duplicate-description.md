@@ -1,6 +1,6 @@
 ---
 title: "meta:no-duplicate-description"
-description: "identical descriptions"
+description: "identical descriptions; mutual hreflang alternates are not counted as duplicates"
 ---
 
 <!-- generated:start -->
@@ -8,7 +8,7 @@ description: "identical descriptions"
 | --- | --- | --- |
 | meta | site | error |
 
-identical descriptions
+identical descriptions; mutual hreflang alternates are not counted as duplicates
 
 ### Options
 

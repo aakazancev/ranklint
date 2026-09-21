@@ -1,6 +1,6 @@
 ---
 title: "meta:no-duplicate-description"
-description: "одинаковые description"
+description: "одинаковые description; взаимные hreflang-альтернативы дублями не считаются"
 ---
 
 <!-- generated:start -->
@@ -8,7 +8,7 @@ description: "одинаковые description"
 | --- | --- | --- |
 | meta | site | error |
 
-одинаковые description
+одинаковые description; взаимные hreflang-альтернативы дублями не считаются
 
 ### Опции
 

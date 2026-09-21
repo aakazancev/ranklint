@@ -2,18 +2,7 @@ import type { Issue, PageSnapshot } from '@ranklint/core'
 import { getDocument } from '@ranklint/core'
 import { defineCheck, docsUrl } from '../../define'
 import { resolveUrl } from '../../net'
-
-interface Alternate {
-  hreflang: string
-  href: string
-}
-
-function alternates(doc: Document): Alternate[] {
-  return [...doc.querySelectorAll('link[rel="alternate"][hreflang]')].map(el => ({
-    hreflang: el.getAttribute('hreflang') ?? '',
-    href: el.getAttribute('href') ?? '',
-  }))
-}
+import { type Alternate, alternates, pathOf } from './alternates'
 
 export const hreflangValidTargets = defineCheck({
   id: 'hreflang:valid-targets',
@@ -42,14 +31,6 @@ export const hreflangValidTargets = defineCheck({
     return issues
   },
 })
-
-function pathOf(url: string, base: string): string | null {
-  try {
-    return new URL(url, base).pathname
-  } catch {
-    return null
-  }
-}
 
 export const hreflangSymmetric = defineCheck({
   id: 'hreflang:symmetric',

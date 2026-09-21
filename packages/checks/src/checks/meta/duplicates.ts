@@ -1,6 +1,7 @@
 import type { CheckContext, Issue, PageSnapshot, Severity } from '@ranklint/core'
 import { getDocument } from '@ranklint/core'
 import { defineCheck, docsUrl } from '../../define'
+import { mutualAlternates, pathOf } from '../i18n/alternates'
 
 function duplicateGroups(
   ctx: CheckContext,
@@ -27,9 +28,13 @@ function duplicateIssues(
   extract: (snapshot: PageSnapshot) => string,
 ): Issue[] {
   const issues: Issue[] = []
+  const mutual = mutualAlternates(ctx.pages ?? [], ctx.site.url)
   for (const [value, pages] of duplicateGroups(ctx, extract)) {
     if (pages.length < 2) continue
+    const paths = new Set(pages.map(page => pathOf(page.url, ctx.site.url)))
     for (const page of pages) {
+      const partners = mutual.get(pathOf(page.url, ctx.site.url) ?? '') ?? new Set()
+      if ([...partners].some(partner => paths.has(partner))) continue
       issues.push({
         checkId,
         severity,

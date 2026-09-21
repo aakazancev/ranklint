@@ -16,6 +16,8 @@ const bugs = [
   'broken-link',
   'duplicate-title-a',
   'duplicate-title-b',
+  'duplicate-title-i18n-a',
+  'duplicate-title-i18n-b',
   'jsonld-broken',
   'images-bad',
   'noindex-in-sitemap',

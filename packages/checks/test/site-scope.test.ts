@@ -30,6 +30,39 @@ describe('duplicate checks', () => {
     expect(await uniqueH1.run(ctx(pages))).toHaveLength(2)
   })
 
+  function altLinks(entries: [string, string][]): string {
+    return entries.map(([lang, path]) => `<link rel="alternate" hreflang="${lang}" href="https://x.com${path}">`).join('')
+  }
+
+  function localized(alts: [string, string][]): string {
+    return `<html><head><title>Same title on both pages here</title><meta name="description" content="Shared description that both locale versions of the page use."></head>${altLinks(alts)}<body><h1>Heading</h1></body></html>`
+  }
+
+  it('does not flag pages that are mutual hreflang alternates', async () => {
+    const alts: [string, string][] = [['en', '/en/x'], ['ru', '/ru/x']]
+    const pages = [snap('/en/x', localized(alts)), snap('/ru/x', localized(alts))]
+    expect(await noDuplicateTitle.run(ctx(pages))).toEqual([])
+    expect(await noDuplicateDescription.run(ctx(pages))).toEqual([])
+  })
+
+  it('flags pages when the hreflang link is one-way', async () => {
+    const pages = [
+      snap('/en/x', localized([['ru', '/ru/x']])),
+      snap('/ru/x', localized([])),
+    ]
+    expect(await noDuplicateTitle.run(ctx(pages))).toHaveLength(2)
+    expect(await noDuplicateDescription.run(ctx(pages))).toHaveLength(2)
+  })
+
+  it('flags only the page outside the hreflang cluster', async () => {
+    const alts: [string, string][] = [['en', '/en/x'], ['ru', '/ru/x']]
+    const pages = [snap('/en/x', localized(alts)), snap('/ru/x', localized(alts)), snap('/en/y', localized([]))]
+    const issues = await noDuplicateTitle.run(ctx(pages))
+    expect(issues).toHaveLength(1)
+    expect(issues[0]?.url).toBe('https://x.com/en/y')
+    expect(issues[0]?.message).toContain('shared by 3 pages')
+  })
+
   it('ignores non-200 snapshots and empty values', async () => {
     const pages = [snap('/a', dupTitle), snap('/404', dupTitle, 'https://x.com', 404), snap('/b', '<html></html>'), snap('/c', '<html></html>')]
     expect(await noDuplicateTitle.run(ctx(pages))).toEqual([])
