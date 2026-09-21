@@ -3,28 +3,17 @@ import { dirname, join } from 'node:path'
 import { createRequire } from 'node:module'
 import { fileURLToPath } from 'node:url'
 import { allChecks } from '../packages/checks/dist/index.mjs'
+import { END, START, mergeGenerated } from './lib/generated-md.mjs'
 
 const { z } = createRequire(new URL('../packages/checks/package.json', import.meta.url))('zod')
 const root = fileURLToPath(new URL('..', import.meta.url))
 const i18n = JSON.parse(readFileSync(join(root, 'docs/rules-i18n.json'), 'utf8'))
-const START = '<!-- generated:start -->'
-const END = '<!-- generated:end -->'
-
 const t = {
   en: { folders: { headings: 'Headings', http: 'HTTP', i18n: 'i18n', images: 'Images', indexability: 'Indexability', links: 'Links', meta: 'Meta', robots: 'Robots', 'structured-data': 'Structured data' }, rules: 'Rules', index: 'All rules', why: 'Why it matters', fix: 'How to fix', options: 'Options', none: 'No options.', category: 'Category', scope: 'Scope', severity: 'Default severity', option: 'Option', type: 'Type', description: 'Description', indexDesc: 'Every rule accepts `error`, `warn`, `info`, `off` or `[severity, options]` in ranklint.config and can be suppressed per page with useRanklintIgnore().' },
   ru: { folders: { headings: 'Заголовки', http: 'HTTP', i18n: 'i18n', images: 'Изображения', indexability: 'Индексируемость', links: 'Ссылки', meta: 'Мета', robots: 'Robots', 'structured-data': 'Структурированные данные' }, rules: 'Правила', index: 'Все правила', why: 'Почему это важно', fix: 'Как исправить', options: 'Опции', none: 'Опций нет.', category: 'Категория', scope: 'Область', severity: 'Severity по умолчанию', option: 'Опция', type: 'Тип', description: 'Описание', indexDesc: 'Каждое правило принимает `error`, `warn`, `info`, `off` или `[severity, options]` в ranklint.config и отключается на странице через useRanklintIgnore().' },
 }
 
-export function mergeGenerated(existing, frontmatter, generated) {
-  if (!existing) {
-    return `${frontmatter}\n\n${generated}\n`
-  }
-  const start = existing.indexOf(START)
-  const end = existing.indexOf(END)
-  if (start === -1 || end === -1) throw new Error('page has no generated markers')
-  const tail = existing.slice(end + END.length)
-  return `${frontmatter}\n\n${generated}${tail}`
-}
+export { mergeGenerated }
 
 function slug(id) {
   return id.replace(/:/g, '-')
