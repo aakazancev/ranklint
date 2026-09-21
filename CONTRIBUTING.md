@@ -39,4 +39,4 @@ Pick `minor` for a new feature or new public API, `patch` for a fix. All package
 2. While unreleased changeset files exist, `changesets/action` keeps a pull request named `chore: release` open. That PR contains the version bumps, the updated `CHANGELOG.md` files and the removal of the consumed changesets.
 3. Merging the `chore: release` PR triggers the workflow again; with no changesets left, the action runs `pnpm changeset publish`, which publishes the packages to npm and pushes git tags.
 
-The workflow needs a repository secret `NPM_TOKEN` with publish rights for `ranklint` and `@ranklint/*`.
+Publishing uses npm trusted publishing (OIDC): every package on npmjs.com has a trusted publisher set to the repository `aakazancev/ranklint` and the workflow `release.yml`, with `npm publish` allowed. No npm token is stored in the repository.
