@@ -64,11 +64,12 @@ In dev, JSON-LD is validated against Schema.org schemas (Product, Article, Bread
 npm i -D @ranklint/cli
 npx playwright install chromium
 
+npx ranklint init                                      # generate ranklint.config.ts
 ranklint audit --url https://uat.example.com          # audit a live site
 ranklint audit --start .output/server/index.mjs        # or self-contained from a build
 ```
 
-Exit code 1 when errors are found. Reporters: `markdown` (default), `json`, `junit` (`--reporter`, `--output`).
+Exit code 1 when errors are found. Reporters: `markdown` (default), `json`, `junit`, `html`, `gitlab`, `github`, `sarif` (`--reporter`, `--output`).
 
 Rules are configured in `ranklint.config.ts` with ESLint semantics:
 
@@ -248,7 +249,7 @@ export default defineRanklintConfig({
 | `@ranklint/cli` | `ranklint audit` — crawler (Playwright) + checks + reports |
 | `@ranklint/core` | Engine: crawler, runner, config (no Nuxt dependencies) |
 | `@ranklint/checks` | Rules + Schema.org schemas |
-| `@ranklint/reporters` | markdown / junit / json |
+| `@ranklint/reporters` | markdown / junit / json / html / gitlab / github / sarif |
 | `@ranklint/devtools` | Vue panel for Nuxt DevTools: live checks of the current page |
 | `@ranklint/preset-default` | Preset with the built-in rules for `extends` |
 | `ranklint` | Alias of `@ranklint/cli` — `npm i -D ranklint` gives the `ranklint` binary |

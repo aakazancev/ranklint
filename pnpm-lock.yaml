@@ -94,6 +94,9 @@ importers:
       citty:
         specifier: ^0.2.2
         version: 0.2.2
+      consola:
+        specifier: ^3.4.2
+        version: 3.4.2
       lighthouse:
         specifier: ^13.4.0
         version: 13.4.0

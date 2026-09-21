@@ -62,6 +62,7 @@
     "chokidar": "^5.0.0",
     "chrome-launcher": "^1.2.1",
     "citty": "^0.2.2",
+    "consola": "^3.4.2",
     "lighthouse": "^13.4.0",
     "playwright": "^1.61.1"
   }
