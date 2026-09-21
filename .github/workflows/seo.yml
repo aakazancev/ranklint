@@ -17,10 +17,19 @@ on:
         required: false
         type: string
         default: ""
+      sarif:
+        description: Also upload a SARIF report to GitHub Code Scanning (needs security-events write)
+        required: false
+        type: boolean
+        default: false
 
 jobs:
   audit:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      security-events: write
     steps:
       - uses: actions/setup-node@v4
         with:
@@ -37,6 +46,20 @@ jobs:
           --url "${{ inputs.url }}"
           --reporter github
           --json-output ranklint-report.json
+      - name: Audit for code scanning
+        if: inputs.sarif
+        continue-on-error: true
+        run: >
+          ranklint audit
+          --url "${{ inputs.url }}"
+          --reporter sarif
+          --output ranklint.sarif
+      - name: Upload SARIF
+        if: inputs.sarif
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: ranklint.sarif
+          category: ranklint
       - name: Download base report
         if: github.event_name == 'pull_request'
         uses: actions/download-artifact@v4
@@ -59,11 +82,29 @@ jobs:
           script: |
             const fs = require('fs')
             if (!fs.existsSync('ranklint-diff.md')) return
+            const body = fs.readFileSync('ranklint-diff.md', 'utf8')
+            const marker = '<!-- ranklint-diff -->'
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              per_page: 100,
+            })
+            const existing = comments.find(c => c.body && c.body.startsWith(marker))
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body,
+              })
+              return
+            }
             await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: context.issue.number,
-              body: fs.readFileSync('ranklint-diff.md', 'utf8'),
+              body,
             })
       - uses: actions/upload-artifact@v4
         if: always()

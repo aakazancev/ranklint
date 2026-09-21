@@ -24,6 +24,10 @@ describe('markdownDiff', () => {
     expect(out).toContain('Added: `/new-page`')
   })
 
+  it('starts with the sticky comment marker', () => {
+    expect(markdownDiff(diff).split('\n')[0]).toBe('<!-- ranklint-diff -->')
+  })
+
   it('renders clean state', () => {
     const out = markdownDiff({ newIssues: [], fixedIssues: [], pagesDelta: { added: [], removed: [] } })
     expect(out).toContain('No SEO changes detected')

@@ -1,5 +1,7 @@
 import type { DiffResult, Issue } from '@ranklint/core'
 
+const DIFF_MARKER = '<!-- ranklint-diff -->'
+
 function issueRows(issues: Issue[]): string[] {
   return issues.map(i =>
     `| ${i.severity} | \`${i.checkId}\` | ${i.url.replace(/\|/g, '\\|')} | ${i.message.replace(/\|/g, '\\|')} |`)
@@ -7,6 +9,8 @@ function issueRows(issues: Issue[]): string[] {
 
 export function markdownDiff(diff: DiffResult): string {
   const lines: string[] = []
+  lines.push(DIFF_MARKER)
+  lines.push('')
   lines.push('## Ranklint SEO Diff')
   lines.push('')
   const errors = diff.newIssues.filter(i => i.severity === 'error').length

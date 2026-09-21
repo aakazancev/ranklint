@@ -20,7 +20,7 @@ export const audit = defineCommand({
     url: { type: 'string', description: 'URL of a running site to audit' },
     start: { type: 'string', description: 'Path to a built server entry (.output/server/index.mjs) to launch and audit' },
     profile: { type: 'string', description: 'Profile from ranklint.config to apply' },
-    reporter: { type: 'string', default: 'markdown', description: 'Output format: markdown | json | junit | html | gitlab | github' },
+    reporter: { type: 'string', default: 'markdown', description: 'Output format: markdown | json | junit | html | gitlab | github | sarif' },
     output: { type: 'string', description: 'Write the report to a file instead of stdout' },
     jsonOutput: { type: 'string', description: 'Additionally write the raw json report to a file (input for ranklint diff)' },
     htmlOutput: { type: 'string', description: 'Additionally write a self-contained html report (e.g. to publish on Pages)' },
