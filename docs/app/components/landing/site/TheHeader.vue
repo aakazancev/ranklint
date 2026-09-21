@@ -44,7 +44,7 @@ const items = computed(() => [
             v-for="link in items"
             :key="link.to"
             :to="link.to"
-            class="text-[15px] text-fg-muted no-underline transition-colors hover:text-fg"
+            class="whitespace-nowrap text-[15px] text-fg-muted no-underline transition-colors hover:text-fg"
           >
             {{ link.label }}
           </NuxtLink>
