@@ -36,6 +36,17 @@ const cli = `# @ranklint/cli
 ### Patch Changes
 
 - Fix watch exit code
+- 6b7a0e1: Fix zone classification
+  - @ranklint/core@0.4.1
+`
+
+const reporters = `# @ranklint/reporters
+
+## 0.4.1
+
+### Patch Changes
+
+- @ranklint/core@0.4.1
 `
 
 describe('parseChangelog', () => {
@@ -43,16 +54,20 @@ describe('parseChangelog', () => {
     const versions = parseChangelog(cli)
     expect(versions.map(v => v.version)).toEqual(['1.0.0', '0.4.1'])
     expect(versions[0]!.groups.major).toEqual([{ hash: '3f5d9fb', text: 'ranklint 1.0.0: stable public API' }])
-    expect(versions[1]!.groups.patch).toEqual([{ hash: null, text: 'Fix watch exit code' }])
+    expect(versions[1]!.groups.patch).toEqual([{ hash: null, text: 'Fix watch exit code' }, { hash: '6b7a0e1', text: 'Fix zone classification' }])
   })
 
   it('drops Updated dependencies bullets and their children', () => {
     expect(parseChangelog(cli)[0]!.groups.patch).toEqual([])
   })
+
+  it('drops bare dependency bump bullets', () => {
+    expect(parseChangelog(reporters)[0]!.groups.patch).toEqual([])
+  })
 })
 
 describe('mergeChangelogs', () => {
-  const merged = mergeChangelogs([{ pkg: '@ranklint/core', text: core }, { pkg: '@ranklint/cli', text: cli }])
+  const merged = mergeChangelogs([{ pkg: '@ranklint/core', text: core }, { pkg: '@ranklint/cli', text: cli }, { pkg: '@ranklint/reporters', text: reporters }])
 
   it('dedupes by hash across packages and records package names', () => {
     const v1 = merged.find(v => v.version === '1.0.0')!
@@ -62,7 +77,10 @@ describe('mergeChangelogs', () => {
 
   it('maps groups to kinds and keeps hashless entries', () => {
     const v041 = merged.find(v => v.version === '0.4.1')!
-    expect(v041.entries).toEqual([{ kind: 'fix', hash: null, text: 'Fix watch exit code', packages: ['@ranklint/cli'] }])
+    expect(v041.entries).toEqual([
+      { kind: 'fix', hash: null, text: 'Fix watch exit code', packages: ['@ranklint/cli'] },
+      { kind: 'fix', hash: '6b7a0e1', text: 'Fix zone classification', packages: ['@ranklint/cli'] },
+    ])
     expect(merged.find(v => v.version === '0.4.0')!.entries[0]!.kind).toBe('feature')
   })
 

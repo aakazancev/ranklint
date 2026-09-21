@@ -1,6 +1,7 @@
 import { END, START, mergeGenerated } from './lib/generated-md.mjs'
 
 const REPO = 'https://github.com/aakazancev/ranklint'
+const DEP_BUMP = /^@?[\w./-]+@\d+\.\d+\.\d+\S*$/
 const KIND = { major: 'breaking', minor: 'feature', patch: 'fix' }
 const t = {
   en: { index: 'Changelog', indexDesc: 'What changed in every ranklint release.', date: 'Released', breaking: 'Breaking', feature: 'Features', fix: 'Fixes' },
@@ -11,7 +12,6 @@ export function parseChangelog(text) {
   const versions = []
   let current
   let group
-  let skipping = false
   for (const line of text.split('\n')) {
     const version = line.match(/^## (\d+\.\d+\.\d+\S*)/)
     if (version) {
@@ -28,13 +28,12 @@ export function parseChangelog(text) {
     if (!current || !group) continue
     const bullet = line.match(/^- (.*)$/)
     if (bullet) {
-      skipping = bullet[1].startsWith('Updated dependencies')
-      if (skipping) continue
+      if (bullet[1].startsWith('Updated dependencies') || DEP_BUMP.test(bullet[1])) continue
       const hashed = bullet[1].match(/^([0-9a-f]{7,40}): (.*)$/)
       current.groups[group].push(hashed ? { hash: hashed[1], text: hashed[2] } : { hash: null, text: bullet[1] })
       continue
     }
-    if (skipping && /^\s+- /.test(line)) continue
+    if (/^\s+- /.test(line)) continue
     const last = current.groups[group].at(-1)
     if (last && /^\s+\S/.test(line)) last.text += ` ${line.trim()}`
   }
