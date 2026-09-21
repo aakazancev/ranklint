@@ -9,6 +9,7 @@
       "rules": "Rules",
       "cli": "CLI",
       "monitor": "Monitoring",
+      "changelog": "Changelog",
       "start": "Get started",
       "github": "GitHub",
       "lang": "Site language",
@@ -242,7 +243,9 @@
         "title": "Docs",
         "intro": "Introduction",
         "install": "Installation",
-        "module": "Nuxt module"
+        "module": "Nuxt module",
+        "guide": "SEO checklist",
+        "changelog": "Changelog"
       },
       "cli": {
         "title": "CLI",

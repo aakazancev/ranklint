@@ -11,6 +11,8 @@ const columns = computed(() => [
       { key: 'intro', to: links.value.introduction, external: false },
       { key: 'install', to: links.value.installation, external: false },
       { key: 'module', to: links.value.module, external: false },
+      { key: 'guide', to: links.value.guide, external: false },
+      { key: 'changelog', to: links.value.changelog, external: false },
     ],
   },
   {

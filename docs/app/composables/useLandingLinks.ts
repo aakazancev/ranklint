@@ -21,6 +21,8 @@ export function useLandingLinks() {
     composables: `${prefix.value}/module/composables`,
     customRules: `${prefix.value}/advanced/custom-rules`,
     config: `${prefix.value}/config/reference`,
+    changelog: `${prefix.value}/changelog`,
+    guide: `${prefix.value}/guides/seo-checklist-nuxt`,
     repo: RANKLINT_REPO,
     releases: `${RANKLINT_REPO}/releases`,
     issues: `${RANKLINT_REPO}/issues`,

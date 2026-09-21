@@ -9,6 +9,7 @@
       "rules": "Правила",
       "cli": "CLI",
       "monitor": "Мониторинг",
+      "changelog": "Изменения",
       "start": "Начать",
       "github": "GitHub",
       "lang": "Язык сайта",
@@ -242,7 +243,9 @@
         "title": "Дока",
         "intro": "Введение",
         "install": "Установка",
-        "module": "Nuxt-модуль"
+        "module": "Nuxt-модуль",
+        "guide": "SEO-чеклист",
+        "changelog": "Изменения"
       },
       "cli": {
         "title": "CLI",
