@@ -84,7 +84,8 @@ describe.each(locales)('landing links to the guide and the changelog (%s)', (loc
     expect(landing.footer.docs.changelog).toBeTruthy()
   })
 
-  it('names the seo checklist in the footer', () => {
+  it('names the seo checklist in the header and the footer', () => {
+    expect(landing.nav.guide).toBeTruthy()
     expect(landing.footer.docs.guide).toBeTruthy()
   })
 })

@@ -14,6 +14,7 @@ const items = computed(() => [
   { label: t('landing.nav.cli'), to: links.value.audit },
   { label: t('landing.nav.monitor'), to: links.value.monitor },
   { label: t('landing.nav.changelog'), to: links.value.changelog },
+  { label: t('landing.nav.guide'), to: links.value.guide },
 ])
 </script>
 
