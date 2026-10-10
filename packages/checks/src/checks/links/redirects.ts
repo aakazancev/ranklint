@@ -1,4 +1,5 @@
 import type { CheckContext, Issue } from '@ranklint/core'
+import { normalizeUrl } from '@ranklint/core'
 import { defineCheck, docsUrl } from '../../define'
 import { resolveUrl } from '../../net'
 
@@ -7,16 +8,11 @@ function internalLinks(ctx: CheckContext): { href: string, resolved: string }[] 
   const seen = new Set<string>()
   const result: { href: string, resolved: string }[] = []
   for (const link of ctx.page!.links) {
-    try {
-      const url = new URL(link.href, ctx.page!.url)
-      if (url.origin !== origin) continue
-      url.hash = ''
-      if (seen.has(url.toString())) continue
-      seen.add(url.toString())
-      result.push({ href: link.href, resolved: url.toString() })
-    } catch {
-      continue
-    }
+    const key = normalizeUrl(link.href, ctx.page!.url)
+    if (!key || new URL(key).origin !== origin) continue
+    if (seen.has(key)) continue
+    seen.add(key)
+    result.push({ href: link.href, resolved: key })
   }
   return result
 }

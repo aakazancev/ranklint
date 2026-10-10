@@ -112,6 +112,23 @@ describe('links:permanent-redirects', () => {
     expect(issues).toHaveLength(1)
     expect(issues[0]?.selector).toBe('a[href="/temp"]')
   })
+
+  it('checks links differing only in tracking params once', async () => {
+    const requested: string[] = []
+    const fetcher = {
+      ...fakeHeadFetcher({}),
+      head: async (url: string) => {
+        requested.push(url)
+        return url.endsWith('/temp') ? { statusCode: 302, headers: { location: '/final' } } : { statusCode: 200, headers: {} }
+      },
+    }
+    const html = '<html><body><a href="/temp?gclid=1">t</a><a href="/temp">p</a></body></html>'
+    const links = [{ href: '/temp?gclid=1', text: 't' }, { href: '/temp', text: 'p' }]
+    const issues = await runCheckOnHtml(permanentRedirects, html, { links, fetcher })
+    expect(requested.filter(u => u.includes('/temp'))).toEqual(['https://example.com/temp'])
+    expect(issues).toHaveLength(1)
+    expect(issues[0]?.selector).toBe('a[href="/temp?gclid=1"]')
+  })
 })
 
 describe('links:trailing-slash-consistent', () => {

@@ -40,6 +40,24 @@ describe('links:no-broken', () => {
     })
     expect(await runCheckOnHtml(noBroken, html, { links, fetcher })).toEqual([])
   })
+
+  it('checks links differing only in tracking params once, reporting the first href', async () => {
+    const requested: string[] = []
+    const fetcher = {
+      ...fakeHeadFetcher({}),
+      head: async (url: string) => {
+        requested.push(url)
+        return { statusCode: 404, headers: {} }
+      },
+    }
+    const issues = await runCheckOnHtml(noBroken, html, {
+      links: [{ href: '/gone?utm_source=x', text: 'a' }, { href: '/gone', text: 'b' }],
+      fetcher,
+    })
+    expect(requested).toEqual(['https://example.com/gone'])
+    expect(issues).toHaveLength(1)
+    expect(issues[0]?.selector).toBe('a[href="/gone?utm_source=x"]')
+  })
 })
 
 describe('links:no-redirect-chain', () => {

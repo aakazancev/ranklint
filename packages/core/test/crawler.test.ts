@@ -42,6 +42,15 @@ describe('crawl', () => {
     expect(result.truncated).toBe(false)
   })
 
+  it('treats tracking params as the same page', async () => {
+    const fetcher = fakeFetcher({
+      '/': ['/a', '/a?utm_source=x&utm_medium=referral', '/a?gclid=1#top'],
+      '/a': ['/?fbclid=2'],
+    })
+    const result = await crawl(fetcher, [site], { siteUrl: site })
+    expect(result.snapshots.map(s => s.url).sort()).toEqual(['https://x.com/', 'https://x.com/a'])
+  })
+
   it('stops at maxPages and marks truncated', async () => {
     const fetcher = fakeFetcher({
       '/': ['/a', '/b', '/c'],
