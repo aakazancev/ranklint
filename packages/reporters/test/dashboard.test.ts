@@ -130,4 +130,22 @@ describe('dashboard', () => {
     expect(out).not.toContain('tile-label">CrUX')
     expect(out).not.toContain('CrUX LCP, p75')
   })
+
+  it('puts errors first in capped diff lists', () => {
+    const infos = Array.from({ length: 25 }, (_, i) => issue('meta:info', 'info', `/i${i}`))
+    const errors = [issue('meta:err', 'error', '/e1'), issue('meta:err', 'error', '/e2')]
+    const warn = issue('meta:warn', 'warn', '/w')
+    const all = [...infos, warn, ...errors]
+    const out = dashboard([
+      { key: 'a', report: report('2026-07-01T00:00:00.000Z', all) },
+      { key: 'b', report: report('2026-07-02T00:00:00.000Z', []) },
+      { key: 'c', report: report('2026-07-03T00:00:00.000Z', all) },
+    ])
+    const urls = (kind: string) => {
+      const block = out.split(`changes-${kind}`)[1]!.split('</ul>')[0]!
+      return [...block.matchAll(/class="url">https:\/\/x\.com([^<]+)</g)].map(m => m[1])
+    }
+    expect(urls('new').slice(0, 4)).toEqual(['/e1', '/e2', '/w', '/i0'])
+    expect(urls('new')).toHaveLength(20)
+  })
 })

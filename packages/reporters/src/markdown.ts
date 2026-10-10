@@ -2,6 +2,10 @@ import type { Issue, Report, Severity } from '@ranklint/core'
 
 const order: Record<Severity, number> = { error: 0, warn: 1, info: 2 }
 
+export function sortBySeverity(issues: Issue[]): Issue[] {
+  return [...issues].sort((a, b) => order[a.severity] - order[b.severity])
+}
+
 export interface RuleGroup {
   checkId: string
   severity: Severity

@@ -1,11 +1,5 @@
-import type { Issue } from '@ranklint/core'
+import { type Issue, isTrackingParam } from '@ranklint/core'
 import { defineCheck, docsUrl } from '../../define'
-
-const TRACKING_PARAMS = new Set(['gclid', 'gbraid', 'wbraid', 'fbclid', 'yclid', 'msclkid', '_gl', 'mc_cid', 'mc_eid'])
-
-function isTrackingParam(name: string): boolean {
-  return name.startsWith('utm_') || TRACKING_PARAMS.has(name)
-}
 
 export const noUtmInternal = defineCheck({
   id: 'links:no-utm-internal',
@@ -36,7 +30,7 @@ export const noUtmInternal = defineCheck({
         severity: 'warn',
         message: `Internal link "${href}" carries tracking parameters: ${params.join(', ')}`,
         url: pageUrl,
-        selector: `a[href="${href}"]`,
+        selector: `a[href="${href.replace(/["\\]/g, '\\$&')}"]`,
         suggestion: 'Remove UTM and click-id parameters from internal links: they overwrite the visit source in analytics. Use a plain <NuxtLink to="/path"> and track internal clicks with an analytics event (for example a @click handler or a Nuxt plugin calling gtag/umami)',
         docs: docsUrl('links:no-utm-internal'),
       })

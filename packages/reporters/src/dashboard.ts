@@ -1,5 +1,5 @@
 import { diffReports, type Issue, type Report } from '@ranklint/core'
-import { groupByRule } from './markdown'
+import { groupByRule, sortBySeverity } from './markdown'
 import { averageScore, CRUX_METRICS, type CruxMetric, esc, formatMetric, SCORE_LABEL, type ScoreKey } from './vitals'
 
 export interface DashboardEntry {
@@ -89,7 +89,7 @@ ${out.join('\n')}
 
 function issueList(title: string, issues: Issue[], kind: string): string {
   if (issues.length === 0) return ''
-  const items = issues.slice(0, DIFF_LIMIT).map(issue =>
+  const items = sortBySeverity(issues).slice(0, DIFF_LIMIT).map(issue =>
     `<li><span class="badge ${issue.severity}">${issue.severity}</span> <code>${esc(issue.checkId)}</code> <span class="url">${esc(issue.url)}</span><div class="hint">${esc(issue.message)}</div></li>`)
   if (issues.length > DIFF_LIMIT) items.push(`<li class="more">and ${issues.length - DIFF_LIMIT} more</li>`)
   return `<div class="changes-${kind}">

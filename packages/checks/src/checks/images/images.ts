@@ -8,7 +8,7 @@ function images(doc: Document): Element[] {
 
 function selectorFor(img: Element): string {
   const src = img.getAttribute('src') ?? ''
-  return src ? `img[src="${src}"]` : 'img'
+  return src ? `img[src="${src.replace(/["\\]/g, '\\$&')}"]` : 'img'
 }
 
 export const altRequired = defineCheck({

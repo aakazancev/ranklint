@@ -136,6 +136,16 @@ describe('links:no-utm-internal', () => {
     expect(await run('<a href="https://ext.com/?utm_source=x">a</a><a href="http://x.com/?utm_source=x">b</a>')).toEqual([])
   })
 
+  it('flags percent-encoded tracking param names', async () => {
+    const issues = await run('<a href="/p?utm%5Fsource=1">a</a>')
+    expect(issues.map(i => i.message)).toEqual(['Internal link "/p?utm%5Fsource=1" carries tracking parameters: utm_source'])
+  })
+
+  it('escapes quotes and backslashes in the selector', async () => {
+    const issues = await run('<a href=\'/p?utm_source=a"b\\c\'>a</a>')
+    expect(issues[0]?.selector).toBe('a[href="/p?utm_source=a\\"b\\\\c"]')
+  })
+
   it('ignores lookalike parameter names', async () => {
     expect(await run('<a href="/p?utmost=1&utm=2&gclid_x=3&my_utm_source=4">a</a>')).toEqual([])
   })

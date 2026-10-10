@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { normalizeUrl } from '../src/url'
+import { isTrackingParam, normalizeUrl } from '../src/url'
 import { classifyUrl } from '../src/zones'
 
 describe('normalizeUrl', () => {
@@ -31,6 +31,18 @@ describe('normalizeUrl', () => {
 
   it('returns null for garbage', () => {
     expect(normalizeUrl('http://', 'not-a-base')).toBeNull()
+  })
+})
+
+describe('isTrackingParam', () => {
+  it('matches utm_* and known click ids', () => {
+    for (const name of ['utm_source', 'utm_x', 'gclid', 'gbraid', 'wbraid', 'fbclid', 'yclid', 'msclkid', '_gl', 'mc_cid', 'mc_eid'])
+      expect(isTrackingParam(name)).toBe(true)
+  })
+
+  it('ignores lookalikes', () => {
+    for (const name of ['utm', 'utmost', 'gl', 'gclid_x', 'my_utm_source', 'page'])
+      expect(isTrackingParam(name)).toBe(false)
   })
 })
 

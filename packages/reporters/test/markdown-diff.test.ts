@@ -24,6 +24,16 @@ describe('markdownDiff', () => {
     expect(out).toContain('Added: `/new-page`')
   })
 
+  it('sorts new and fixed issues by severity, stable within a group', () => {
+    const mk = (severity: 'error' | 'warn' | 'info', id: string) => ({ checkId: id, severity, message: 'm', url: 'https://x.com/' })
+    const issues = [mk('info', 'i1'), mk('warn', 'w1'), mk('error', 'e1'), mk('info', 'i2'), mk('error', 'e2'), mk('warn', 'w2')]
+    const out = markdownDiff({ newIssues: issues, fixedIssues: [...issues].reverse(), pagesDelta: { added: [], removed: [] } })
+    const [newPart, fixedPart] = out.split('### ✅ Fixed')
+    const ids = (part: string) => [...part!.matchAll(/`(\w\d)`/g)].map(m => m[1])
+    expect(ids(newPart!)).toEqual(['e1', 'e2', 'w1', 'w2', 'i1', 'i2'])
+    expect(ids(fixedPart!)).toEqual(['e2', 'e1', 'w2', 'w1', 'i2', 'i1'])
+  })
+
   it('starts with the sticky comment marker', () => {
     expect(markdownDiff(diff).split('\n')[0]).toBe('<!-- ranklint-diff -->')
   })

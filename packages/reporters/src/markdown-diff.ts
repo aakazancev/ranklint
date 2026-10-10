@@ -1,4 +1,5 @@
 import type { DiffResult, Issue } from '@ranklint/core'
+import { sortBySeverity } from './markdown'
 
 const DIFF_MARKER = '<!-- ranklint-diff -->'
 
@@ -27,7 +28,7 @@ export function markdownDiff(diff: DiffResult): string {
     lines.push('')
     lines.push('| Severity | Check | URL | Message |')
     lines.push('| --- | --- | --- | --- |')
-    lines.push(...issueRows(diff.newIssues))
+    lines.push(...issueRows(sortBySeverity(diff.newIssues)))
     lines.push('')
   }
 
@@ -36,7 +37,7 @@ export function markdownDiff(diff: DiffResult): string {
     lines.push('')
     lines.push('| Severity | Check | URL | Message |')
     lines.push('| --- | --- | --- | --- |')
-    lines.push(...issueRows(diff.fixedIssues))
+    lines.push(...issueRows(sortBySeverity(diff.fixedIssues)))
     lines.push('')
   }
 

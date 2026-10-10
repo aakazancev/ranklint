@@ -1,9 +1,10 @@
 import type { DiffResult } from '@ranklint/core'
+import { sortBySeverity } from './markdown'
 
 export function slackPayload(diff: DiffResult, siteUrl: string): { text: string, blocks: unknown[] } {
   const errors = diff.newIssues.filter(i => i.severity === 'error').length
   const headline = `Ranklint: ${diff.newIssues.length} new SEO issues (${errors} errors) on ${siteUrl}`
-  const list = diff.newIssues.slice(0, 10)
+  const list = sortBySeverity(diff.newIssues).slice(0, 10)
     .map(i => `• *${i.checkId}* ${i.url}\n  ${i.message}`)
     .join('\n')
   return {
@@ -21,7 +22,7 @@ export function slackPayload(diff: DiffResult, siteUrl: string): { text: string,
 export function telegramText(diff: DiffResult, siteUrl: string): string {
   const errors = diff.newIssues.filter(i => i.severity === 'error').length
   const lines = [`Ranklint: ${diff.newIssues.length} new SEO issues (${errors} errors) on ${siteUrl}`]
-  for (const issue of diff.newIssues.slice(0, 10)) {
+  for (const issue of sortBySeverity(diff.newIssues).slice(0, 10)) {
     lines.push(`- [${issue.severity}] ${issue.checkId} ${issue.url}: ${issue.message}`)
   }
   if (diff.newIssues.length > 10) lines.push(`…and ${diff.newIssues.length - 10} more`)

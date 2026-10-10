@@ -43,6 +43,11 @@ describe('images checks', () => {
     expect(issues[0]?.selector).toBe('img[src="/a.png"]')
   })
 
+  it('escapes quotes and backslashes in the src selector', async () => {
+    const issues = await runCheckOnHtml(altRequired, body('<img src=\'/a"b\\c.png\'>'))
+    expect(issues[0]?.selector).toBe('img[src="/a\\"b\\\\c.png"]')
+  })
+
   it('dimensions-required needs both width and height', async () => {
     const issues = await runCheckOnHtml(dimensionsRequired, body('<img src="/a.png" width="10"><img src="/b.png" width="10" height="10">'))
     expect(issues).toHaveLength(1)

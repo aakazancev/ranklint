@@ -9,8 +9,7 @@ function paramName(pair: string): string {
   }
 }
 
-function isTrackingParam(pair: string): boolean {
-  const name = paramName(pair)
+export function isTrackingParam(name: string): boolean {
   return name.startsWith('utm_') || TRACKING_PARAMS.has(name)
 }
 
@@ -20,7 +19,7 @@ export function normalizeUrl(href: string, base: string): string | null {
     u.hash = ''
     if (u.search) {
       const pairs = u.search.slice(1).split('&')
-      const kept = pairs.filter(pair => !isTrackingParam(pair))
+      const kept = pairs.filter(pair => !isTrackingParam(paramName(pair)))
       if (kept.length < pairs.length) {
         const nonEmpty = kept.filter(pair => pair !== '')
         u.search = nonEmpty.length > 0 ? `?${nonEmpty.join('&')}` : ''
