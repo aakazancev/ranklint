@@ -1,6 +1,7 @@
 import type { CheckContext, Issue, PageSnapshot, Severity } from '@ranklint/core'
 import { getDocument } from '@ranklint/core'
 import { defineCheck, docsUrl } from '../../define'
+import { normalizeText } from '../../text'
 import { mutualAlternates, pathOf } from '../i18n/alternates'
 
 function duplicateGroups(
@@ -10,7 +11,7 @@ function duplicateGroups(
   const groups = new Map<string, PageSnapshot[]>()
   for (const page of ctx.pages ?? []) {
     if (page.statusCode !== 200) continue
-    const value = extract(page).trim()
+    const value = normalizeText(extract(page))
     if (!value) continue
     const list = groups.get(value) ?? []
     list.push(page)

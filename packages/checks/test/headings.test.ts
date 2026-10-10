@@ -57,4 +57,9 @@ describe('headings:h1-length', () => {
     expect(issues[0]?.message).toContain('5 chars')
     expect(issues[0]?.message).toContain('expected 20-70')
   })
+
+  it('measures the h1 with collapsed whitespace', async () => {
+    const spaced = `<h1>A heading that is\n${' '.repeat(30)}long enough here\n${' '.repeat(30)}with spaces</h1>`
+    expect(await runCheckOnHtml(h1Length, body(spaced))).toEqual([])
+  })
 })

@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { defineCheck, docsUrl } from '../../define'
+import { normalizeText } from '../../text'
 
 function headings(doc: Document | undefined): { level: number, text: string }[] {
   if (!doc) return []
@@ -93,7 +94,7 @@ export const h1Length = defineCheck({
   }),
   async run(ctx) {
     const { min = 20, max = 70 } = ctx.config.options as { min?: number, max?: number }
-    const text = ctx.document?.querySelector('h1')?.textContent?.trim() ?? ''
+    const text = normalizeText(ctx.document?.querySelector('h1')?.textContent)
     if (!text) return []
     if (text.length >= min && text.length <= max) return []
     return [{

@@ -2,6 +2,7 @@ import type { Issue } from '@ranklint/core'
 import { getDocument, mostSpecific, routePatternOf } from '@ranklint/core'
 import { z } from 'zod'
 import { defineCheck, docsUrl } from '../../define'
+import { normalizeText } from '../../text'
 
 const PROBE_PATH = '/__ranklint-soft-404-probe'
 const NOT_FOUND_PATTERNS = /not found|page does not exist|страница не найдена|ничего не найдено/i
@@ -32,12 +33,12 @@ export const noSoft404 = defineCheck({
     }
     for (const page of ctx.pages ?? []) {
       if (page.statusCode !== 200) continue
-      const title = getDocument(page).querySelector('title')?.textContent ?? ''
+      const title = normalizeText(getDocument(page).querySelector('title')?.textContent)
       if (NOT_FOUND_PATTERNS.test(title)) {
         issues.push({
           checkId: 'http:no-soft-404',
           severity: 'error',
-          message: `Page responds 200 but its title looks like an error page: "${title.trim()}"`,
+          message: `Page responds 200 but its title looks like an error page: "${title}"`,
           url: page.url,
           selector: 'title',
           suggestion: 'Serve the proper 404 status code for missing content',

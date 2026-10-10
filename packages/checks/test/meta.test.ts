@@ -36,6 +36,11 @@ describe('meta:title-length', () => {
     expect(short[0]?.docs).toContain('meta-title-length')
     expect(await runCheckOnHtml(titleLength, page('<title>Tiny</title>'), { options: { min: 1 } })).toEqual([])
   })
+
+  it('measures the title with collapsed whitespace', async () => {
+    const spaced = goodTitle.replace(/ /g, `\n${' '.repeat(8)}`)
+    expect(await runCheckOnHtml(titleLength, page(`<title>${spaced}</title>`))).toEqual([])
+  })
 })
 
 describe('meta:description-required', () => {

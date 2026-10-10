@@ -1,12 +1,13 @@
 import { parseHTML } from 'linkedom'
 import { z } from 'zod'
 import { defineCheck, docsUrl } from '../../define'
+import { normalizeText } from '../../text'
 
 function textOf(html: string): { h1: string, bodyText: string } {
   const { document } = parseHTML(html)
   return {
-    h1: document.querySelector('h1')?.textContent?.trim() ?? '',
-    bodyText: document.querySelector('body')?.textContent?.replace(/\s+/g, ' ').trim() ?? '',
+    h1: normalizeText(document.querySelector('h1')?.textContent),
+    bodyText: normalizeText(document.querySelector('body')?.textContent),
   }
 }
 

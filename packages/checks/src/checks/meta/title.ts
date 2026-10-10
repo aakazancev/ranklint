@@ -1,8 +1,9 @@
 import { z } from 'zod'
 import { defineCheck, docsUrl } from '../../define'
+import { normalizeText } from '../../text'
 
 function pageTitle(doc: Document | undefined): string {
-  return doc?.querySelector('title')?.textContent?.trim() ?? ''
+  return normalizeText(doc?.querySelector('title')?.textContent)
 }
 
 export const titleRequired = defineCheck({

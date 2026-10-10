@@ -30,6 +30,28 @@ describe('duplicate checks', () => {
     expect(await uniqueH1.run(ctx(pages))).toHaveLength(2)
   })
 
+  it('groups titles and h1 that differ only in whitespace', async () => {
+    const spaced = '<html><head><title>Same title\n   on both pages here</title></head><body><h1>Same heading \ntext on  both pages</h1></body></html>'
+    const pages = [snap('/a', dupTitle), snap('/b', spaced)]
+    const titleIssues = await noDuplicateTitle.run(ctx(pages))
+    expect(titleIssues).toHaveLength(2)
+    expect(titleIssues[1]?.message).toContain('"Same title on both pages here"')
+    const h1Issues = await uniqueH1.run(ctx(pages))
+    expect(h1Issues).toHaveLength(2)
+    expect(h1Issues[1]?.message).toContain('"Same heading text on both pages"')
+  })
+
+  it('groups descriptions that differ only in whitespace', async () => {
+    const description = (content: string) => `<html><head><meta name="description" content="${content}"></head><body></body></html>`
+    const pages = [
+      snap('/a', description('Shared description used by two different pages.')),
+      snap('/b', description('Shared  description\n   used by two different pages.')),
+    ]
+    const issues = await noDuplicateDescription.run(ctx(pages))
+    expect(issues).toHaveLength(2)
+    expect(issues[1]?.message).toContain('"Shared description used by two different pages."')
+  })
+
   function altLinks(entries: [string, string][]): string {
     return entries.map(([lang, path]) => `<link rel="alternate" hreflang="${lang}" href="https://x.com${path}">`).join('')
   }

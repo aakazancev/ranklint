@@ -41,6 +41,14 @@ describe('http:no-soft-404', () => {
     expect(issues[0]?.url).toContain('/ghost')
     expect(await noSoft404.run(siteCtx([snap('/ok')], fetcher))).toEqual([])
   })
+
+  it('flags not-found titles split across lines', async () => {
+    const fetcher = { ...stubFetcher, head: async () => ({ statusCode: 404, headers: {} }) }
+    const errorish = snap('/ghost', { html: '<html><head><title>Page Not\n   Found</title></head><body></body></html>' })
+    const issues = await noSoft404.run(siteCtx([errorish], fetcher))
+    expect(issues).toHaveLength(1)
+    expect(issues[0]?.message).toContain('"Page Not Found"')
+  })
 })
 
 describe('http:x-robots-consistent', () => {
