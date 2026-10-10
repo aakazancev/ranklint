@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import { defineCommand, runMain } from 'citty'
 import { audit } from './commands/audit'
+import { dashboard } from './commands/dashboard'
 import { diff } from './commands/diff'
 import { generate } from './commands/generate'
 import { history } from './commands/history'
@@ -16,6 +17,7 @@ const main = defineCommand({
   },
   subCommands: {
     audit,
+    dashboard,
     diff,
     generate,
     history,

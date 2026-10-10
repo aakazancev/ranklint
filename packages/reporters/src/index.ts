@@ -7,6 +7,7 @@ import { junit } from './junit'
 import { markdown } from './markdown'
 import { sarif } from './sarif'
 
+export { dashboard, type DashboardEntry, type DashboardOptions } from './dashboard'
 export { markdownDiff } from './markdown-diff'
 export { slackPayload, telegramText } from './notifications'
 

@@ -1,12 +1,60 @@
 import type { Report } from '@ranklint/core'
 import { groupByRule } from './markdown'
+import { CRUX_METRICS, esc, formatMetric, RATING_LABEL, rateCrux, SCORE_LABEL, scoreClass, type ScoreKey } from './vitals'
 
-function esc(value: string): string {
-  return value
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
+const SCORE_KEYS: ScoreKey[] = ['performance', 'seo', 'accessibility', 'bestPractices']
+
+function cruxTiles(report: Report): string {
+  const crux = report.crux
+  if (!crux) return ''
+  const tiles = CRUX_METRICS.flatMap((metric) => {
+    const value = crux[metric]
+    if (value === undefined) return []
+    const rating = rateCrux(metric, value)
+    return [`<div class="stat vital ${rating}"><span>${metric.toUpperCase()}</span><b>${formatMetric(metric, value)}</b><em>${RATING_LABEL[rating]}</em></div>`]
+  })
+  if (tiles.length === 0) return ''
+  return `<h3>CrUX · p75 of real users</h3>
+<div class="summary">
+  ${tiles.join('\n  ')}
+</div>`
+}
+
+function lighthouseTable(report: Report): string {
+  const results = report.lighthouse ?? []
+  if (results.length === 0) return ''
+  const rows = results.map((result) => {
+    const scores = SCORE_KEYS.map((key) => {
+      const value = result.metrics[key]
+      return value === undefined ? '<td>—</td>' : `<td class="score ${scoreClass(value)}">${Math.round(value)}</td>`
+    })
+    const metrics = (['lcp', 'cls', 'tbt'] as const).map((key) => {
+      const value = result.metrics[key]
+      return `<td>${value === undefined ? '—' : formatMetric(key, value)}</td>`
+    })
+    const hint = result.lcpElement?.suggestion ? `<div class="hint">💡 ${esc(result.lcpElement.suggestion)}</div>` : ''
+    return `<tr>
+    <td class="url">${esc(result.url)}<div class="hint">${esc(result.aggregation)} of ${result.runs} runs</div>${hint}</td>
+    ${[...scores, ...metrics].join('')}
+  </tr>`
+  })
+  return `<h3>Lighthouse</h3>
+<table>
+<thead><tr><th>URL</th>${SCORE_KEYS.map(key => `<th>${SCORE_LABEL[key]}</th>`).join('')}<th>LCP</th><th>CLS</th><th>TBT</th></tr></thead>
+<tbody>
+${rows.join('\n')}
+</tbody>
+</table>`
+}
+
+function webVitals(report: Report): string {
+  const body = [cruxTiles(report), lighthouseTable(report)].filter(Boolean)
+  if (body.length === 0) return ''
+  return `<section class="vitals">
+<h2>Web Vitals</h2>
+${body.join('\n')}
+</section>
+`
 }
 
 export function html(report: Report): string {
@@ -46,6 +94,15 @@ ${group.issues.map(issue => `<tr class="${issue.severity}">
   .hint { color: #666; font-size: 12px; margin-top: 4px; }
   h2.rule { font-size: 15px; margin: 24px 0 8px; }
   h2.rule small { color: #666; font-weight: 400; }
+  .vitals { margin-bottom: 24px; overflow-x: auto; }
+  .vitals h2 { font-size: 16px; }
+  .vitals h3 { font-size: 14px; margin: 16px 0 8px; }
+  .vital span { color: #666; font-size: 12px; }
+  .vital em { display: block; font-style: normal; font-size: 12px; font-weight: 600; }
+  .good em, .score.good { color: #2f855a; }
+  .needs-improvement em, .score.average { color: #b7791f; }
+  .poor em, .score.poor { color: #c0392b; }
+  .score { font-weight: 600; }
 </style>
 </head>
 <body>
@@ -56,7 +113,7 @@ ${group.issues.map(issue => `<tr class="${issue.severity}">
   <div class="stat"><b>${counts.warn}</b> warnings</div>
   <div class="stat"><b>${counts.info}</b> info</div>
 </div>
-${report.issues.length === 0 ? '<p>No issues found 🎉</p>' : sections}
+${webVitals(report)}${report.issues.length === 0 ? '<p>No issues found 🎉</p>' : sections}
 </body>
 </html>
 `
