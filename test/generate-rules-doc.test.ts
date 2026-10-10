@@ -1,6 +1,6 @@
 import { existsSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
-import { buildRulesIndex, mergeGenerated } from '../scripts/generate-rules-doc.mjs'
+import { buildRulesIndex, mergeGenerated, ruleTitlesSource } from '../scripts/generate-rules-doc.mjs'
 
 const generated = '<!-- generated:start -->\nNEW\n<!-- generated:end -->'
 
@@ -29,6 +29,26 @@ describe('mergeGenerated', () => {
     const out = mergeGenerated(existing, '---\ntitle: new\n---', generated)
     expect(out).toContain('title: new')
     expect(out).not.toContain('title: old')
+  })
+})
+
+describe('ruleTitlesSource', () => {
+  it('renders sorted english titles without option tails', () => {
+    const out = ruleTitlesSource({
+      'meta:b': { en: 'title length; { min, max }', ru: 'x' },
+      'meta:a': { en: 'it\'s fine (network)', ru: 'y' },
+      'meta:c': { en: 'schemas; { schemas } — your own', ru: 'z' },
+      'meta:d': { en: 'back\\slash', ru: 'w' },
+    })
+    expect(out).toBe([
+      'export const RULE_TITLES: Record<string, string> = {',
+      '  \'meta:a\': \'it\\\'s fine\',',
+      '  \'meta:b\': \'title length\',',
+      '  \'meta:c\': \'schemas\',',
+      '  \'meta:d\': \'back\\\\slash\',',
+      '}',
+      '',
+    ].join('\n'))
   })
 })
 

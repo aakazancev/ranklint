@@ -73,9 +73,19 @@ export function buildRulesIndex() {
   return { total: allChecks.length, groups }
 }
 
+export function ruleTitlesSource(source) {
+  const quote = value => `'${value.replace(/\\/g, '\\\\').replace(/'/g, '\\\'')}'`
+  const rows = Object.keys(source).sort().map((id) => {
+    const title = (source[id].en ?? '').replace(/;\s*\{[^}]*\}.*$/, '').replace(/\s*\((network|SSR)\)$/i, '')
+    return `  ${quote(id)}: ${quote(title)},`
+  })
+  return ['export const RULE_TITLES: Record<string, string> = {', ...rows, '}', ''].join('\n')
+}
+
 function build() {
   const out = new Map()
   out.set(join(root, 'docs/rules-index.json'), `${JSON.stringify(buildRulesIndex(), null, 2)}\n`)
+  out.set(join(root, 'packages/reporters/src/rule-titles.ts'), ruleTitlesSource(i18n))
   for (const locale of ['en', 'ru']) {
     const base = join(root, 'docs/content', locale, '6.rules')
     out.set(join(base, '.navigation.yml'), `title: ${t[locale].rules}\nicon: i-lucide-list-checks\n`)

@@ -39,11 +39,11 @@ describe('html reporter', () => {
     const out = html(report)
     expect(out).toContain('<!doctype html>')
     expect(out).toContain('2 &lt;h1&gt; tags &amp; stuff')
-    expect(out).toContain('<b>1</b> errors')
-    expect(out).toContain('💡 Keep one h1')
+    expect(out).toMatch(/<span class="lbl">Errors<\/span><span class="val">1<\/span>/)
+    expect(out).toContain('Keep one h1')
     expect(out).not.toContain('2 <h1> tags')
-    expect(out).toContain('<h2 class="rule"><code>headings:single-h1</code>')
-    expect(out.indexOf('headings:single-h1')).toBeLessThan(out.indexOf('meta:title-length'))
+    expect(out).toContain('id="page-/page"')
+    expect(out.indexOf('id="page-/page"')).toBeLessThan(out.indexOf('id="page-/other"'))
   })
 
   it('renders empty state', () => {

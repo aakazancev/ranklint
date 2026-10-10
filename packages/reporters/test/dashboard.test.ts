@@ -1,151 +1,184 @@
-import type { Issue, Report } from '@ranklint/core'
+import type { Report } from '@ranklint/core'
 import { describe, expect, it } from 'vitest'
 import { dashboard } from '../src/dashboard'
 import { html } from '../src/html'
-
-function issue(checkId: string, severity: Issue['severity'], path: string, message = 'm'): Issue {
-  return { checkId, severity, message, url: `https://x.com${path}`, suggestion: 's' }
-}
-
-function report(timestamp: string, issues: Issue[], extra: Partial<Report> = {}): Report {
-  return {
-    formatVersion: 1,
-    meta: { url: 'https://x.com', timestamp, pagesAudited: 10 },
-    issues,
-    crawlStats: { visited: 10, skipped: 0, external: 0, ignored: 0 },
-    ...extra,
-  }
-}
+import { current, issue, previous, report } from './site'
 
 const lighthouse: Report['lighthouse'] = [{
-  url: 'https://x.com/<a>',
+  url: 'https://example.com/<a>',
   runs: 3,
   aggregation: 'median',
   metrics: { performance: 95, seo: 72, accessibility: 40, bestPractices: 100, lcp: 2100, cls: 0.05, tbt: 150 },
   lcpElement: { type: 'image', suggestion: 'Preload <img>' },
 }]
 
-describe('html reporter web vitals', () => {
-  it('omits the section without crux and lighthouse', () => {
-    expect(html(report('t', []))).not.toContain('Web Vitals')
+function markup(out: string): string {
+  return out.replace(/<script\b[\s\S]*?<\/script>/g, '').replace(/<style>[\s\S]*?<\/style>/g, '')
+}
+
+function externalScripts(out: string): string[] {
+  return [...out.matchAll(/<script\b[^>]*\bsrc=/g)].map(m => m[0])
+}
+
+describe('html report', () => {
+  it('renders the page view with brand fonts and no external scripts', () => {
+    const out = html(current)
+    expect(out).toContain('<!doctype html>')
+    expect(out).toContain('rank<span class="acid">lint</span>')
+    expect(out).toContain('data-mode="page"')
+    expect(out).toContain('fonts.googleapis.com')
+    expect(out).toContain('id="issues-data"')
+    expect(externalScripts(out)).toEqual([])
+    expect(markup(out)).not.toContain('class="new"')
+    expect(out).not.toContain('← Dashboard')
   })
 
-  it('renders crux tiles with google ratings', () => {
-    const out = html(report('t', [issue('meta:title', 'error', '/')], { crux: { lcp: 2000, inp: 600, cls: 0.15 } }))
-    expect(out).toContain('Web Vitals')
+  it('marks new issues and shows deltas against the previous run', () => {
+    const out = html(current, { previous, dashboardHref: '../index.html' })
+    expect(markup(out)).toContain('class="new"')
+    expect(out).toContain('id="ex-new"')
+    expect(out).toContain('href="../index.html"')
+    expect(out).toContain('vs 1 Jul, 09:15 UTC')
+  })
+
+  it('omits web vitals without crux and lighthouse', () => {
+    const out = html(report('t', []))
+    expect(out).not.toContain('Lighthouse by page')
+    expect(out).not.toContain('CrUX')
+    expect(out).toContain('No issues found')
+  })
+
+  it('renders crux values with google ratings', () => {
+    const out = html(report('t', [issue('meta:title-length', 'error', '/')], { crux: { lcp: 2000, inp: 600, cls: 0.15 } }))
     expect(out).toMatch(/LCP[\s\S]*?2000 ms[\s\S]*?good/)
     expect(out).toMatch(/INP[\s\S]*?600 ms[\s\S]*?poor/)
     expect(out).toMatch(/CLS[\s\S]*?0\.15[\s\S]*?needs improvement/)
-    expect(out.indexOf('Web Vitals')).toBeLessThan(out.indexOf('meta:title'))
-    expect(out).not.toContain('<th>Performance</th>')
   })
 
-  it('renders an escaped lighthouse table with colored scores', () => {
+  it('renders an escaped lighthouse list', () => {
     const out = html(report('t', [], { lighthouse }))
-    expect(out).toContain('<th>Performance</th>')
-    expect(out).toContain('https://x.com/&lt;a&gt;')
-    expect(out).not.toContain('https://x.com/<a>')
-    expect(out).toContain('<td class="score good">95</td>')
-    expect(out).toContain('<td class="score average">72</td>')
-    expect(out).toContain('<td class="score poor">40</td>')
-    expect(out).toContain('median of 3 runs')
+    expect(out).toContain('Lighthouse by page')
+    expect(out).toContain('/&lt;a&gt;')
+    expect(out).not.toContain('/<a>')
     expect(out).toContain('Preload &lt;img&gt;')
-    expect(out).not.toContain('CrUX')
+    expect(out).toContain('median of 3 runs')
   })
 })
 
 describe('dashboard', () => {
-  it('renders a single run without deltas and charts', () => {
-    const out = dashboard([{ key: 'a', report: report('2026-07-01T00:00:00.000Z', [issue('meta:title', 'error', '/')]) }])
-    expect(out).toContain('<!doctype html>')
-    expect(out).toContain('https://x.com')
-    expect(out).toContain('2026-07-01T00:00:00.000Z')
-    expect(out).not.toContain('<svg')
-    expect(out).not.toContain('class="delta')
-    expect(out).toContain('href="runs/a.html"')
-    expect(out).toContain('prefers-color-scheme: dark')
-    expect(out).not.toMatch(/<(script|link)\b/)
-    expect(out).not.toContain('Lighthouse performance')
-    expect(out).not.toContain('Run audit')
-  })
-
-  it('renders a run audit link when runUrl is set', () => {
-    const out = dashboard([{ key: 'a', report: report('2026-07-01T00:00:00.000Z', []) }], { runUrl: 'https://ci.example/new?a=1&b=2' })
-    expect(out).toContain('<a class="run-audit" href="https://ci.example/new?a=1&amp;b=2" target="_blank" rel="noopener">Run audit</a>')
-  })
-
   it('renders an empty state', () => {
     expect(dashboard([])).toContain('No stored reports')
   })
 
-  it('sorts by timestamp and renders deltas, diff, charts and links', () => {
-    const older = report('2026-07-01T00:00:00.000Z', [
-      issue('meta:title', 'error', '/a'),
-      issue('meta:title', 'error', '/b'),
-      issue('links:broken', 'warn', '/c'),
-    ], { lighthouse, crux: { lcp: 3000, inp: 150, cls: 0.05 } })
-    const newer = report('2026-07-02T00:00:00.000Z', [
-      issue('meta:title', 'error', '/a'),
-      issue('headings:h1', 'warn', '/d', 'bad <h1> & co'),
-      issue('headings:h1', 'warn', '/e'),
-    ], { lighthouse, crux: { lcp: 2000, inp: 150, cls: 0.3 } })
+  it('renders a single run without deltas and charts', () => {
+    const out = dashboard([{ key: 'a', report: current }])
+    expect(out).toContain('rank<span class="acid">lint</span>')
+    expect(out).toContain('<h1>example.com</h1>')
+    expect(out).toContain('30 pages')
+    expect(out).not.toContain('<svg')
+    expect(out).not.toContain('class="dl ')
+    expect(out).toContain('href="runs/a.html"')
+    expect(out).not.toContain('Run audit')
+    expect(out).toContain('RANKLINT_CRUX_API_KEY')
+    expect(externalScripts(out)).toEqual([])
+    expect(out).toContain('id="issues"')
+    expect(out).toContain('data-mode="rule"')
+  })
+
+  it('renders a run audit button when runUrl is set', () => {
+    const out = dashboard([{ key: 'a', report: current }], { runUrl: 'https://ci.example/new?a=1&b=2' })
+    expect(out).toContain('<a class="run-btn" href="https://ci.example/new?a=1&amp;b=2" target="_blank" rel="noopener">Run audit')
+  })
+
+  it('renders the cockpit for several runs', () => {
     const out = dashboard(
-      [{ key: 'new', report: newer }, { key: 'old', report: older }],
+      [{ key: 'new', report: current }, { key: 'old', report: previous }],
       { runHref: key => `archive/${key}/` },
     )
-    expect(out).toContain('2026-07-02T00:00:00.000Z')
-    expect(out).toContain('<span class="delta good">−1</span>')
-    expect(out).toContain('<span class="delta bad">+1</span>')
-    expect(out).toContain('tile-label">CrUX LCP</span><b>2000 ms</b> <span class="delta good">−1000</span>')
-    expect(out).toContain('New issues (2)')
-    expect(out).toContain('Fixed issues (2)')
-    expect(out).toContain('bad &lt;h1&gt; &amp; co')
-    expect(out).not.toContain('bad <h1>')
-    expect(out.match(/<svg/g)?.length).toBe(5)
-    expect(out).toContain('href="archive/new/"')
-    expect(out).toContain('href="archive/old/"')
+    expect(out).toContain('10:30 UTC')
+    expect(out).toContain('New since 1 Jul, 09:15 UTC')
+    expect(out).toContain('Fixed since 1 Jul, 09:15 UTC')
+    expect(out).toMatch(/class="read big err"><span class="lbl">Errors<\/span><span class="val">9<\/span><span class="dl bad">\+4 <em>was 5<\/em>/)
+    expect(out).toContain('href="#rule-meta:title-length"')
+    expect(out).toContain('title="No longer present in the last run"')
+    expect(out).toContain('href="#issues"')
+    expect(out).toContain('href="#runs"')
     expect(out.indexOf('href="archive/new/"')).toBeLessThan(out.indexOf('href="archive/old/"'))
-    expect(out).toMatch(/<code>headings:h1<\/code>[\s\S]*?warn[\s\S]*?2/)
+    expect(out.match(/<svg/g)?.length).toBe(1)
+    expect(out).toContain('Top rules')
+    expect(out).toContain('Fix once')
   })
 
-  it('rounds the chart scale up to an even integer', () => {
+  it('puts error rules first in the new and top rules panels', () => {
+    const out = dashboard([{ key: 'old', report: previous }, { key: 'new', report: current }])
+    const newPanel = out.split('id="new-h"')[1]!.split('</section>')[0]!
+    const ids = [...newPanel.matchAll(/<code>([^<]+)<\/code>/g)].map(m => m[1])
+    expect(ids).toEqual(['meta:title-length', 'links:no-orphans'])
+    const top = out.split('Top rules')[1]!.split('</table>')[0]!
+    const topIds = [...top.matchAll(/href="#rule-([^"]+)"/g)].map(m => m[1])
+    expect(topIds.slice(0, 2)).toEqual(['meta:title-length', 'headings:single-h1'])
+  })
+
+  it('charts lighthouse and crux when present', () => {
     const out = dashboard([
-      { key: 'a', report: report('2026-07-01T00:00:00.000Z', [issue('meta:title', 'error', '/a')]) },
-      { key: 'b', report: report('2026-07-02T00:00:00.000Z', [1, 2, 3].map(i => issue('meta:title', 'error', `/${i}`))) },
+      { key: 'a', report: report('2026-07-01T00:00:00.000Z', [], { lighthouse, crux: { lcp: 3000, inp: 150, cls: 0.05 } }) },
+      { key: 'b', report: report('2026-07-02T00:00:00.000Z', [], { lighthouse, crux: { lcp: 2000, inp: 150, cls: 0.3 } }) },
     ])
-    expect(out).toMatch(/text-anchor="end">2<\/text>/)
-    expect(out).toMatch(/text-anchor="end">4<\/text>/)
-    expect(out).not.toMatch(/text-anchor="end">3<\/text>/)
+    expect(out.match(/<svg/g)?.length).toBe(3)
+    expect(out).not.toContain('RANKLINT_CRUX_API_KEY')
+    expect(out).toContain('Lighthouse by page')
+    expect(out).toContain('href="#page-/&lt;a&gt;"')
   })
 
-  it('caps diff lists at 20 items', () => {
-    const many = Array.from({ length: 25 }, (_, i) => issue('meta:title', 'error', `/${i}`))
+  it('escapes messages and embedded data', () => {
     const out = dashboard([
       { key: 'a', report: report('2026-07-01T00:00:00.000Z', []) },
-      { key: 'b', report: report('2026-07-02T00:00:00.000Z', many) },
+      { key: 'b', report: report('2026-07-02T00:00:00.000Z', [issue('headings:single-h1', 'error', '/x', 'bad <h1> & co</script>')]) },
     ])
-    expect(out).toContain('New issues (25)')
-    expect(out).toContain('and 5 more')
-    expect(out).toContain('<svg')
-    expect(out).not.toContain('tile-label">CrUX')
-    expect(out).not.toContain('CrUX LCP, p75')
+    expect(out).toContain('bad &lt;h1&gt; &amp; co')
+    expect(out).not.toContain('bad <h1>')
+    expect(out).not.toContain('co</script>')
+  })
+})
+
+describe('brand', () => {
+  it('shows the client logo and a powered-by footer', () => {
+    const brand = { logo: 'https://cdn.example.com/logo.svg?a=1&b="2"', name: 'Acme <Shop>' }
+    for (const out of [dashboard([{ key: 'a', report: current }], { brand }), html(current, { brand })]) {
+      expect(out).toContain('<img class="brand-logo" src="https://cdn.example.com/logo.svg?a=1&amp;b=&quot;2&quot;" alt="Acme &lt;Shop&gt;"')
+      expect(out).toContain('Acme &lt;Shop&gt;')
+      expect(out).toMatch(/powered by <a class="wm" href="https:\/\/ranklint\.dev" target="_blank" rel="noopener">rank<span class="acid">lint/)
+    }
   })
 
-  it('puts errors first in capped diff lists', () => {
-    const infos = Array.from({ length: 25 }, (_, i) => issue('meta:info', 'info', `/i${i}`))
-    const errors = [issue('meta:err', 'error', '/e1'), issue('meta:err', 'error', '/e2')]
-    const warn = issue('meta:warn', 'warn', '/w')
-    const all = [...infos, warn, ...errors]
-    const out = dashboard([
-      { key: 'a', report: report('2026-07-01T00:00:00.000Z', all) },
-      { key: 'b', report: report('2026-07-02T00:00:00.000Z', []) },
-      { key: 'c', report: report('2026-07-03T00:00:00.000Z', all) },
-    ])
-    const urls = (kind: string) => {
-      const block = out.split(`changes-${kind}`)[1]!.split('</ul>')[0]!
-      return [...block.matchAll(/class="url">https:\/\/x\.com([^<]+)</g)].map(m => m[1])
-    }
-    expect(urls('new').slice(0, 4)).toEqual(['/e1', '/e2', '/w', '/i0'])
-    expect(urls('new')).toHaveLength(20)
+  it('puts powered-by next to the service line', () => {
+    const brand = { logo: 'https://cdn.example.com/logo.svg' }
+    const board = markup(dashboard([{ key: 'a', report: current }], { brand }))
+    expect(board).toMatch(/<footer><div class="pw">powered by [\s\S]*?<\/div>1 run stored · report format v1<\/footer>/)
+    const run = markup(html(current, { brand }))
+    expect(run).toMatch(/<header class="rbar">[\s\S]*<div class="meta-r"><span class="src">[^<]*<\/span><div class="pw">powered by [\s\S]*<\/header>/)
+  })
+
+  it('drives every accent from one css variable with a contrasting ink', () => {
+    const dark = dashboard([{ key: 'a', report: current }], { brand: { accent: '#1E6BFF' } })
+    expect(dark).toContain(':root{--accent:#1e6bff;--accent-ink:#ffffff}')
+    const light = html(current, { brand: { accent: '#fc0' } })
+    expect(light).toContain(':root{--accent:#fc0;--accent-ink:#0a0b0d}')
+    expect(markup(dark)).not.toContain('#b4f13c')
+    expect(dark).toContain('.pw .acid{color:#b4f13c}')
+    expect(dark).toContain('.chip.error[aria-pressed=true]{background:var(--err-bg)')
+  })
+
+  it('rejects accents that are not hex colors', () => {
+    expect(() => dashboard([{ key: 'a', report: current }], { brand: { accent: 'red;}body{display:none' } })).toThrow('Invalid accent color')
+    expect(() => html(current, { brand: { accent: '#12345' } })).toThrow('use #rgb or #rrggbb')
+  })
+
+  it('falls back to a generic alt and keeps the wordmark without a logo', () => {
+    expect(html(current, { brand: { logo: 'data:image/png;base64,AAAA' } })).toContain('alt="logo"')
+    const plain = dashboard([{ key: 'a', report: current }], { brand: { name: 'Acme' } })
+    expect(plain).not.toContain('powered by')
+    expect(markup(plain)).not.toContain('brand-logo')
+    expect(plain).toContain('rank<span class="acid">lint</span>')
   })
 })

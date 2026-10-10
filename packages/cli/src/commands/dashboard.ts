@@ -13,6 +13,9 @@ export const dashboard = defineCommand({
     'limit': { type: 'string', description: 'Use at most N latest reports (default: all)' },
     'out': { type: 'string', default: 'ranklint-dashboard', description: 'Output directory' },
     'run-url': { type: 'string', description: 'URL for the "Run audit" button, e.g. a CI pipeline page' },
+    'logo': { type: 'string', description: 'Your logo: a local .png/.svg/.jpg/.webp file up to 200 KB (embedded) or an http(s) URL' },
+    'brand-name': { type: 'string', description: 'Name shown next to the logo and used as its alt text' },
+    'accent': { type: 'string', description: 'Accent color as #rgb or #rrggbb instead of the ranklint green' },
   },
   async run({ args }) {
     let limit: number | undefined
@@ -33,6 +36,9 @@ export const dashboard = defineCommand({
       out: args.out,
       limit,
       runUrl: args['run-url'],
+      logo: args.logo,
+      brandName: args['brand-name'],
+      accent: args.accent,
     })
     process.stdout.write(`${index}\n`)
   },
