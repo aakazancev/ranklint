@@ -1,3 +1,4 @@
+import { parseHTML } from 'linkedom'
 import { describe, expect, it } from 'vitest'
 import { altRequired, dimensionsRequired, noLazyAboveFold } from '../src/checks/images/images'
 import { jsonldParseable, jsonldValidSchema } from '../src/checks/jsonld/jsonld'
@@ -46,6 +47,21 @@ describe('images checks', () => {
   it('escapes quotes and backslashes in the src selector', async () => {
     const issues = await runCheckOnHtml(altRequired, body('<img src=\'/a"b\\c.png\'>'))
     expect(issues[0]?.selector).toBe('img[src="/a\\"b\\\\c.png"]')
+  })
+
+  it('uses a structural selector instead of a data: URI', async () => {
+    const png = `data:image/png;base64,${'A'.repeat(4000)}`
+    const html = body(`<div><img src="${png}" alt="x"></div><div><p></p><img src="${png}"><img src="data:image/gif;base64,R0lG"></div>`)
+    const first = await runCheckOnHtml(altRequired, html)
+    const second = await runCheckOnHtml(altRequired, html)
+    expect(first.map(i => i.selector)).toEqual([
+      'body:nth-of-type(1) > div:nth-of-type(2) > img:nth-of-type(1)',
+      'body:nth-of-type(1) > div:nth-of-type(2) > img:nth-of-type(2)',
+    ])
+    expect(second.map(i => i.selector)).toEqual(first.map(i => i.selector))
+    const { document } = parseHTML(html)
+    const targets = [...document.querySelectorAll('div:nth-of-type(2) img')]
+    expect(first.map(i => document.querySelector(i.selector!))).toEqual(targets)
   })
 
   it('dimensions-required needs both width and height', async () => {

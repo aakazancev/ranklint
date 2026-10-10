@@ -1,6 +1,6 @@
-import type { CheckContext, Issue, PageFetcher, Severity } from '@ranklint/core'
+import type { CheckContext, Issue, PageFetcher, ParsedRobots, Severity } from '@ranklint/core'
+import { isPathDisallowed, parseRobotsTxt } from '@ranklint/core'
 import { defineCheck, docsUrl } from '../../define'
-import { isPathDisallowed, parseRobotsTxt, type ParsedRobots } from '../../robots-parser'
 
 interface FetchedRobots {
   statusCode: number
@@ -14,12 +14,15 @@ const robotsCache = new WeakMap<PageFetcher, Promise<FetchedRobots>>()
 function getRobots(ctx: CheckContext): Promise<FetchedRobots> {
   let pending = robotsCache.get(ctx.fetcher)
   if (!pending) {
-    pending = ctx.fetcher.fetch(`${new URL(ctx.site.url).origin}/robots.txt`).then(snap => ({
-      statusCode: snap.statusCode,
-      contentType: snap.headers['content-type'] ?? '',
-      text: snap.html,
-      parsed: parseRobotsTxt(snap.html),
-    }))
+    pending = ctx.fetcher.fetch(`${new URL(ctx.site.url).origin}/robots.txt`).then((snap) => {
+      const text = snap.ssrHtml ?? snap.html
+      return {
+        statusCode: snap.statusCode,
+        contentType: snap.headers['content-type'] ?? '',
+        text,
+        parsed: parseRobotsTxt(text),
+      }
+    })
     robotsCache.set(ctx.fetcher, pending)
   }
   return pending

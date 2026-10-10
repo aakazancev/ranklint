@@ -6,8 +6,19 @@ function images(doc: Document): Element[] {
   return [...doc.querySelectorAll('img')]
 }
 
+function structuralSelector(el: Element): string {
+  const parts: string[] = []
+  for (let node: Element | null = el; node?.parentElement; node = node.parentElement) {
+    const tag = node.tagName
+    const index = [...node.parentElement.children].filter(c => c.tagName === tag).indexOf(node) + 1
+    parts.unshift(`${tag.toLowerCase()}:nth-of-type(${index})`)
+  }
+  return parts.join(' > ')
+}
+
 function selectorFor(img: Element): string {
   const src = img.getAttribute('src') ?? ''
+  if (src.startsWith('data:')) return structuralSelector(img)
   return src ? `img[src="${src.replace(/["\\]/g, '\\$&')}"]` : 'img'
 }
 

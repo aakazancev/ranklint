@@ -36,6 +36,7 @@ export const configSchema = z.object({
     strategy: z.enum(['full', 'sitemap+sample']).optional(),
     userAgent: z.string().optional(),
     insecureTls: z.boolean().optional(),
+    respectRobots: z.boolean().optional(),
     viewport: z.object({ width: z.number().int().positive(), height: z.number().int().positive() }).optional(),
     auth: z.object({
       headers: z.record(z.string(), z.string()).optional(),
@@ -58,6 +59,7 @@ export const configSchema = z.object({
     aggregation: z.enum(['median', 'p75', 'best']).optional(),
     formFactor: z.enum(['mobile', 'desktop']).optional(),
     maxUrls: z.number().int().positive().optional(),
+    urls: z.array(z.string()).optional(),
     thresholds: z.record(z.string(), z.record(z.string(), z.number())).optional(),
   }).optional(),
   customChecks: z.array(customCheckSchema).optional(),

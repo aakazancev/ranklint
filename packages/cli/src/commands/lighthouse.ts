@@ -2,7 +2,7 @@ import { writeFile } from 'node:fs/promises'
 import { defineCommand } from 'citty'
 import type { RanklintUserConfig } from '@ranklint/core'
 import { loadRanklintConfig } from '@ranklint/core'
-import { checkThresholds, collectLighthouse } from '../lighthouse'
+import { checkThresholds, collectLighthouse, lighthouseTargets } from '../lighthouse'
 import { realLighthouseRunner } from '../real-lighthouse'
 
 export const lighthouse = defineCommand({
@@ -26,7 +26,7 @@ export const lighthouse = defineCommand({
       config = { site: { url: new URL(args.url).origin } }
     }
     const lhConfig = { ...config.lighthouse, ...(args.runs ? { runs: Number(args.runs) } : {}) }
-    const results = await collectLighthouse([args.url], lhConfig, realLighthouseRunner)
+    const results = await collectLighthouse(lighthouseTargets(args.url, lhConfig, [args.url]), lhConfig, realLighthouseRunner)
     const issues = checkThresholds(results, lhConfig.thresholds)
     const output = JSON.stringify({ config: lhConfig, results, issues }, null, 2)
     if (args.output) await writeFile(args.output, output)

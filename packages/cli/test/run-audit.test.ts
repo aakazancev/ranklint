@@ -1,5 +1,5 @@
 import type { PageFetcher } from '@ranklint/core'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { runAudit } from '../src/run-audit'
 
 function fakeFetcher(pages: Record<string, string>): PageFetcher {
@@ -69,5 +69,69 @@ describe('runAudit', () => {
     })
     expect(report.meta.pagesAudited).toBe(1)
     expect(report.pages).toEqual(['/en/app'])
+  })
+
+  it('runs lighthouse on lighthouse.urls even when they were not crawled', async () => {
+    const fetcher = fakeFetcher({ '/': '<html><head><title>Home</title></head><body><a href="/a">a</a></body></html>', '/a': '<html></html>' })
+    const measured: string[] = []
+    await runAudit({
+      url: 'https://site.test/',
+      cwd: '/tmp',
+      fetcher,
+      lighthouseRunner: async (url) => {
+        measured.push(url)
+        return { metrics: { performance: 100 } }
+      },
+      config: { site: { url: 'https://site.test' }, lighthouse: { enabled: true, runs: 1, urls: ['/landing', '/'] } },
+    })
+    expect(measured).toEqual(['https://site.test/landing', 'https://site.test/'])
+  })
+
+  it('filters sitemap samples through robots.txt but always crawls entry', async () => {
+    const pages = {
+      '/': '<html></html>',
+      '/en/flow/entry': '<html></html>',
+      '/en/flow/sampled': '<html></html>',
+      '/ok': '<html></html>',
+      '/robots.txt': 'User-agent: *\nDisallow: /*/flow/*',
+    }
+    vi.stubGlobal('fetch', async () => new Response('<urlset><url><loc>https://site.test/en/flow/sampled</loc></url><url><loc>https://site.test/ok</loc></url></urlset>'))
+    try {
+      const report = await runAudit({
+        url: 'https://site.test/',
+        cwd: '/tmp',
+        fetcher: fakeFetcher(pages),
+        config: { site: { url: 'https://site.test' }, crawl: { strategy: 'sitemap+sample', entry: ['/', '/en/flow/entry'] } },
+      })
+      expect(report.pages.sort()).toEqual(['/', '/en/flow/entry', '/ok'])
+      expect(report.crawlStats.disallowed).toBe(1)
+    } finally {
+      vi.unstubAllGlobals()
+    }
+  })
+
+  it('logs urls skipped by robots.txt and honours crawl.respectRobots', async () => {
+    const pages = {
+      '/': '<html><body><a href="/en/flow/1">f</a><a href="/a">a</a></body></html>',
+      '/a': '<html></html>',
+      '/en/flow/1': '<html></html>',
+      '/robots.txt': 'User-agent: *\nDisallow: /*/flow/*',
+    }
+    const writes: string[] = []
+    const original = process.stderr.write.bind(process.stderr)
+    process.stderr.write = ((chunk: string) => {
+      writes.push(String(chunk))
+      return true
+    }) as typeof process.stderr.write
+    try {
+      const respected = await runAudit({ url: 'https://site.test/', cwd: '/tmp', fetcher: fakeFetcher(pages), config: { site: { url: 'https://site.test' } } })
+      expect(respected.pages).toEqual(['/', '/a'])
+      expect(respected.crawlStats.disallowed).toBe(1)
+      expect(writes.join('')).toContain('1 disallowed by robots.txt')
+      const ignored = await runAudit({ url: 'https://site.test/', cwd: '/tmp', fetcher: fakeFetcher(pages), config: { site: { url: 'https://site.test' }, crawl: { respectRobots: false } } })
+      expect(ignored.pages.sort()).toEqual(['/', '/a', '/en/flow/1'])
+    } finally {
+      process.stderr.write = original
+    }
   })
 })

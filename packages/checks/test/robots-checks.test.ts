@@ -41,6 +41,25 @@ describe('robots:reachable', () => {
   })
 })
 
+describe('robots.txt rendered by a browser', () => {
+  it('parses ssrHtml instead of the wrapped html', async () => {
+    const fetcher: PageFetcher = {
+      ...stubFetcher,
+      fetch: async url => ({
+        url,
+        html: `<html><head></head><body><pre>${closedRobots}</pre></body></html>`,
+        ssrHtml: closedRobots,
+        statusCode: 200,
+        headers: { 'content-type': 'text/plain' },
+        ttfb: 1,
+        links: [],
+      }),
+    }
+    const issues = await run(robotsZoneNotBlocked, fetcher, { apps: { self: { paths: ['/market/**'] } } })
+    expect(issues).toHaveLength(1)
+  })
+})
+
 describe('robots:zone-not-blocked', () => {
   const site = { apps: { self: { paths: ['/market/**'] } } }
 

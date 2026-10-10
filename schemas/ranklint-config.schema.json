@@ -136,6 +136,9 @@
         "insecureTls": {
           "type": "boolean"
         },
+        "respectRobots": {
+          "type": "boolean"
+        },
         "viewport": {
           "type": "object",
           "properties": {
@@ -272,6 +275,12 @@
           "type": "integer",
           "exclusiveMinimum": 0,
           "maximum": 9007199254740991
+        },
+        "urls": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         },
         "thresholds": {
           "type": "object",

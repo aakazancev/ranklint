@@ -71,6 +71,21 @@ describe('crawl.insecureTls', () => {
   })
 })
 
+describe('crawl.respectRobots', () => {
+  it('accepts a boolean and rejects other values', () => {
+    expect(configSchema.safeParse({ site: { url: 'https://x.com' }, crawl: { respectRobots: false } }).success).toBe(true)
+    expect(configSchema.safeParse({ site: { url: 'https://x.com' }, crawl: { respectRobots: 'no' } }).success).toBe(false)
+  })
+})
+
+describe('lighthouse.urls', () => {
+  it('accepts a list of paths and urls', () => {
+    const parsed = configSchema.safeParse({ site: { url: 'https://x.com' }, lighthouse: { urls: ['/pricing', 'https://x.com/en/'] } })
+    expect(parsed.success).toBe(true)
+    expect(configSchema.safeParse({ site: { url: 'https://x.com' }, lighthouse: { urls: '/pricing' } }).success).toBe(false)
+  })
+})
+
 describe('legacy config name', () => {
   it('falls back to seo.config.* with a deprecation warning', async () => {
     const legacyCwd = fileURLToPath(new URL('./fixtures/config-legacy', import.meta.url))

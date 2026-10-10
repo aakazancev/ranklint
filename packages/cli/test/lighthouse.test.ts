@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { aggregate, checkThresholds, collectLighthouse, type LighthouseRunner } from '../src/lighthouse'
+import { aggregate, checkThresholds, collectLighthouse, lighthouseTargets, type LighthouseRunner } from '../src/lighthouse'
 
 describe('aggregate', () => {
   it('median and p75', () => {
@@ -69,5 +69,33 @@ describe('checkThresholds', () => {
   it('passes within thresholds and without config', () => {
     expect(checkThresholds(results, { '/**': { performance: 70, lcp: 3000 } })).toEqual([])
     expect(checkThresholds(results, undefined)).toEqual([])
+  })
+})
+
+describe('lighthouseTargets', () => {
+  const discovered = ['https://x.com/', 'https://x.com/a', 'https://x.com/b', 'https://x.com/c', 'https://x.com/d', 'https://x.com/e']
+
+  it('takes the first discovered urls up to maxUrls or 5', () => {
+    expect(lighthouseTargets('https://x.com/', undefined, discovered)).toEqual(discovered.slice(0, 5))
+    expect(lighthouseTargets('https://x.com/', { maxUrls: 2 }, discovered)).toEqual(discovered.slice(0, 2))
+  })
+
+  it('uses configured urls in order, resolved against the base', () => {
+    const urls = ['/pricing', 'https://other.com/x', 'en/blog']
+    expect(lighthouseTargets('https://x.com/root/', { urls }, discovered)).toEqual([
+      'https://x.com/pricing',
+      'https://other.com/x',
+      'https://x.com/root/en/blog',
+    ])
+  })
+
+  it('treats an empty urls list as not set', () => {
+    expect(lighthouseTargets('https://x.com/', { urls: [], maxUrls: 2 }, discovered)).toEqual(discovered.slice(0, 2))
+  })
+
+  it('caps configured urls with maxUrls when set', () => {
+    const urls = ['/1', '/2', '/3', '/4', '/5', '/6', '/7']
+    expect(lighthouseTargets('https://x.com', { urls }, [])).toHaveLength(7)
+    expect(lighthouseTargets('https://x.com', { urls, maxUrls: 3 }, [])).toEqual(['https://x.com/1', 'https://x.com/2', 'https://x.com/3'])
   })
 })

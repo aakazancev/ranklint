@@ -13,6 +13,7 @@ export interface LighthouseConfig {
   aggregation?: LighthouseAggregation
   formFactor?: 'mobile' | 'desktop'
   maxUrls?: number
+  urls?: string[]
   thresholds?: Record<string, Record<string, number>>
 }
 
@@ -38,6 +39,14 @@ function lcpElement(snippet: string | undefined): LighthouseResult['lcpElement']
       ? 'Preload the LCP image and mark it with fetchpriority="high", never loading="lazy"'
       : undefined,
   }
+}
+
+export function lighthouseTargets(base: string, config: LighthouseConfig | undefined, discovered: string[]): string[] {
+  if (config?.urls?.length) {
+    const urls = config.urls.map(u => new URL(u, base).href)
+    return config.maxUrls ? urls.slice(0, config.maxUrls) : urls
+  }
+  return discovered.slice(0, config?.maxUrls ?? 5)
 }
 
 export async function collectLighthouse(

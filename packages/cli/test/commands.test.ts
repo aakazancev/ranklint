@@ -107,6 +107,18 @@ describe('lighthouse command', () => {
     expect(out.results).toHaveLength(1)
   })
 
+  it('measures lighthouse.urls resolved against --url', async () => {
+    const dir = await mkdtemp(join(tmpdir(), 'ranklint-lh-'))
+    await writeFile(join(dir, 'ranklint.config.mjs'), `export default {
+  site: { url: 'https://x.com' },
+  lighthouse: { runs: 1, urls: ['/pricing', '/en/'] },
+}
+`)
+    await runCommand(lighthouse, { rawArgs: ['--url', 'https://staging.x.com/', '--cwd', dir, '--output', join(dir, 'out.json')] })
+    const out = JSON.parse(await readFile(join(dir, 'out.json'), 'utf8'))
+    expect(out.results.map((r: { url: string }) => r.url)).toEqual(['https://staging.x.com/pricing', 'https://staging.x.com/en/'])
+  })
+
   it('rejects unknown profile', async () => {
     const dir = await mkdtemp(join(tmpdir(), 'ranklint-lh-'))
     await writeFile(join(dir, 'ranklint.config.mjs'), `export default { site: { url: 'https://x.com' } }\n`)

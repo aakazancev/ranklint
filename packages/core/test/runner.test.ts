@@ -119,4 +119,28 @@ describe('failed snapshots', () => {
     expect(report.issues).toEqual([])
     expect(report.meta.pagesAudited).toBe(1)
   })
+
+  it.each([404, 410, 500, 503])('skips page checks for snapshots with statusCode %i but passes them to site checks', async (statusCode) => {
+    const broken: PageSnapshot = { ...snap('https://x.com/x.pdf', '<html><body><p>Not found</p></body></html>'), statusCode }
+    let sitePages: PageSnapshot[] = []
+    const siteCheck: Check = {
+      id: 'meta:site-probe',
+      category: 'meta',
+      severity: 'warn',
+      scope: 'site',
+      run: async (ctx) => {
+        sitePages = ctx.pages ?? []
+        return []
+      },
+    }
+    const report = await runChecks(baseInput({ snapshots: [broken], checks: [h1Check, siteCheck] }))
+    expect(report.issues).toEqual([])
+    expect(sitePages).toEqual([broken])
+  })
+
+  it('runs page checks for 3xx snapshots', async () => {
+    const moved: PageSnapshot = { ...snap('https://x.com/m', '<html><body></body></html>'), statusCode: 301 }
+    const report = await runChecks(baseInput({ snapshots: [moved], checks: [h1Check] }))
+    expect(report.issues).toHaveLength(1)
+  })
 })

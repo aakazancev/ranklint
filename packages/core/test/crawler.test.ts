@@ -117,3 +117,96 @@ describe('crawl', () => {
     expect(result.reachability).toEqual([{ url: `${site}/other`, zone: 'main', statusCode: 0 }])
   })
 })
+
+function withRobots(fetcher: PageFetcher, robots: string | Error, statusCode = 200): PageFetcher & { fetched: string[] } {
+  const fetched: string[] = []
+  return {
+    ...fetcher,
+    fetched,
+    async fetch(url, opts) {
+      fetched.push(url)
+      if (new URL(url).pathname !== '/robots.txt') return fetcher.fetch(url, opts)
+      if (robots instanceof Error) throw robots
+      return { url, html: robots, statusCode, headers: { 'content-type': 'text/plain' }, ttfb: 1, links: [] }
+    },
+  }
+}
+
+describe('crawl respects robots.txt', () => {
+  const graph = {
+    '/': ['/a', '/en/flow/step', '/private/x', '/files/a.pdf'],
+    '/a': [], '/en/flow/step': [], '/private/x': [], '/files/a.pdf': [],
+  }
+  const robots = 'User-agent: *\nDisallow: /*/flow/*\nDisallow: /private\nDisallow: /*.pdf$\n\nUser-agent: rankbot\nDisallow: /a'
+
+  it('does not enqueue urls disallowed for * and counts them', async () => {
+    const fetcher = withRobots(fakeFetcher(graph), robots)
+    const result = await crawl(fetcher, [site], { siteUrl: site })
+    expect(result.snapshots.map(s => new URL(s.url).pathname).sort()).toEqual(['/', '/a'])
+    expect(result.stats.disallowed).toBe(3)
+    expect(fetcher.fetched.filter(u => u.endsWith('/robots.txt'))).toEqual(['https://x.com/robots.txt'])
+    expect(result.issues).toEqual([])
+  })
+
+  it('uses the group matching crawl userAgent', async () => {
+    const fetcher = withRobots(fakeFetcher(graph), robots)
+    const result = await crawl(fetcher, [site], { siteUrl: site, userAgent: 'Mozilla/5.0 (compatible; RankBot/1.0)' })
+    expect(result.snapshots.map(s => new URL(s.url).pathname).sort()).toEqual(['/', '/en/flow/step', '/files/a.pdf', '/private/x'].sort())
+    expect(result.stats.disallowed).toBe(1)
+  })
+
+  it('always crawls user entry urls', async () => {
+    const fetcher = withRobots(fakeFetcher(graph), robots)
+    const result = await crawl(fetcher, [site, `${site}/private/x`], { siteUrl: site })
+    expect(result.snapshots.map(s => new URL(s.url).pathname).sort()).toEqual(['/', '/a', '/private/x'])
+    expect(result.stats.disallowed).toBe(2)
+  })
+
+  it('reads robots.txt from ssrHtml when the browser wraps it in html', async () => {
+    const base = withRobots(fakeFetcher(graph), robots)
+    const fetcher: PageFetcher = {
+      ...base,
+      async fetch(url, opts) {
+        const snap = await base.fetch(url, opts)
+        if (new URL(url).pathname !== '/robots.txt') return snap
+        return { ...snap, html: `<html><head></head><body><pre>${snap.html}</pre></body></html>`, ssrHtml: snap.html }
+      },
+    }
+    const result = await crawl(fetcher, [site], { siteUrl: site })
+    expect(result.stats.disallowed).toBe(3)
+  })
+
+  it('applies robots to seeds that are not listed in entries', async () => {
+    const fetcher = withRobots(fakeFetcher(graph), robots)
+    const result = await crawl(fetcher, [site, `${site}/private/x`, `${site}/files/a.pdf`], { siteUrl: site, entries: [site] })
+    expect(result.snapshots.map(s => new URL(s.url).pathname).sort()).toEqual(['/', '/a'])
+    expect(result.stats.disallowed).toBe(3)
+  })
+
+  it('crawls everything with respectRobots false', async () => {
+    const fetcher = withRobots(fakeFetcher(graph), robots)
+    const result = await crawl(fetcher, [site], { siteUrl: site, respectRobots: false })
+    expect(result.snapshots).toHaveLength(5)
+    expect(result.stats.disallowed).toBe(0)
+    expect(fetcher.fetched.some(u => u.endsWith('/robots.txt'))).toBe(false)
+  })
+
+  it('blocks nothing when robots.txt is missing or fails', async () => {
+    for (const fetcher of [withRobots(fakeFetcher(graph), robots, 404), withRobots(fakeFetcher(graph), new Error('boom'))]) {
+      const result = await crawl(fetcher, [site], { siteUrl: site })
+      expect(result.snapshots).toHaveLength(5)
+      expect(result.stats.disallowed).toBe(0)
+      expect(result.issues).toEqual([])
+    }
+  })
+
+  it('does not apply robots rules to reachability zones', async () => {
+    const fetcher = withRobots(fakeFetcher({ '/market': ['/private/y'] }), robots)
+    const result = await crawl(fetcher, [`${site}/market`], {
+      siteUrl: site,
+      apps: { self: { paths: ['/market/**', '/market'] }, main: { paths: ['/**'], owner: 'external' } },
+    })
+    expect(result.reachability).toEqual([{ url: `${site}/private/y`, zone: 'main', statusCode: 200 }])
+    expect(result.stats.disallowed).toBe(0)
+  })
+})

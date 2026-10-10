@@ -1,3 +1,4 @@
+import { isPathDisallowed, parseRobotsTxt, type ParsedRobots } from './robots'
 import type { CrawlStats, Issue, PageFetcher, PageSnapshot } from './types'
 import { normalizeUrl } from './url'
 import { classifyUrl, type ZoneConfig } from './zones'
@@ -8,6 +9,8 @@ export interface CrawlOptions extends ZoneConfig {
   maxPages?: number
   timeout?: number
   userAgent?: string
+  respectRobots?: boolean
+  entries?: string[]
   onPage?: (event: CrawlProgressEvent) => void
 }
 
@@ -38,18 +41,32 @@ function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
 
 const sleep = (ms: number) => new Promise(r => setTimeout(r, ms))
 
+async function loadRobots(fetcher: PageFetcher, siteUrl: string, timeout: number, userAgent?: string): Promise<ParsedRobots | undefined> {
+  try {
+    const snap = await withTimeout(fetcher.fetch(`${new URL(siteUrl).origin}/robots.txt`, { userAgent }), timeout)
+    return snap.statusCode === 200 ? parseRobotsTxt(snap.ssrHtml ?? snap.html) : undefined
+  } catch {
+    return undefined
+  }
+}
+
+function isDisallowed(robots: ParsedRobots, url: string, userAgent?: string): boolean {
+  const { pathname, search } = new URL(url)
+  return isPathDisallowed(robots, pathname + search, userAgent ?? '*')
+}
+
 export async function crawl(
   fetcher: PageFetcher,
   seeds: string[],
   options: CrawlOptions,
 ): Promise<CrawlResult> {
-  const { concurrency = 5, delay = 0, maxPages = 1000, timeout = 30_000 } = options
+  const { concurrency = 5, delay = 0, maxPages = 1000, timeout = 30_000, respectRobots = true } = options
   const queue: string[] = []
   const seen = new Set<string>()
   const snapshots: PageSnapshot[] = []
   const reachability: CrawlResult['reachability'] = []
   const issues: Issue[] = []
-  const stats: CrawlStats = { visited: 0, skipped: 0, external: 0, ignored: 0 }
+  const stats: Required<CrawlStats> = { visited: 0, skipped: 0, external: 0, ignored: 0, disallowed: 0 }
   let truncated = false
 
   const enqueue = (href: string, base: string) => {
@@ -60,6 +77,8 @@ export async function crawl(
   }
 
   for (const seed of seeds) enqueue(seed, options.siteUrl)
+  const entries = new Set(options.entries?.map(e => normalizeUrl(e, options.siteUrl)) ?? queue)
+  const robots = respectRobots ? await loadRobots(fetcher, options.siteUrl, timeout, options.userAgent) : undefined
 
   const processUrl = async (url: string) => {
     const cls = classifyUrl(url, options)
@@ -78,6 +97,10 @@ export async function crawl(
       } catch {
         reachability.push({ url, zone: cls.zone, statusCode: 0 })
       }
+      return
+    }
+    if (robots && !entries.has(url) && isDisallowed(robots, url, options.userAgent)) {
+      stats.disallowed++
       return
     }
     if (snapshots.length >= maxPages) {

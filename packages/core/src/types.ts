@@ -97,6 +97,7 @@ export interface CrawlStats {
   skipped: number
   external: number
   ignored: number
+  disallowed?: number
 }
 
 export interface Report {

@@ -21,6 +21,6 @@ export * from './checks/robots/robots'
 export * from './checks/sitemap/sitemap'
 export * from './checks/i18n/hreflang'
 export * from './checks/i18n/locale-leak'
-export * from './robots-parser'
+export { isPathDisallowed, parseRobotsTxt, type ParsedRobots, type RobotsGroup } from '@ranklint/core'
 
 export const packageName = '@ranklint/checks'

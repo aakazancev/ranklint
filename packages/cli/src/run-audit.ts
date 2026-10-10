@@ -1,7 +1,7 @@
 import type { Check, PageFetcher, RanklintUserConfig, Report } from '@ranklint/core'
 import { analyzeCrawlBudget, crawl, loadRanklintConfig, resolveRules, runChecks, sampleUrls } from '@ranklint/core'
 import { allChecks, ruleRegistry } from '@ranklint/checks'
-import { checkThresholds, collectLighthouse, type LighthouseRunner } from './lighthouse'
+import { checkThresholds, collectLighthouse, lighthouseTargets, type LighthouseRunner } from './lighthouse'
 import { PlaywrightFetcher } from './playwright-fetcher'
 
 export interface RunAuditOptions {
@@ -69,9 +69,11 @@ export async function runAudit(opts: RunAuditOptions): Promise<Report> {
       maxPages: config.crawl?.maxPages,
       delay: config.crawl?.delay,
       userAgent: config.crawl?.userAgent,
+      respectRobots: config.crawl?.respectRobots,
+      entries: baseSeeds,
       onPage: e => process.stderr.write(`[ranklint] ${e.visited}${config.crawl?.maxPages ? `/${config.crawl.maxPages}` : ''} ${e.statusCode} ${e.ms}ms ${e.url}\n`),
     })
-    process.stderr.write(`[ranklint] crawl done: ${crawlResult.stats.visited} pages, running checks\n`)
+    process.stderr.write(`[ranklint] crawl done: ${crawlResult.stats.visited} pages${crawlResult.stats.disallowed ? `, ${crawlResult.stats.disallowed} disallowed by robots.txt` : ''}, running checks\n`)
     const crawlIssues = [...crawlResult.issues]
     const reachableRule = rules.get('links:reachable')
     if (reachableRule && reachableRule !== 'off') {
@@ -101,10 +103,8 @@ export async function runAudit(opts: RunAuditOptions): Promise<Report> {
     if (config.lighthouse?.enabled) {
       const { realLighthouseRunner } = await import('./real-lighthouse')
       const runner = opts.lighthouseRunner ?? realLighthouseRunner
-      const urls = crawlResult.snapshots
-        .filter(s => s.statusCode === 200)
-        .map(s => s.url)
-        .slice(0, config.lighthouse.maxUrls ?? 5)
+      const crawled = crawlResult.snapshots.filter(s => s.statusCode === 200).map(s => s.url)
+      const urls = lighthouseTargets(opts.url, config.lighthouse, crawled)
       report.lighthouse = await collectLighthouse(urls, config.lighthouse, runner)
       report.issues.push(...checkThresholds(report.lighthouse, config.lighthouse.thresholds))
     }
