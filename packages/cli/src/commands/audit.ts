@@ -23,7 +23,7 @@ export const audit = defineCommand({
     reporter: { type: 'string', default: 'markdown', description: 'Output format: markdown | json | junit | html | gitlab | github | sarif' },
     output: { type: 'string', description: 'Write the report to a file instead of stdout' },
     jsonOutput: { type: 'string', description: 'Additionally write the raw json report to a file (input for ranklint diff)' },
-    htmlOutput: { type: 'string', description: 'Additionally write a self-contained html report (e.g. to publish on Pages)' },
+    htmlOutput: { type: 'string', description: 'Additionally write an html report (e.g. to publish on Pages)' },
     cwd: { type: 'string', description: 'Directory to look up ranklint.config in' },
     mode: { type: 'string', description: 'Set to "monitor" for scheduled prod runs: exit 0, diff against last stored report, alert on new issues only' },
   },

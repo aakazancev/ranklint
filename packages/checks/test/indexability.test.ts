@@ -33,7 +33,7 @@ describe('indexability:ssr-content', () => {
   })
 
   it('passes when h1 contains line breaks and repeated spaces', async () => {
-    const html = '<html><body><h1 data-v-2a96ad39>Boat &amp; yacht insurance \nin   2 minutes</h1><p>Compare offers online</p></body></html>'
+    const html = '<html><body><h1 data-v-2a96ad39>Fresh coffee &amp; tea \nin   2 days</h1><p>Order beans online</p></body></html>'
     expect(await run(html, html)).toEqual([])
   })
 

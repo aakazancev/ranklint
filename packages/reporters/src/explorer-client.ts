@@ -189,21 +189,23 @@ q.addEventListener('input', function () { clearTimeout(tmr); tmr = setTimeout(fu
 secSel.addEventListener('change', function (e) { st.sec = e.target.value; render() })
 if (locSel) locSel.addEventListener('change', function (e) { st.loc = e.target.value; render() })
 if (newBox) newBox.addEventListener('change', function (e) { st.onlyNew = e.target.checked; render() })
+function decode(s) { try { return decodeURIComponent(s) } catch (e) { return s } }
+function byHash(h) { return document.getElementById(h) || document.getElementById(decode(h)) }
 function openHash() {
-  var h = decodeURIComponent(location.hash.slice(1))
+  var h = location.hash.slice(1)
   if (h.indexOf('rule-') !== 0 && h.indexOf('page-') !== 0) return
   var want = h.indexOf('rule-') === 0 ? 'rule' : 'page'
-  if (st.mode !== want || !document.getElementById(h)) {
+  if (st.mode !== want || !byHash(h)) {
     st.q = ''; q.value = ''; st.sec = 'all'; st.loc = 'all'; st.onlyNew = false; st.sev = { error: true, warn: true, info: true }
     secSel.value = 'all'; if (locSel) locSel.value = 'all'; if (newBox) newBox.checked = false
     root.querySelectorAll('[data-sev]').forEach(function (x) { x.setAttribute('aria-pressed', 'true') })
     setMode(want); render()
   }
-  var d = document.getElementById(h)
+  var d = byHash(h)
   if (d) { d.open = true; if (d.querySelector('.gb') && !d.querySelector('.gb').innerHTML) fill(d, STEP); d.scrollIntoView({ block: 'start' }) }
 }
 render()
 window.addEventListener('hashchange', openHash)
-document.addEventListener('click', function (e) { var a = e.target.closest && e.target.closest('a[href^="#rule-"],a[href^="#page-"]'); if (a && decodeURIComponent(a.getAttribute('href')) === decodeURIComponent(location.hash)) { e.preventDefault(); openHash() } })
+document.addEventListener('click', function (e) { var a = e.target.closest && e.target.closest('a[href^="#rule-"],a[href^="#page-"]'); if (a && decode(a.getAttribute('href')) === decode(location.hash)) { e.preventDefault(); openHash() } })
 openHash()
 `

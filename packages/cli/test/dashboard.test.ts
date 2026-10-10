@@ -85,6 +85,19 @@ describe('writeDashboard', () => {
     expect(index).toContain('powered by')
   })
 
+  it('renders a history with mixed format versions', async () => {
+    const dir = await mkdtemp(join(tmpdir(), 'ranklint-dashboard-'))
+    const storage = new FsReportStorage(join(dir, 'reports'))
+    await storage.save({ ...report('2026-07-01T00:00:00.000Z', 1), formatVersion: 0 } as unknown as Report, 'old')
+    await storage.save(report('2026-07-02T00:00:00.000Z', 2), 'mid')
+    await storage.save(report('2026-07-03T00:00:00.000Z', 3), 'new')
+    const out = join(dir, 'site')
+    await writeDashboard({ dir: join(dir, 'reports'), out })
+    expect(await readFile(join(out, 'runs', 'mid.html'), 'utf8')).not.toContain('vs 1 Jul, 00:00 UTC')
+    expect(await readFile(join(out, 'runs', 'new.html'), 'utf8')).toContain('vs 2 Jul, 00:00 UTC')
+    expect(await readFile(join(out, 'index.html'), 'utf8')).toContain('New since')
+  })
+
   it('keeps remote logos as urls', async () => {
     const dir = await seed()
     const out = join(dir, 'site')

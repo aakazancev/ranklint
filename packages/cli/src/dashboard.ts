@@ -58,7 +58,8 @@ export async function writeDashboard(options: WriteDashboardOptions): Promise<st
   await mkdir(join(options.out, 'runs'), { recursive: true })
   const offset = all.length - entries.length
   for (const [index, entry] of entries.entries()) {
-    const previous = all[offset + index - 1]?.report
+    const before = all[offset + index - 1]?.report
+    const previous = before?.formatVersion === entry.report.formatVersion ? before : undefined
     await writeFile(join(options.out, 'runs', `${entry.key}.html`), html(entry.report, { previous, dashboardHref: '../index.html', brand }))
   }
   const index = join(options.out, 'index.html')

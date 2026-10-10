@@ -35,7 +35,7 @@ describe('gitlab reporter', () => {
 })
 
 describe('html reporter', () => {
-  it('renders a self-contained escaped page', () => {
+  it('renders an escaped single page with embedded data', () => {
     const out = html(report)
     expect(out).toContain('<!doctype html>')
     expect(out).toContain('2 &lt;h1&gt; tags &amp; stuff')

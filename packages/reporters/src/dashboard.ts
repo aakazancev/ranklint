@@ -202,7 +202,8 @@ export function dashboard(entries: DashboardEntry[], opts: DashboardOptions = {}
   if (!latest) {
     return page('ranklint monitor', `<main class="rmain"><div class="rail-head">${brandMark(brand)}</div><div class="panel"><h2>ranklint monitor</h2><p class="muted">No stored reports found.</p>${runButton}</div>${poweredBy(brand)}</main>`, brand)
   }
-  const previous = sorted[sorted.length - 2]
+  const prior = sorted[sorted.length - 2]
+  const previous = prior?.report.formatVersion === latest.report.formatVersion ? prior : undefined
   const runs = sorted.map(stats)
   const current = runs[runs.length - 1]!
   const before = previous ? runs[runs.length - 2] : undefined

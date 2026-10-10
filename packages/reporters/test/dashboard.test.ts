@@ -63,6 +63,13 @@ describe('html report', () => {
     expect(out).toContain('Preload &lt;img&gt;')
     expect(out).toContain('median of 3 runs')
   })
+
+  it('links lighthouse rows to page cards by the same id for encoded paths', () => {
+    const path = '/%D0%BA%D0%B0%D1%82%D0%B0%D0%BB%D0%BE%D0%B3/a%20b'
+    const out = html(report('t', [issue('meta:title-length', 'error', path)], { lighthouse: [{ ...lighthouse![0]!, url: `https://example.com${path}` }] }))
+    expect(out).toContain(`href="#page-${path}"`)
+    expect(out).toContain(`id="page-${path}"`)
+  })
 })
 
 describe('dashboard', () => {
@@ -107,6 +114,13 @@ describe('dashboard', () => {
     expect(out.match(/<svg/g)?.length).toBe(1)
     expect(out).toContain('Top rules')
     expect(out).toContain('Fix once')
+  })
+
+  it('skips the diff when the previous run has another format version', () => {
+    const old = { ...previous, formatVersion: 0 } as unknown as Report
+    const out = dashboard([{ key: 'new', report: current }, { key: 'old', report: old }])
+    expect(out).not.toContain('New since')
+    expect(out).toContain('href="runs/old.html"')
   })
 
   it('puts error rules first in the new and top rules panels', () => {
