@@ -9,6 +9,7 @@ import { jsonldParseable, jsonldValidSchema } from './checks/jsonld/jsonld'
 import { descriptionLength, descriptionRequired } from './checks/meta/description'
 import { ogRequired, twitterCard } from './checks/meta/social'
 import { titleLength, titleRequired } from './checks/meta/title'
+import { noUtmInternal } from './checks/links/utm-internal'
 
 export const level1Checks: CheckDefinition[] = [
   titleRequired,
@@ -31,4 +32,5 @@ export const level1Checks: CheckDefinition[] = [
   xRobotsConsistent,
   viewport,
   noMixedContent,
+  noUtmInternal,
 ]

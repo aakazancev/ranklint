@@ -1,7 +1,7 @@
 {
   "name": "@ranklint/cli",
   "version": "1.0.0",
-  "description": "SEO audit CLI: crawl a deployed site with real Chrome, run 42 checks, Lighthouse, diff between branches, production monitoring.",
+  "description": "SEO audit CLI: crawl a deployed site with real Chrome, run 43 checks, Lighthouse, diff between branches, production monitoring.",
   "keywords": [
     "seo",
     "lint",

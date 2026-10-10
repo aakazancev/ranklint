@@ -95,6 +95,10 @@
     "en": "redirect chains; { maxHops }",
     "ru": "цепочки редиректов; { maxHops }"
   },
+  "links:no-utm-internal": {
+    "en": "internal links carry no UTM or click-id parameters",
+    "ru": "внутренние ссылки без UTM и click-id параметров"
+  },
   "links:permanent-redirects": {
     "en": "302 where a 301 belongs",
     "ru": "302 там, где должен быть 301"

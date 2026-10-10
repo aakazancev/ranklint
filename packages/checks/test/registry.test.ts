@@ -4,8 +4,8 @@ import { allChecks, ruleRegistry } from '../src/registry'
 
 describe('registry', () => {
   it('contains all registered checks with unique ids', () => {
-    expect(allChecks).toHaveLength(42)
-    expect(new Set(allChecks.map(c => c.id)).size).toBe(42)
+    expect(allChecks).toHaveLength(43)
+    expect(new Set(allChecks.map(c => c.id)).size).toBe(43)
   })
 
   it('every check carries docs and suggestion-producing run', () => {

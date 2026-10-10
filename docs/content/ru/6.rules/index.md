@@ -1,6 +1,6 @@
 ---
 title: Все правила
-description: 42 built-in rules generated from the check registry.
+description: 43 built-in rules generated from the check registry.
 ---
 
 Каждое правило принимает `error`, `warn`, `info`, `off` или `[severity, options]` в ranklint.config и отключается на странице через useRanklintIgnore().
@@ -31,6 +31,7 @@ description: 42 built-in rules generated from the check registry.
 | [`links:no-broken`](/ru/rules/links/links-no-broken) | links | page | error | внутренние ссылки не 4xx/5xx (HEAD с кешем на прогон) |
 | [`links:no-orphans`](/ru/rules/links/links-no-orphans) | links | site | warn | страницы sitemap, на которые никто не ссылается |
 | [`links:no-redirect-chain`](/ru/rules/links/links-no-redirect-chain) | links | page | warn | цепочки редиректов; { maxHops } |
+| [`links:no-utm-internal`](/ru/rules/links/links-no-utm-internal) | links | page | warn | внутренние ссылки без UTM и click-id параметров |
 | [`links:permanent-redirects`](/ru/rules/links/links-permanent-redirects) | links | page | warn | 302 там, где должен быть 301 |
 | [`links:trailing-slash-consistent`](/ru/rules/links/links-trailing-slash-consistent) | links | site | warn | единообразие завершающего слеша |
 | [`meta:description-length`](/ru/rules/meta/meta-description-length) | meta | page | warn | длина meta description, по умолчанию 70–160 символов; { min, max } |

@@ -12,6 +12,7 @@ import { altRequired, dimensionsRequired, noLazyAboveFold } from './checks/image
 import { jsonldParseable, jsonldValidSchema } from './checks/jsonld/jsonld'
 import { noBroken, noRedirectChain } from './checks/links/links'
 import { noOrphans } from './checks/links/orphans'
+import { noUtmInternal } from './checks/links/utm-internal'
 import { descriptionLength, descriptionRequired } from './checks/meta/description'
 import { noDuplicateDescription, noDuplicateTitle, uniqueH1 } from './checks/meta/duplicates'
 import { ogRequired, twitterCard } from './checks/meta/social'
@@ -62,6 +63,7 @@ export const allChecks: CheckDefinition[] = [
   viewport,
   permanentRedirects,
   trailingSlashConsistent,
+  noUtmInternal,
 ]
 
 export const ruleRegistry = new Map<string, RuleRegistryEntry>(

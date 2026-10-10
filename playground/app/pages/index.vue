@@ -25,6 +25,7 @@ const bugs = [
   'canonical-chain-a',
   'canonical-chain-b',
   'canonical-chain-c',
+  'utm-internal',
 ]
 </script>
 

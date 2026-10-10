@@ -1,5 +1,5 @@
 {
-  "total": 42,
+  "total": 43,
   "groups": [
     {
       "folder": "headings",
@@ -97,7 +97,7 @@
     },
     {
       "folder": "links",
-      "count": 5,
+      "count": 6,
       "first": "/rules/links/links-no-broken",
       "samples": [
         "links:no-broken",
@@ -107,6 +107,7 @@
         "links:no-broken",
         "links:no-orphans",
         "links:no-redirect-chain",
+        "links:no-utm-internal",
         "links:permanent-redirects",
         "links:trailing-slash-consistent"
       ],

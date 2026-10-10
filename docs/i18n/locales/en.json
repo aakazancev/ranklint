@@ -2,7 +2,7 @@
   "landing": {
     "meta": {
       "title": "SEO linter for Nuxt and CI",
-      "description": "A Nuxt module, a DevTools tab and a CI crawler that fails the pipeline on SEO regressions. Any stack, 42 rules, open source."
+      "description": "A Nuxt module, a DevTools tab and a CI crawler that fails the pipeline on SEO regressions. Any stack, 43 rules, open source."
     },
     "nav": {
       "docs": "Docs",

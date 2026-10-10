@@ -1,6 +1,6 @@
 ---
 title: All rules
-description: 42 built-in rules generated from the check registry.
+description: 43 built-in rules generated from the check registry.
 ---
 
 Every rule accepts `error`, `warn`, `info`, `off` or `[severity, options]` in ranklint.config and can be suppressed per page with useRanklintIgnore().
@@ -31,6 +31,7 @@ Every rule accepts `error`, `warn`, `info`, `off` or `[severity, options]` in ra
 | [`links:no-broken`](/en/rules/links/links-no-broken) | links | page | error | internal links aren't 4xx/5xx (HEAD, cached per run) |
 | [`links:no-orphans`](/en/rules/links/links-no-orphans) | links | site | warn | sitemap pages nobody links to |
 | [`links:no-redirect-chain`](/en/rules/links/links-no-redirect-chain) | links | page | warn | redirect chains; { maxHops } |
+| [`links:no-utm-internal`](/en/rules/links/links-no-utm-internal) | links | page | warn | internal links carry no UTM or click-id parameters |
 | [`links:permanent-redirects`](/en/rules/links/links-permanent-redirects) | links | page | warn | 302 where a 301 belongs |
 | [`links:trailing-slash-consistent`](/en/rules/links/links-trailing-slash-consistent) | links | site | warn | trailing-slash consistency |
 | [`meta:description-length`](/en/rules/meta/meta-description-length) | meta | page | warn | meta description length, 70–160 chars by default; { min, max } |

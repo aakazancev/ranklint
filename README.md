@@ -184,7 +184,7 @@ Add a pipeline schedule (CI/CD → Schedules) — both jobs run only on `schedul
 
 ## Rules
 
-42 rules across the meta, headings, canonical, links, i18n, structured-data, images, robots, indexability, and http categories — see the full reference at [ranklint.dev/en/rules](https://ranklint.dev/en/rules).
+43 rules across the meta, headings, canonical, links, i18n, structured-data, images, robots, indexability, and http categories — see the full reference at [ranklint.dev/en/rules](https://ranklint.dev/en/rules).
 
 Every rule accepts `'error' | 'warn' | 'off'` or `[severity, options]`. Inline suppression on a page — `useRanklintIgnore([...])`.
 
