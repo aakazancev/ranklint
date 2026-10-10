@@ -13,7 +13,8 @@ export function matchPattern(pattern: string, path: string): boolean {
   if (pattern.endsWith('/**')) {
     const prefix = pattern.slice(0, -3)
     if (prefix === '') return true
-    return path === prefix || path.startsWith(`${prefix}/`)
+    const source = toRegExp(prefix).source.slice(1, -1)
+    return new RegExp(`^${source}(?:/.*)?$`).test(path)
   }
   return toRegExp(pattern).test(path)
 }

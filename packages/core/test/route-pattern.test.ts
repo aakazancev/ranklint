@@ -20,6 +20,19 @@ describe('matchPattern', () => {
     expect(matchPattern('/listing/*', '/listing')).toBe(false)
   })
 
+  it('matches a glob prefix before /**', () => {
+    expect(matchPattern('/*/market/**', '/en/market/cars')).toBe(true)
+    expect(matchPattern('/*/market/**', '/en/market')).toBe(true)
+    expect(matchPattern('/*/market/**', '/en/marketing')).toBe(false)
+    expect(matchPattern('/*/market/**', '/market/cars')).toBe(false)
+    expect(matchPattern('/*/market/**', '/en/x/market')).toBe(false)
+  })
+
+  it('escapes regexp characters in a literal prefix', () => {
+    expect(matchPattern('/a.b/**', '/a.b/c')).toBe(true)
+    expect(matchPattern('/a.b/**', '/axb/c')).toBe(false)
+  })
+
   it('matches exact paths', () => {
     expect(matchPattern('/about', '/about')).toBe(true)
     expect(matchPattern('/about', '/about/team')).toBe(false)
