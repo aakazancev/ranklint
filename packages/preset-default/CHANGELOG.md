@@ -1,5 +1,22 @@
 # @ranklint/preset-default
 
+## 1.1.0
+
+### Patch Changes
+
+- 9172e75: New rule links:no-utm-internal (warn) flags internal links that carry UTM or click-id parameters (utm\_\*, gclid, gbraid, wbraid, fbclid, yclid, msclkid, \_gl, mc_cid, mc_eid)
+- Updated dependencies [1f669ea]
+- Updated dependencies [41da7b8]
+- Updated dependencies [98e44d7]
+- Updated dependencies [9172e75]
+- Updated dependencies [660be37]
+- Updated dependencies [81088bc]
+- Updated dependencies [1f669ea]
+- Updated dependencies [4cab41d]
+- Updated dependencies [d1c054c]
+  - @ranklint/core@1.1.0
+  - @ranklint/checks@1.1.0
+
 ## 1.0.0
 
 ### Major Changes
