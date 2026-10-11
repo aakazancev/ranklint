@@ -5,6 +5,12 @@ description: "Every ranklint release with breaking changes, features and fixes, 
 
 <!-- generated:start -->
 
+## ranklint 1.1.0
+
+Released: 2026-10-11 · [Release notes](/en/changelog/v1.1.0)
+
+New rule links:no-utm-internal (warn) flags internal links that carry UTM or click-id parameters (utm\_\*, gclid, gbraid, wbraid, fbclid, yclid, msclkid, \_gl, mc_cid, mc_eid)
+
 ## ranklint 1.0.0
 
 Released: 2026-09-21 · [Release notes](/en/changelog/v1.0.0)

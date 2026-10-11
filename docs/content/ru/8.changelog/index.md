@@ -5,6 +5,16 @@ description: "Все релизы ranklint: ломающие изменения,
 
 <!-- generated:start -->
 
+## ranklint 1.1.0
+
+Дата: 2026-10-11 · [Подробнее](/ru/changelog/v1.1.0)
+
+::div{lang="en"}
+
+New rule links:no-utm-internal (warn) flags internal links that carry UTM or click-id parameters (utm\_\*, gclid, gbraid, wbraid, fbclid, yclid, msclkid, \_gl, mc_cid, mc_eid)
+
+::
+
 ## ranklint 1.0.0
 
 Дата: 2026-09-21 · [Подробнее](/ru/changelog/v1.0.0)

@@ -1,5 +1,21 @@
 # @ranklint/devtools
 
+## 1.1.0
+
+### Patch Changes
+
+- Updated dependencies [1f669ea]
+- Updated dependencies [41da7b8]
+- Updated dependencies [98e44d7]
+- Updated dependencies [9172e75]
+- Updated dependencies [660be37]
+- Updated dependencies [81088bc]
+- Updated dependencies [1f669ea]
+- Updated dependencies [4cab41d]
+- Updated dependencies [d1c054c]
+  - @ranklint/core@1.1.0
+  - @ranklint/checks@1.1.0
+
 ## 1.0.0
 
 ### Major Changes

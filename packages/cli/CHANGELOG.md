@@ -1,5 +1,29 @@
 # @ranklint/cli
 
+## 1.1.0
+
+### Minor Changes
+
+- e35b41d: New `ranklint dashboard` command and `dashboard()` reporter: a single-file HTML monitoring dashboard for GitLab or GitHub Pages built from the stored monitor reports. It shows the latest run with deltas against the previous one, new and fixed issues by rule with errors first, trends for errors, warnings, Lighthouse scores and CrUX field data, Lighthouse by page and the history of every run with a per-run report in `runs/<date>.html`. An issue explorer groups problems by rule or by page: every page gets a checklist of what to fix with the suggestion and docs link for each rule, the affected elements and a NEW mark, and a "Fix once" block lists issues repeated across a section or the whole site that are fixed in one template. Optional branding with `--logo`, `--brand-name` and `--accent`: your logo top left, one accent color for the whole page and a "powered by ranklint" line in the side panel. A `--run-url` button opens the CI pipeline form. The html reporter (`--reporter html`, `--html-output`) gets the same design: issues grouped by page by default, the explorer with filters and a Web Vitals section with CrUX ratings and a Lighthouse table. Pages embed their data and script and load the brand fonts from Google Fonts, falling back to system fonts offline.
+- 4cab41d: Page checks skip 4xx/5xx snapshots, so an HTML 404 behind a broken link no longer raises canonical or duplicate title issues; the broken link itself is still reported by `links:no-broken`. New `crawl.respectRobots` option (default `true`): the crawler loads `<origin>/robots.txt` once and does not crawl links disallowed for `*` or for the group matching `crawl.userAgent`; entry URLs are always crawled and the count is reported as `crawlStats.disallowed` and in the crawl log. The robots.txt parser moved to `@ranklint/core` (`parseRobotsTxt`, `isPathDisallowed`, still re-exported by `@ranklint/checks`) and now supports Google `*` and `$` patterns, percent-encoded and non-ASCII paths and most specific user agent group selection. robots.txt is read from the raw response (`ssrHtml`) so browser-rendered fetchers no longer hide its rules from the crawler and `robots:*` checks. Entry URLs are exempt from robots.txt, `sitemap+sample` samples are not. New `lighthouse.urls` option pins the exact list of paths or URLs measured by Lighthouse in `audit` and the `lighthouse` command; an empty list counts as not set. `images:*` issues for `data:` images use a structural `nth-of-type` selector instead of embedding the data URI.
+
+### Patch Changes
+
+- 41da7b8: The crawler no longer treats a page that redirects to another origin as a page of the site: it is counted in `crawlStats.external`, its links are not crawled and page checks don't run on its HTML. Links of a page redirected inside the site resolve against the final URL, and several URLs redirecting to one final URL give a single snapshot, reported under the final URL. An entry URL redirecting to another origin (`example.com` → `www.example.com`, `http` → `https`) is reported as a `crawl:entry-redirect` error instead of an empty audit. `PageSnapshot` gets an optional `finalUrl`, filled by `HttpFetcher` and `PlaywrightFetcher`. `links:no-broken`, `links:no-redirect-chain`, `links:permanent-redirects`, `links:no-utm-internal`, `links:no-orphans` and `canonical:no-chain` resolve relative URLs against `finalUrl` when it is set.
+- Updated dependencies [1f669ea]
+- Updated dependencies [41da7b8]
+- Updated dependencies [98e44d7]
+- Updated dependencies [9172e75]
+- Updated dependencies [660be37]
+- Updated dependencies [e35b41d]
+- Updated dependencies [81088bc]
+- Updated dependencies [1f669ea]
+- Updated dependencies [4cab41d]
+- Updated dependencies [d1c054c]
+  - @ranklint/core@1.1.0
+  - @ranklint/checks@1.1.0
+  - @ranklint/reporters@1.1.0
+
 ## 1.0.0
 
 ### Major Changes

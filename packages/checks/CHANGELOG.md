@@ -1,5 +1,27 @@
 # @ranklint/checks
 
+## 1.1.0
+
+### Minor Changes
+
+- 9172e75: New rule links:no-utm-internal (warn) flags internal links that carry UTM or click-id parameters (utm\_\*, gclid, gbraid, wbraid, fbclid, yclid, msclkid, \_gl, mc_cid, mc_eid)
+
+### Patch Changes
+
+- 41da7b8: The crawler no longer treats a page that redirects to another origin as a page of the site: it is counted in `crawlStats.external`, its links are not crawled and page checks don't run on its HTML. Links of a page redirected inside the site resolve against the final URL, and several URLs redirecting to one final URL give a single snapshot, reported under the final URL. An entry URL redirecting to another origin (`example.com` → `www.example.com`, `http` → `https`) is reported as a `crawl:entry-redirect` error instead of an empty audit. `PageSnapshot` gets an optional `finalUrl`, filled by `HttpFetcher` and `PlaywrightFetcher`. `links:no-broken`, `links:no-redirect-chain`, `links:permanent-redirects`, `links:no-utm-internal`, `links:no-orphans` and `canonical:no-chain` resolve relative URLs against `finalUrl` when it is set.
+- 98e44d7: Collapse line breaks and repeated spaces in H1 and title text: `indexability:ssr-content` no longer reports multi-line headings as client-side only, `headings:h1-length` and `meta:title-length` measure the normalized text, and `headings:unique-h1`, `meta:no-duplicate-title` and `meta:no-duplicate-description` group duplicates that differ only in whitespace.
+  `http:no-soft-404` matches not-found titles split across lines and shows the normalized title in the message.
+- 660be37: i18n:no-locale-leak ignores subtrees whose lang attribute differs from the page language
+- 1f669ea: `links:no-utm-internal` and `images:*` escape `"` and `\` in the attribute value of the issue selector. `markdownDiff`, the monitor dashboard and Slack/Telegram notifications list new and fixed issues by severity (error, warn, info), so errors are not cut off by the item limit.
+- 4cab41d: Page checks skip 4xx/5xx snapshots, so an HTML 404 behind a broken link no longer raises canonical or duplicate title issues; the broken link itself is still reported by `links:no-broken`. New `crawl.respectRobots` option (default `true`): the crawler loads `<origin>/robots.txt` once and does not crawl links disallowed for `*` or for the group matching `crawl.userAgent`; entry URLs are always crawled and the count is reported as `crawlStats.disallowed` and in the crawl log. The robots.txt parser moved to `@ranklint/core` (`parseRobotsTxt`, `isPathDisallowed`, still re-exported by `@ranklint/checks`) and now supports Google `*` and `$` patterns, percent-encoded and non-ASCII paths and most specific user agent group selection. robots.txt is read from the raw response (`ssrHtml`) so browser-rendered fetchers no longer hide its rules from the crawler and `robots:*` checks. Entry URLs are exempt from robots.txt, `sitemap+sample` samples are not. New `lighthouse.urls` option pins the exact list of paths or URLs measured by Lighthouse in `audit` and the `lighthouse` command; an empty list counts as not set. `images:*` issues for `data:` images use a structural `nth-of-type` selector instead of embedding the data URI.
+- d1c054c: `normalizeUrl` strips tracking params (`utm_*`, `gclid`, `gbraid`, `wbraid`, `fbclid`, `yclid`, `msclkid`, `_gl`, `mc_cid`, `mc_eid`), so the crawler no longer visits `/a?utm_source=x` as a separate page. `links:no-broken`, `links:no-redirect-chain` and `links:permanent-redirects` check such links once and still report the original href.
+- Updated dependencies [1f669ea]
+- Updated dependencies [41da7b8]
+- Updated dependencies [81088bc]
+- Updated dependencies [4cab41d]
+- Updated dependencies [d1c054c]
+  - @ranklint/core@1.1.0
+
 ## 1.0.0
 
 ### Major Changes
