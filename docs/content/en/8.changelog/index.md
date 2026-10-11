@@ -9,7 +9,7 @@ description: "Every ranklint release with breaking changes, features and fixes, 
 
 Released: 2026-10-11 · [Release notes](/en/changelog/v1.1.0)
 
-New rule links:no-utm-internal (warn) flags internal links that carry UTM or click-id parameters (utm\_\*, gclid, gbraid, wbraid, fbclid, yclid, msclkid, \_gl, mc_cid, mc_eid)
+ranklint 1.1.0 turns monitor mode into a place to read results. `ranklint dashboard` builds a single-file HTML dashboard from the stored monitor reports, ready for GitLab or GitHub Pages: the latest run with deltas, new and fixed issues with errors first, trends for errors, Lighthouse scores and CrUX field data, a per-run report for every date and an issue explorer that turns each page into a checklist of what to fix. A "Fix once" block lists problems repeated across a section or the whole site, and `--logo`, `--brand-name` and `--accent` put your brand on it. The crawler now respects robots.txt, follows redirects to the final URL, skips pages that redirect off the site and drops tracking parameters when it dedupes URLs; `lighthouse.urls` pins Lighthouse to your key pages, and the new `links:no-utm-internal` rule flags internal links with UTM tags.
 
 ## ranklint 1.0.0
 
