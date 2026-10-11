@@ -1,5 +1,14 @@
 # @ranklint/nuxt
 
+## 1.1.3
+
+### Patch Changes
+
+- Updated dependencies [c188633]
+  - @ranklint/core@1.1.3
+  - @ranklint/checks@1.1.3
+  - @ranklint/devtools@1.1.3
+
 ## 1.1.2
 
 ### Patch Changes
