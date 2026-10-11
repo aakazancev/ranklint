@@ -1,5 +1,11 @@
 # @ranklint/reporters
 
+## 1.1.2
+
+### Patch Changes
+
+- @ranklint/core@1.1.2
+
 ## 1.1.1
 
 ### Patch Changes

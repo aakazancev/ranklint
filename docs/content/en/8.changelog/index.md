@@ -5,6 +5,12 @@ description: "Every ranklint release with breaking changes, features and fixes, 
 
 <!-- generated:start -->
 
+## ranklint 1.1.2
+
+Released: 2026-10-11 · [Release notes](/en/changelog/v1.1.2)
+
+A crashed Lighthouse run is now logged and skipped instead of aborting the audit, and Chrome runs with `--disable-dev-shm-usage` for containers.
+
 ## ranklint 1.1.1
 
 Released: 2026-10-11 · [Release notes](/en/changelog/v1.1.1)
