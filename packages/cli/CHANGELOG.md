@@ -1,5 +1,16 @@
 # @ranklint/cli
 
+## 1.1.3
+
+### Patch Changes
+
+- c188633: Lighthouse runs time out after lighthouse.runTimeout (default 3 minutes) and are skipped instead of hanging the audit.
+- f9b40c7: Lighthouse runs are no longer failed by stray "Target closed" rejections from Lighthouse itself, and runtime errors such as NO_FCP are logged per run.
+- Updated dependencies [c188633]
+  - @ranklint/core@1.1.3
+  - @ranklint/checks@1.1.3
+  - @ranklint/reporters@1.1.3
+
 ## 1.1.2
 
 ### Patch Changes

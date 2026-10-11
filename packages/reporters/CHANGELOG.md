@@ -1,5 +1,12 @@
 # @ranklint/reporters
 
+## 1.1.3
+
+### Patch Changes
+
+- Updated dependencies [c188633]
+  - @ranklint/core@1.1.3
+
 ## 1.1.2
 
 ### Patch Changes

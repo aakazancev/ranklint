@@ -1,5 +1,11 @@
 # @ranklint/core
 
+## 1.1.3
+
+### Patch Changes
+
+- c188633: Lighthouse runs time out after lighthouse.runTimeout (default 3 minutes) and are skipped instead of hanging the audit.
+
 ## 1.1.2
 
 ## 1.1.1

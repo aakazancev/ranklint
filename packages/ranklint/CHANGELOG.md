@@ -1,5 +1,13 @@
 # ranklint
 
+## 1.1.3
+
+### Patch Changes
+
+- Updated dependencies [c188633]
+- Updated dependencies [f9b40c7]
+  - @ranklint/cli@1.1.3
+
 ## 1.1.2
 
 ### Patch Changes

@@ -1,6 +1,6 @@
 {
   "name": "ranklint",
-  "version": "1.1.2",
+  "version": "1.1.3",
   "description": "Lint your SEO before Google does. Alias for @ranklint/cli: the SEO linter for CI that crawls any deployed site.",
   "keywords": [
     "seo",
