@@ -8,7 +8,7 @@ export const noUtmInternal = defineCheck({
   scope: 'page',
   docs: docsUrl('links:no-utm-internal'),
   async run(ctx) {
-    const pageUrl = ctx.page!.url
+    const pageUrl = ctx.page!.finalUrl ?? ctx.page!.url
     const origin = new URL(pageUrl).origin
     const seen = new Set<string>()
     const issues: Issue[] = []
@@ -29,7 +29,7 @@ export const noUtmInternal = defineCheck({
         checkId: 'links:no-utm-internal',
         severity: 'warn',
         message: `Internal link "${href}" carries tracking parameters: ${params.join(', ')}`,
-        url: pageUrl,
+        url: ctx.page!.url,
         selector: `a[href="${href.replace(/["\\]/g, '\\$&')}"]`,
         suggestion: 'Remove UTM and click-id parameters from internal links: they overwrite the visit source in analytics. Use a plain <NuxtLink to="/path"> and track internal clicks with an analytics event (for example a @click handler or a Nuxt plugin calling gtag/umami)',
         docs: docsUrl('links:no-utm-internal'),

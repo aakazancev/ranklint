@@ -9,7 +9,7 @@ function internalLinks(ctx: CheckContext): { href: string, resolved: string }[] 
   const seen = new Set<string>()
   const result: { href: string, resolved: string }[] = []
   for (const link of ctx.page!.links) {
-    const key = normalizeUrl(link.href, ctx.page!.url)
+    const key = normalizeUrl(link.href, ctx.page!.finalUrl ?? ctx.page!.url)
     if (!key || new URL(key).origin !== origin) continue
     if (seen.has(key)) continue
     seen.add(key)

@@ -77,11 +77,11 @@ export const canonicalValid = defineCheck({
   },
 })
 
-function canonicalPathOf(page: { url: string }, doc: Document): string | null {
+function canonicalPathOf(page: { url: string, finalUrl?: string }, doc: Document): string | null {
   const href = canonicalHref(doc)
   if (!href) return null
   try {
-    return new URL(href, page.url).pathname
+    return new URL(href, page.finalUrl ?? page.url).pathname
   } catch {
     return null
   }

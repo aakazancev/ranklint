@@ -12,6 +12,7 @@ export interface PageLink {
 
 export interface PageSnapshot {
   url: string
+  finalUrl?: string
   html: string
   ssrHtml?: string
   statusCode: number

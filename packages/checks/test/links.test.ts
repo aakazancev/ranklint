@@ -22,6 +22,17 @@ describe('links:no-broken', () => {
     expect(issues[0]?.message).toContain('404')
   })
 
+  it('resolves relative links against the final url of the page', async () => {
+    const fetcher = fakeHeadFetcher({ 'https://example.com/b/child': { status: 200 } })
+    const issues = await runCheckOnHtml(noBroken, '<a href="child">c</a>', {
+      url: 'https://example.com/a',
+      finalUrl: 'https://example.com/b/',
+      links: [{ href: 'child', text: 'c' }],
+      fetcher,
+    })
+    expect(issues).toEqual([])
+  })
+
   it('flags network failures as broken', async () => {
     const fetcher = {
       ...fakeHeadFetcher({}),
@@ -73,6 +84,22 @@ describe('links:no-redirect-chain', () => {
     const issues = await runCheckOnHtml(noRedirectChain, html, { links: testLinks, fetcher })
     expect(issues).toHaveLength(1)
     expect(issues[0]?.selector).toBe('a[href="/chain"]')
+    expect(issues[0]?.message).toContain('2 redirects')
+  })
+
+  it('follows relative links from the final url of the page', async () => {
+    const fetcher = fakeHeadFetcher({
+      'https://example.com/b/child': { status: 301, location: '/b/mid' },
+      'https://example.com/b/mid': { status: 301, location: '/b/end' },
+      'https://example.com/b/end': { status: 200 },
+    })
+    const issues = await runCheckOnHtml(noRedirectChain, '<a href="child">c</a>', {
+      url: 'https://example.com/a',
+      finalUrl: 'https://example.com/b/',
+      links: [{ href: 'child', text: 'c' }],
+      fetcher,
+    })
+    expect(issues).toHaveLength(1)
     expect(issues[0]?.message).toContain('2 redirects')
   })
 

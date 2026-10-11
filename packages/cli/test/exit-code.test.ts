@@ -1,4 +1,4 @@
-import type { Report } from '@ranklint/core'
+import { crawl, type PageFetcher, type Report, runChecks } from '@ranklint/core'
 import { describe, expect, it } from 'vitest'
 import { exitCodeFor } from '../src/exit-code'
 
@@ -24,5 +24,17 @@ describe('exitCodeFor', () => {
   it('returns 0 for warnings/info only and for empty report', () => {
     expect(exitCodeFor(report(['warn', 'info']))).toBe(0)
     expect(exitCodeFor(report([]))).toBe(0)
+  })
+
+  it('returns 1 when the entry redirects outside the site origin', async () => {
+    const fetcher: PageFetcher = {
+      fetch: async url => ({ url, finalUrl: 'https://www.example.com/', html: '', statusCode: 200, headers: {}, ttfb: 1, links: [] }),
+      head: async () => ({ statusCode: 200, headers: {} }),
+      close: async () => {},
+    }
+    const site = { url: 'https://example.com' }
+    const crawled = await crawl(fetcher, [`${site.url}/`], { siteUrl: site.url, respectRobots: false })
+    const result = await runChecks({ snapshots: crawled.snapshots, checks: [], rules: new Map(), site, fetcher, crawlStats: crawled.stats, crawlIssues: crawled.issues })
+    expect(exitCodeFor(result)).toBe(1)
   })
 })

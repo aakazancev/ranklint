@@ -9,6 +9,7 @@ vi.mock('playwright', () => {
       headers: () => ({}),
       text: async () => '<html><head><title>t</title></head><body></body></html>',
     }),
+    url: () => 'https://x.com/',
     waitForLoadState: async () => {},
     content: async () => '<html><head><title>t</title></head><body></body></html>',
     $$eval: async () => [],

@@ -209,4 +209,123 @@ describe('crawl respects robots.txt', () => {
     expect(result.reachability).toEqual([{ url: `${site}/private/y`, zone: 'main', statusCode: 200 }])
     expect(result.stats.disallowed).toBe(0)
   })
+
+  it('treats a page redirected to a foreign origin as external', async () => {
+    const fetched: string[] = []
+    const fetcher: PageFetcher = {
+      async fetch(url) {
+        fetched.push(url)
+        const path = new URL(url).pathname
+        if (path === '/l/xbdyq') {
+          return { url, finalUrl: 'https://apps.apple.com/us/app/x', html: '', statusCode: 200, headers: {}, ttfb: 1, links: [{ href: '/us/iphone/today', text: 'x' }, { href: '/ca/iphone/today?l=fr', text: 'x' }] }
+        }
+        return { url, html: '', statusCode: 200, headers: {}, ttfb: 1, links: path === '/' ? [{ href: '/l/xbdyq', text: 'x' }] : [] }
+      },
+      async head() {
+        return { statusCode: 200, headers: {} }
+      },
+      async close() {},
+    }
+    const result = await crawl(fetcher, [site], { siteUrl: site, respectRobots: false })
+    expect(fetched).toEqual([`${site}/`, `${site}/l/xbdyq`])
+    expect(result.snapshots.map(s => s.url)).toEqual([`${site}/`])
+    expect(result.stats.visited).toBe(1)
+    expect(result.stats.external).toBe(1)
+  })
+
+  it('resolves links against the final url after an internal redirect', async () => {
+    const fetched: string[] = []
+    const fetcher: PageFetcher = {
+      async fetch(url) {
+        fetched.push(url)
+        const path = new URL(url).pathname
+        if (path === '/a') {
+          return { url, finalUrl: `${site}/b/`, html: '', statusCode: 200, headers: {}, ttfb: 1, links: [{ href: 'child', text: 'x' }] }
+        }
+        return { url, html: '', statusCode: 200, headers: {}, ttfb: 1, links: path === '/' ? [{ href: '/a', text: 'x' }] : [] }
+      },
+      async head() {
+        return { statusCode: 200, headers: {} }
+      },
+      async close() {},
+    }
+    const result = await crawl(fetcher, [site], { siteUrl: site, respectRobots: false })
+    expect(fetched).toEqual([`${site}/`, `${site}/a`, `${site}/b/child`])
+    expect(result.stats.external).toBe(0)
+  })
+
+  it('reports an entry redirected to another origin instead of dropping it silently', async () => {
+    const fetcher: PageFetcher = {
+      async fetch(url) {
+        return { url, finalUrl: url.replace('https://example.com', 'https://www.example.com'), html: '', statusCode: 200, headers: {}, ttfb: 1, links: [{ href: '/about', text: 'x' }] }
+      },
+      async head() {
+        return { statusCode: 200, headers: {} }
+      },
+      async close() {},
+    }
+    const result = await crawl(fetcher, ['https://example.com/'], { siteUrl: 'https://example.com', respectRobots: false })
+    expect(result.snapshots).toEqual([])
+    expect(result.stats.visited).toBe(0)
+    expect(result.issues).toEqual([{
+      checkId: 'crawl:entry-redirect',
+      severity: 'error',
+      message: 'Entry https://example.com/ redirects to https://www.example.com/, outside https://example.com',
+      url: 'https://example.com/',
+      suggestion: 'Set site.url / --url to https://www.example.com',
+    }])
+  })
+
+  it('crawls the other entries when one entry leaves the site origin', async () => {
+    const fetcher: PageFetcher = {
+      async fetch(url) {
+        const path = new URL(url).pathname
+        const finalUrl = path === '/old' ? 'https://other.com/' : url
+        return { url, finalUrl, html: '', statusCode: 200, headers: {}, ttfb: 1, links: [] }
+      },
+      async head() {
+        return { statusCode: 200, headers: {} }
+      },
+      async close() {},
+    }
+    const seeds = [`${site}/old`, `${site}/`]
+    const result = await crawl(fetcher, seeds, { siteUrl: site, respectRobots: false, entries: seeds })
+    expect(result.snapshots.map(s => s.url)).toEqual([`${site}/`])
+    expect(result.issues.map(i => i.checkId)).toEqual(['crawl:entry-redirect'])
+  })
+
+  it('keeps one snapshot for urls redirecting to an already known page', async () => {
+    const fetcher: PageFetcher = {
+      async fetch(url) {
+        const path = new URL(url).pathname
+        if (path === '/a') return { url, finalUrl: `${site}/b/`, html: '', statusCode: 200, headers: {}, ttfb: 1, links: [] }
+        return { url, html: '', statusCode: 200, headers: {}, ttfb: 1, links: path === '/' ? [{ href: '/a', text: 'x' }, { href: '/b/', text: 'x' }] : [] }
+      },
+      async head() {
+        return { statusCode: 200, headers: {} }
+      },
+      async close() {},
+    }
+    const result = await crawl(fetcher, [site], { siteUrl: site, respectRobots: false })
+    expect(result.snapshots.map(s => s.url).sort()).toEqual([`${site}/`, `${site}/b/`])
+  })
+
+  it('does not fetch a redirect target already reached through another url', async () => {
+    const fetched: string[] = []
+    const fetcher: PageFetcher = {
+      async fetch(url) {
+        fetched.push(url)
+        const path = new URL(url).pathname
+        if (path === '/a') return { url, finalUrl: `${site}/b/`, html: '', statusCode: 200, headers: {}, ttfb: 1, links: [{ href: '/b/', text: 'x' }] }
+        return { url, html: '', statusCode: 200, headers: {}, ttfb: 1, links: path === '/' ? [{ href: '/a', text: 'x' }] : [] }
+      },
+      async head() {
+        return { statusCode: 200, headers: {} }
+      },
+      async close() {},
+    }
+    const result = await crawl(fetcher, [site], { siteUrl: site, respectRobots: false })
+    expect(fetched).toEqual([`${site}/`, `${site}/a`])
+    expect(result.snapshots.map(s => s.url)).toEqual([`${site}/`, `${site}/b/`])
+  })
 })

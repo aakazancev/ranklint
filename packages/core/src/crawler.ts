@@ -120,10 +120,29 @@ export async function crawl(
         url,
       })
     }
-    snapshots.push(snapshot)
-    stats.visited++
-    options.onPage?.({ url, statusCode: snapshot.statusCode, ms: Date.now() - started, visited: stats.visited })
-    for (const link of snapshot.links) enqueue(link.href, url)
+    const finalUrl = snapshot.finalUrl ?? url
+    const siteOrigin = new URL(options.siteUrl).origin
+    const finalKey = normalizeUrl(finalUrl, url)
+    if (new URL(finalUrl).origin !== siteOrigin) {
+      if (entries.has(url)) {
+        issues.push({
+          checkId: 'crawl:entry-redirect',
+          severity: 'error',
+          message: `Entry ${url} redirects to ${finalUrl}, outside ${siteOrigin}`,
+          url,
+          suggestion: `Set site.url / --url to ${new URL(finalUrl).origin}`,
+        })
+      } else {
+        stats.external++
+      }
+    } else if (!finalKey || finalKey === url || !seen.has(finalKey)) {
+      if (finalKey) seen.add(finalKey)
+      const page = finalKey && finalKey !== url ? { ...snapshot, url: finalKey } : snapshot
+      snapshots.push(page)
+      stats.visited++
+      options.onPage?.({ url: page.url, statusCode: snapshot.statusCode, ms: Date.now() - started, visited: stats.visited })
+      for (const link of snapshot.links) enqueue(link.href, finalUrl)
+    }
     if (delay > 0) await sleep(delay)
   }
 

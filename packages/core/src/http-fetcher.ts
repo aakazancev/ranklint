@@ -36,6 +36,7 @@ export class HttpFetcher implements PageFetcher {
     const html = await res.text()
     return {
       url,
+      finalUrl: res.url || url,
       html,
       statusCode: res.status,
       headers: Object.fromEntries(res.headers.entries()),

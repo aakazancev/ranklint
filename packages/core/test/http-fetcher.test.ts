@@ -12,6 +12,11 @@ let base: string
 
 beforeAll(async () => {
   server = createServer((req, res) => {
+    if (req.url === '/old') {
+      res.writeHead(301, { location: '/new/' })
+      res.end()
+      return
+    }
     if (req.url === '/missing') {
       res.writeHead(404, { 'content-type': 'text/html' })
       res.end('<html><body>nope</body></html>')
@@ -47,6 +52,13 @@ describe('HttpFetcher', () => {
     expect(snap.ttfb).toBeGreaterThanOrEqual(0)
     expect(snap.links).toHaveLength(2)
     expect(snap.ssrHtml).toBeUndefined()
+  })
+
+  it('reports the final url after redirects', async () => {
+    const snap = await fetcher.fetch(`${base}/old`)
+    expect(snap.url).toBe(`${base}/old`)
+    expect(snap.finalUrl).toBe(`${base}/new/`)
+    expect((await fetcher.fetch(`${base}/`)).finalUrl).toBe(`${base}/`)
   })
 
   it('reports 404 status', async () => {

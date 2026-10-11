@@ -23,6 +23,7 @@ export function fakeHeadFetcher(
 
 export interface RunCheckOptions {
   url?: string
+  finalUrl?: string
   siteUrl?: string
   options?: Record<string, unknown>
   links?: PageLink[]
@@ -38,6 +39,7 @@ export async function runCheckOnHtml(
   const url = opts.url ?? 'https://example.com/'
   const snapshot: PageSnapshot = {
     url,
+    ...(opts.finalUrl ? { finalUrl: opts.finalUrl } : {}),
     html,
     statusCode: 200,
     headers: {},

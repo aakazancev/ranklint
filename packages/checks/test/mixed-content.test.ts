@@ -51,6 +51,17 @@ describe('canonical:no-chain', () => {
     expect(issues[0]?.message).toContain('"/c"')
   })
 
+  it('resolves a relative canonical against the final url of the page', async () => {
+    const pages = [
+      { ...snapWithCanonical('/old/a', null), finalUrl: 'https://x.com/new/a', html: '<html><head><link rel="canonical" href="b"></head></html>' },
+      snapWithCanonical('/new/b', '/new/c'),
+      snapWithCanonical('/new/c', '/new/c'),
+    ]
+    const issues = await canonicalNoChain.run(siteCtx(pages))
+    expect(issues).toHaveLength(1)
+    expect(issues[0]?.message).toContain('"/new/b"')
+  })
+
   it('accepts self-canonicals and single hops', async () => {
     const pages = [snapWithCanonical('/a', '/b'), snapWithCanonical('/b', '/b')]
     expect(await canonicalNoChain.run(siteCtx(pages))).toEqual([])

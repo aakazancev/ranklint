@@ -100,6 +100,20 @@ describe('mobile:viewport', () => {
 })
 
 describe('links:permanent-redirects', () => {
+  it('resolves relative links against the final url of the page', async () => {
+    const fetcher = fakeHeadFetcher({
+      'https://example.com/b/child': { status: 302, location: '/b/end' },
+      'https://example.com/b/end': { status: 200 },
+    })
+    const issues = await runCheckOnHtml(permanentRedirects, '<a href="child">c</a>', {
+      url: 'https://example.com/a',
+      finalUrl: 'https://example.com/b/',
+      links: [{ href: 'child', text: 'c' }],
+      fetcher,
+    })
+    expect(issues).toHaveLength(1)
+  })
+
   it('flags temporary 302 first hop, allows 301', async () => {
     const fetcher = fakeHeadFetcher({
       'https://example.com/temp': { status: 302, location: '/final' },

@@ -56,6 +56,7 @@ export class PlaywrightFetcher implements PageFetcher {
         .filter(src => src !== ''))
       return {
         url,
+        finalUrl: page.url(),
         html,
         ssrHtml,
         statusCode: response.status(),

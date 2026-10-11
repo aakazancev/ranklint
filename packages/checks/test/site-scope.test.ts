@@ -119,4 +119,10 @@ describe('links:no-orphans', () => {
     expect(issues).toHaveLength(1)
     expect(issues[0]?.url).toBe(`${base}/orphan`)
   })
+
+  it('resolves relative links against the final url of the page', async () => {
+    const pages = [{ ...snap('/old/x', '<a href="linked">go</a>', base), finalUrl: `${base}/` }]
+    const issues = await noOrphans.run(ctx(pages, base))
+    expect(issues.map(i => i.url)).toEqual([`${base}/orphan`])
+  })
 })

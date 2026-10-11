@@ -31,7 +31,7 @@ export const noOrphans = defineCheck({
     for (const page of ctx.pages ?? []) {
       for (const link of page.links) {
         try {
-          const u = new URL(link.href, page.url)
+          const u = new URL(link.href, page.finalUrl ?? page.url)
           if (u.origin === origin) linked.add(u.pathname)
         } catch {
           continue

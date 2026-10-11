@@ -104,4 +104,20 @@ describe('PlaywrightFetcher', () => {
     await fetcher.fetch(`${base}/`, { userAgent: 'Googlebot-test' })
     expect(seenUa).toBe('Googlebot-test')
   }, 60_000)
+
+  it('reports the final url after redirects', async () => {
+    server.removeAllListeners('request')
+    server.on('request', (req, res) => {
+      if (req.url === '/old') {
+        res.writeHead(301, { location: '/new/' })
+        res.end()
+        return
+      }
+      res.writeHead(200, { 'content-type': 'text/html' })
+      res.end('<html><body>new</body></html>')
+    })
+    const snap = await fetcher.fetch(`${base}/old`)
+    expect(snap.url).toBe(`${base}/old`)
+    expect(snap.finalUrl).toBe(`${base}/new/`)
+  }, 60_000)
 })
