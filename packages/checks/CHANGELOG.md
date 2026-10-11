@@ -1,5 +1,11 @@
 # @ranklint/checks
 
+## 1.1.1
+
+### Patch Changes
+
+- @ranklint/core@1.1.1
+
 ## 1.1.0
 
 ### Minor Changes

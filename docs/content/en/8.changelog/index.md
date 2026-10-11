@@ -5,6 +5,12 @@ description: "Every ranklint release with breaking changes, features and fixes, 
 
 <!-- generated:start -->
 
+## ranklint 1.1.1
+
+Released: 2026-10-11 · [Release notes](/en/changelog/v1.1.1)
+
+Audit logs progress for checks and every Lighthouse run so long CI jobs no longer look stuck.
+
 ## ranklint 1.1.0
 
 Released: 2026-10-11 · [Release notes](/en/changelog/v1.1.0)
