@@ -45,7 +45,7 @@ const ogImageCheck = `{
 const runs = [
   { off: ['jsonld:parseable', 'jsonld:valid-schema', 'images:alt-required', 'images:dimensions-required', 'images:no-lazy-above-fold'], custom: false },
   { off: ['links:no-orphans', 'meta:no-duplicate-title', 'headings:hierarchy'], custom: true },
-  { off: [], custom: true },
+  { off: ['meta:description-length', 'headings:h1-length', 'canonical:required'], custom: true },
 ]
 
 function configFor(run) {

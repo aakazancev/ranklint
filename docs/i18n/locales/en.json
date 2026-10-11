@@ -172,7 +172,7 @@
       "title": "Every monitor run publishes a dashboard",
       "lead": "Add one step after the monitor and every scheduled run publishes a static site to GitHub or GitLab Pages. The team sees errors by page, trends and history without opening a terminal.",
       "frameTitle": "Dashboard of the last run",
-      "alt": "ranklint dashboard for example.com: 39 errors and 13 warnings in the last run, new issues since the previous run, the error trend and Lighthouse scores by page",
+      "alt": "ranklint dashboard for example.com: 38 errors and 11 warnings in the last run, new and fixed issues since the previous run, the error trend and Lighthouse scores by page",
       "insideTitle": "What the team sees",
       "b1": "A checklist for every page: what to fix, how, and a link to the rule docs",
       "b2": "Fix once: issues that repeat across a section or the whole site, usually one template",
