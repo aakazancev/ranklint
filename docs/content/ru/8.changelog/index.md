@@ -5,6 +5,16 @@ description: "Все релизы ranklint: ломающие изменения,
 
 <!-- generated:start -->
 
+## ranklint 1.1.1
+
+Дата: 2026-10-11 · [Подробнее](/ru/changelog/v1.1.1)
+
+::div{lang="en"}
+
+Audit logs progress for checks and every Lighthouse run so long CI jobs no longer look stuck.
+
+::
+
 ## ranklint 1.1.0
 
 Дата: 2026-10-11 · [Подробнее](/ru/changelog/v1.1.0)

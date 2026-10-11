@@ -1,5 +1,14 @@
 # @ranklint/cli
 
+## 1.1.1
+
+### Patch Changes
+
+- 8c18713: Audit logs progress for checks and every Lighthouse run so long CI jobs no longer look stuck.
+  - @ranklint/checks@1.1.1
+  - @ranklint/core@1.1.1
+  - @ranklint/reporters@1.1.1
+
 ## 1.1.0
 
 ### Minor Changes
