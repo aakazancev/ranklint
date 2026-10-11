@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { aggregate, checkThresholds, collectLighthouse, lighthouseTargets, type LighthouseRunner } from '../src/lighthouse'
 
 describe('aggregate', () => {
@@ -152,5 +152,49 @@ describe('lighthouseTargets', () => {
     const urls = ['/1', '/2', '/3', '/4', '/5', '/6', '/7']
     expect(lighthouseTargets('https://x.com', { urls }, [])).toHaveLength(7)
     expect(lighthouseTargets('https://x.com', { urls, maxUrls: 3 }, [])).toEqual(['https://x.com/1', 'https://x.com/2', 'https://x.com/3'])
+  })
+})
+
+describe('collectLighthouse runTimeout', () => {
+  it('fails a hung run with timeout, aborts its signal and keeps measuring', async () => {
+    const signals: AbortSignal[] = []
+    let call = 0
+    const runner: LighthouseRunner = (_url, opts) => {
+      call++
+      if (call === 1) {
+        signals.push(opts.signal!)
+        return new Promise(() => {})
+      }
+      return Promise.resolve({ metrics: { performance: 80 } })
+    }
+    const events: string[] = []
+    const results = await collectLighthouse(['https://x.com/a', 'https://x.com/b'], { runs: 2, runTimeout: 20 }, runner, (e) => {
+      events.push(`${e.url} ${e.run} ${e.error ?? e.metrics.performance}`)
+    })
+    expect(events).toEqual([
+      'https://x.com/a 1 timeout after 0.02s',
+      'https://x.com/a 2 80',
+      'https://x.com/b 1 80',
+      'https://x.com/b 2 80',
+    ])
+    expect(signals[0]?.aborted).toBe(true)
+    expect(results.map(r => [r.url, r.runs])).toEqual([['https://x.com/a', 1], ['https://x.com/b', 2]])
+  })
+
+  it('clears the timer when a run finishes', async () => {
+    vi.useFakeTimers()
+    try {
+      let signal: AbortSignal | undefined
+      const runner: LighthouseRunner = async (_url, opts) => {
+        signal = opts.signal
+        return { metrics: { performance: 90 } }
+      }
+      const results = await collectLighthouse(['https://x.com/'], { runs: 1 }, runner)
+      expect(results[0]?.metrics.performance).toBe(90)
+      expect(vi.getTimerCount()).toBe(0)
+      expect(signal?.aborted).toBe(false)
+    } finally {
+      vi.useRealTimers()
+    }
   })
 })

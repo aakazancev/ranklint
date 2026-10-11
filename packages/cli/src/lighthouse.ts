@@ -7,7 +7,7 @@ export interface LighthouseRunRaw {
   runtimeError?: string
 }
 
-export type LighthouseRunner = (url: string, opts: { formFactor: 'mobile' | 'desktop' }) => Promise<LighthouseRunRaw>
+export type LighthouseRunner = (url: string, opts: { formFactor: 'mobile' | 'desktop', signal?: AbortSignal }) => Promise<LighthouseRunRaw>
 
 export interface LighthouseRunEvent {
   url: string
@@ -26,6 +26,7 @@ export interface LighthouseConfig {
   aggregation?: LighthouseAggregation
   formFactor?: 'mobile' | 'desktop'
   maxUrls?: number
+  runTimeout?: number
   urls?: string[]
   thresholds?: Record<string, Record<string, number>>
 }
@@ -62,6 +63,22 @@ export function lighthouseTargets(base: string, config: LighthouseConfig | undef
   return discovered.slice(0, config?.maxUrls ?? 5)
 }
 
+async function runWithTimeout(runner: LighthouseRunner, url: string, formFactor: 'mobile' | 'desktop', timeout: number): Promise<LighthouseRunRaw> {
+  const controller = new AbortController()
+  let timer: ReturnType<typeof setTimeout> | undefined
+  const timedOut = new Promise<never>((_, reject) => {
+    timer = setTimeout(() => {
+      controller.abort()
+      reject(new Error(`timeout after ${timeout / 1000}s`))
+    }, timeout)
+  })
+  try {
+    return await Promise.race([runner(url, { formFactor, signal: controller.signal }), timedOut])
+  } finally {
+    clearTimeout(timer)
+  }
+}
+
 export async function collectLighthouse(
   urls: string[],
   config: LighthouseConfig,
@@ -71,6 +88,7 @@ export async function collectLighthouse(
   const runs = config.runs ?? 5
   const aggregation = config.aggregation ?? 'median'
   const formFactor = config.formFactor ?? 'mobile'
+  const runTimeout = config.runTimeout ?? 180000
   const results: LighthouseResult[] = []
   const targets = urls.slice(0, config.maxUrls ?? urls.length)
   for (const [index, url] of targets.entries()) {
@@ -80,7 +98,7 @@ export async function collectLighthouse(
       const event = { url, page: index + 1, pages: targets.length, run: i + 1, runs }
       let raw: LighthouseRunRaw
       try {
-        raw = await runner(url, { formFactor })
+        raw = await runWithTimeout(runner, url, formFactor, runTimeout)
       } catch (error) {
         onRun?.({ ...event, ms: Date.now() - started, metrics: {}, error: error instanceof Error ? error.message : String(error) })
         continue

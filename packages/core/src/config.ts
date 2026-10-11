@@ -59,6 +59,7 @@ export const configSchema = z.object({
     aggregation: z.enum(['median', 'p75', 'best']).optional(),
     formFactor: z.enum(['mobile', 'desktop']).optional(),
     maxUrls: z.number().int().positive().optional(),
+    runTimeout: z.number().int().positive().optional(),
     urls: z.array(z.string()).optional(),
     thresholds: z.record(z.string(), z.record(z.string(), z.number())).optional(),
   }).optional(),

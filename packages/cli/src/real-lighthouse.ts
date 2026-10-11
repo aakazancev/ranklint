@@ -6,6 +6,12 @@ export const realLighthouseRunner: LighthouseRunner = async (url, opts): Promise
     import('chrome-launcher'),
   ])
   const chrome = await chromeLauncher.launch({ chromeFlags: ['--headless', '--disable-dev-shm-usage'] })
+  const kill = () => chrome.kill()
+  if (opts.signal?.aborted) {
+    kill()
+    throw new Error(`Lighthouse run aborted for ${url}`)
+  }
+  opts.signal?.addEventListener('abort', kill, { once: true })
   try {
     const result = await lighthouse(url, {
       port: chrome.port,
@@ -42,6 +48,7 @@ export const realLighthouseRunner: LighthouseRunner = async (url, opts): Promise
       runtimeError: lhr.runtimeError ? `${lhr.runtimeError.code}: ${lhr.runtimeError.message}` : undefined,
     }
   } finally {
+    opts.signal?.removeEventListener('abort', kill)
     chrome.kill()
   }
 }
