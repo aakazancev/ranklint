@@ -1,5 +1,14 @@
 # @ranklint/cli
 
+## 1.1.2
+
+### Patch Changes
+
+- ec1d8e1: A crashed Lighthouse run is now logged and skipped instead of aborting the audit, and Chrome runs with `--disable-dev-shm-usage` for containers.
+  - @ranklint/checks@1.1.2
+  - @ranklint/core@1.1.2
+  - @ranklint/reporters@1.1.2
+
 ## 1.1.1
 
 ### Patch Changes

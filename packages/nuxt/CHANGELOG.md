@@ -1,5 +1,13 @@
 # @ranklint/nuxt
 
+## 1.1.2
+
+### Patch Changes
+
+- @ranklint/checks@1.1.2
+- @ranklint/core@1.1.2
+- @ranklint/devtools@1.1.2
+
 ## 1.1.1
 
 ### Patch Changes
