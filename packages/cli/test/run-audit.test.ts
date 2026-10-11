@@ -109,6 +109,55 @@ describe('runAudit', () => {
     expect(log).toMatch(/\[ranklint\] lighthouse 1\/1 run 2\/2 \d+ms perf 47 https:\/\/site\.test\/\n/)
   })
 
+  it('logs a failed lighthouse run and keeps the audit going', async () => {
+    const fetcher = fakeFetcher({ '/': '<html><head><title>Home</title></head><body></body></html>' })
+    const stderr = vi.spyOn(process.stderr, 'write').mockImplementation(() => true)
+    let log: string
+    let call = 0
+    let report
+    try {
+      report = await runAudit({
+        url: 'https://site.test/',
+        cwd: '/tmp',
+        fetcher,
+        lighthouseRunner: async () => {
+          if (++call === 1) throw new Error('Target closed')
+          return { metrics: { performance: 47 } }
+        },
+        config: { site: { url: 'https://site.test' }, lighthouse: { enabled: true, runs: 2, urls: ['/'] } },
+      })
+      log = stderr.mock.calls.map(c => String(c[0])).join('')
+    } finally {
+      stderr.mockRestore()
+    }
+    expect(log).toContain('[ranklint] lighthouse 1/1 run 1/2 failed: Target closed https://site.test/\n')
+    expect(report.lighthouse?.[0]?.metrics.performance).toBe(47)
+  })
+
+  it('logs stray lighthouse rejections instead of crashing and removes the guard', async () => {
+    const listeners = process.listenerCount('unhandledRejection')
+    const stderr = vi.spyOn(process.stderr, 'write').mockImplementation(() => true)
+    let log: string
+    try {
+      const report = await runAudit({
+        url: 'https://site.test/',
+        cwd: '/tmp',
+        fetcher: fakeFetcher({ '/': '<html><head><title>Home</title></head><body></body></html>' }),
+        lighthouseRunner: async () => {
+          process.emit('unhandledRejection', new Error('late target closed'), Promise.resolve())
+          return { metrics: { performance: 51 } }
+        },
+        config: { site: { url: 'https://site.test' }, lighthouse: { enabled: true, runs: 1, urls: ['/'] } },
+      })
+      expect(report.lighthouse?.[0]?.metrics.performance).toBe(51)
+      log = stderr.mock.calls.map(c => String(c[0])).join('')
+    } finally {
+      stderr.mockRestore()
+    }
+    expect(log).toContain('[ranklint] lighthouse: ignored late target closed\n')
+    expect(process.listenerCount('unhandledRejection')).toBe(listeners)
+  })
+
   it('filters sitemap samples through robots.txt but always crawls entry', async () => {
     const pages = {
       '/': '<html></html>',

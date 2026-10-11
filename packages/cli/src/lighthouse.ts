@@ -16,6 +16,7 @@ export interface LighthouseRunEvent {
   runs: number
   ms: number
   metrics: LighthouseMetrics
+  error?: string
 }
 
 export interface LighthouseConfig {
@@ -74,10 +75,18 @@ export async function collectLighthouse(
     const raws: LighthouseRunRaw[] = []
     for (let i = 0; i < runs; i++) {
       const started = Date.now()
-      const raw = await runner(url, { formFactor })
+      const event = { url, page: index + 1, pages: targets.length, run: i + 1, runs }
+      let raw: LighthouseRunRaw
+      try {
+        raw = await runner(url, { formFactor })
+      } catch (error) {
+        onRun?.({ ...event, ms: Date.now() - started, metrics: {}, error: error instanceof Error ? error.message : String(error) })
+        continue
+      }
       raws.push(raw)
-      onRun?.({ url, page: index + 1, pages: targets.length, run: i + 1, runs, ms: Date.now() - started, metrics: raw.metrics })
+      onRun?.({ ...event, ms: Date.now() - started, metrics: raw.metrics })
     }
+    if (raws.length === 0) continue
     const metrics: LighthouseMetrics = {}
     const keys = new Set(raws.flatMap(r => Object.keys(r.metrics))) as Set<keyof LighthouseMetrics>
     for (const key of keys) {
@@ -86,7 +95,7 @@ export async function collectLighthouse(
     }
     results.push({
       url,
-      runs,
+      runs: raws.length,
       aggregation,
       metrics,
       lcpElement: lcpElement(raws.find(r => r.lcpSnippet)?.lcpSnippet),

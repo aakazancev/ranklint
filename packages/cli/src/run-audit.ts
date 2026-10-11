@@ -16,6 +16,10 @@ export interface RunAuditOptions {
 
 const REACHABLE_DOCS = 'https://ranklint.dev/en/cli/zones'
 
+function ignoreStray(reason: unknown): void {
+  process.stderr.write(`[ranklint] lighthouse: ignored ${reason instanceof Error ? reason.message : String(reason)}\n`)
+}
+
 export async function runAudit(opts: RunAuditOptions): Promise<Report> {
   let config: RanklintUserConfig
   if (opts.config) {
@@ -108,13 +112,16 @@ export async function runAudit(opts: RunAuditOptions): Promise<Report> {
       const crawled = crawlResult.snapshots.filter(s => s.statusCode === 200).map(s => s.url)
       const urls = lighthouseTargets(opts.url, config.lighthouse, crawled)
       process.stderr.write(`[ranklint] lighthouse: ${urls.length} pages\n`)
-      report.lighthouse = await collectLighthouse(urls, config.lighthouse, runner, e => process.stderr.write(
-        `[ranklint] lighthouse ${e.page}/${e.pages} run ${e.run}/${e.runs} ${e.ms}ms${e.metrics.performance === undefined ? '' : ` perf ${e.metrics.performance}`} ${e.url}\n`,
+      process.on('unhandledRejection', ignoreStray)
+      report.lighthouse = await collectLighthouse(urls, config.lighthouse, runner, e => process.stderr.write(e.error
+        ? `[ranklint] lighthouse ${e.page}/${e.pages} run ${e.run}/${e.runs} failed: ${e.error} ${e.url}\n`
+        : `[ranklint] lighthouse ${e.page}/${e.pages} run ${e.run}/${e.runs} ${e.ms}ms${e.metrics.performance === undefined ? '' : ` perf ${e.metrics.performance}`} ${e.url}\n`,
       ))
       report.issues.push(...checkThresholds(report.lighthouse, config.lighthouse.thresholds))
     }
     return report
   } finally {
+    process.off('unhandledRejection', ignoreStray)
     await fetcher.close()
   }
 }

@@ -53,6 +53,37 @@ describe('collectLighthouse', () => {
       '2/2 2/2 90 https://x.com/b',
     ])
   })
+
+  it('skips failed runs and aggregates the rest', async () => {
+    let call = 0
+    const runner: LighthouseRunner = async () => {
+      call++
+      if (call === 2) throw new Error('Target closed')
+      return { metrics: { performance: call === 1 ? 60 : 80 } }
+    }
+    const events: string[] = []
+    const results = await collectLighthouse(['https://x.com/'], { runs: 3, aggregation: 'best' }, runner, (e) => {
+      events.push(`${e.run}/${e.runs} ${e.error ?? e.metrics.performance}`)
+    })
+    expect(events).toEqual(['1/3 60', '2/3 Target closed', '3/3 80'])
+    expect(results).toHaveLength(1)
+    expect(results[0]!.metrics.performance).toBe(80)
+    expect(results[0]!.runs).toBe(2)
+  })
+
+  it('omits a url whose runs all failed and keeps measuring others', async () => {
+    const runner: LighthouseRunner = async (url) => {
+      if (url.endsWith('/a')) return Promise.reject(new Error('Protocol error'))
+      return { metrics: { performance: 90 } }
+    }
+    const errors: string[] = []
+    const results = await collectLighthouse(['https://x.com/a', 'https://x.com/b'], { runs: 2 }, runner, (e) => {
+      if (e.error) errors.push(`${e.run} ${e.error} ${e.url}`)
+    })
+    expect(errors).toEqual(['1 Protocol error https://x.com/a', '2 Protocol error https://x.com/a'])
+    expect(results.map(r => r.url)).toEqual(['https://x.com/b'])
+    expect(results[0]!.metrics.performance).toBe(90)
+  })
 })
 
 describe('checkThresholds', () => {
