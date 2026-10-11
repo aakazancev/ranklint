@@ -4,6 +4,7 @@ import { mostSpecific } from '@ranklint/core'
 export interface LighthouseRunRaw {
   metrics: LighthouseMetrics
   lcpSnippet?: string
+  runtimeError?: string
 }
 
 export type LighthouseRunner = (url: string, opts: { formFactor: 'mobile' | 'desktop' }) => Promise<LighthouseRunRaw>
@@ -17,6 +18,7 @@ export interface LighthouseRunEvent {
   ms: number
   metrics: LighthouseMetrics
   error?: string
+  runtimeError?: string
 }
 
 export interface LighthouseConfig {
@@ -84,7 +86,7 @@ export async function collectLighthouse(
         continue
       }
       raws.push(raw)
-      onRun?.({ ...event, ms: Date.now() - started, metrics: raw.metrics })
+      onRun?.({ ...event, ms: Date.now() - started, metrics: raw.metrics, runtimeError: raw.runtimeError })
     }
     if (raws.length === 0) continue
     const metrics: LighthouseMetrics = {}

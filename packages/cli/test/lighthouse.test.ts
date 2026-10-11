@@ -54,6 +54,15 @@ describe('collectLighthouse', () => {
     ])
   })
 
+  it('passes runtimeError through onRun and still counts the run', async () => {
+    const runner: LighthouseRunner = async () => ({ metrics: { lcp: 900 }, runtimeError: 'NO_FCP: The page did not paint any content.' })
+    const errors: (string | undefined)[] = []
+    const results = await collectLighthouse(['https://x.com/'], { runs: 1 }, runner, e => errors.push(e.runtimeError))
+    expect(errors).toEqual(['NO_FCP: The page did not paint any content.'])
+    expect(results[0]?.runs).toBe(1)
+    expect(results[0]?.metrics.lcp).toBe(900)
+  })
+
   it('skips failed runs and aggregates the rest', async () => {
     let call = 0
     const runner: LighthouseRunner = async () => {

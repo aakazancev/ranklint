@@ -134,6 +134,24 @@ describe('runAudit', () => {
     expect(report.lighthouse?.[0]?.metrics.performance).toBe(47)
   })
 
+  it('logs the lighthouse runtime error on the run line', async () => {
+    const stderr = vi.spyOn(process.stderr, 'write').mockImplementation(() => true)
+    let log: string
+    try {
+      await runAudit({
+        url: 'https://site.test/',
+        cwd: '/tmp',
+        fetcher: fakeFetcher({ '/': '<html><head><title>Home</title></head><body></body></html>' }),
+        lighthouseRunner: async () => ({ metrics: {}, runtimeError: 'NO_FCP: The page did not paint any content.' }),
+        config: { site: { url: 'https://site.test' }, lighthouse: { enabled: true, runs: 1, urls: ['/'] } },
+      })
+      log = stderr.mock.calls.map(c => String(c[0])).join('')
+    } finally {
+      stderr.mockRestore()
+    }
+    expect(log).toMatch(/\[ranklint\] lighthouse 1\/1 run 1\/1 \d+ms runtime error NO_FCP: The page did not paint any content\. https:\/\/site\.test\/\n/)
+  })
+
   it('logs stray lighthouse rejections instead of crashing and removes the guard', async () => {
     const listeners = process.listenerCount('unhandledRejection')
     const stderr = vi.spyOn(process.stderr, 'write').mockImplementation(() => true)

@@ -115,7 +115,7 @@ export async function runAudit(opts: RunAuditOptions): Promise<Report> {
       process.on('unhandledRejection', ignoreStray)
       report.lighthouse = await collectLighthouse(urls, config.lighthouse, runner, e => process.stderr.write(e.error
         ? `[ranklint] lighthouse ${e.page}/${e.pages} run ${e.run}/${e.runs} failed: ${e.error} ${e.url}\n`
-        : `[ranklint] lighthouse ${e.page}/${e.pages} run ${e.run}/${e.runs} ${e.ms}ms${e.metrics.performance === undefined ? '' : ` perf ${e.metrics.performance}`} ${e.url}\n`,
+        : `[ranklint] lighthouse ${e.page}/${e.pages} run ${e.run}/${e.runs} ${e.ms}ms${e.metrics.performance === undefined ? '' : ` perf ${e.metrics.performance}`}${e.runtimeError ? ` runtime error ${e.runtimeError}` : ''} ${e.url}\n`,
       ))
       report.issues.push(...checkThresholds(report.lighthouse, config.lighthouse.thresholds))
     }

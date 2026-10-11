@@ -1,14 +1,5 @@
 import type { LighthouseRunner, LighthouseRunRaw } from './lighthouse'
 
-export function rejectOnUnhandled<T>(task: Promise<T>): Promise<T> {
-  let listener: (reason: unknown) => void = () => {}
-  const crashed = new Promise<never>((_, reject) => {
-    listener = reason => reject(reason instanceof Error ? reason : new Error(String(reason)))
-    process.on('unhandledRejection', listener)
-  })
-  return Promise.race([task, crashed]).finally(() => process.off('unhandledRejection', listener))
-}
-
 export const realLighthouseRunner: LighthouseRunner = async (url, opts): Promise<LighthouseRunRaw> => {
   const [{ default: lighthouse }, chromeLauncher] = await Promise.all([
     import('lighthouse'),
@@ -16,7 +7,7 @@ export const realLighthouseRunner: LighthouseRunner = async (url, opts): Promise
   ])
   const chrome = await chromeLauncher.launch({ chromeFlags: ['--headless', '--disable-dev-shm-usage'] })
   try {
-    const result = await rejectOnUnhandled(lighthouse(url, {
+    const result = await lighthouse(url, {
       port: chrome.port,
       output: 'json',
       formFactor: opts.formFactor,
@@ -24,7 +15,7 @@ export const realLighthouseRunner: LighthouseRunner = async (url, opts): Promise
         ? { mobile: false, width: 1350, height: 940, deviceScaleFactor: 1, disabled: false }
         : undefined,
       onlyCategories: ['performance', 'seo', 'accessibility', 'best-practices'],
-    }))
+    })
     const lhr = result?.lhr
     if (!lhr) throw new Error(`Lighthouse returned no result for ${url}`)
     const score = (id: string) => {
@@ -48,6 +39,7 @@ export const realLighthouseRunner: LighthouseRunner = async (url, opts): Promise
         tbt: audit('total-blocking-time'),
       },
       lcpSnippet: lcpItems?.[0]?.node?.snippet,
+      runtimeError: lhr.runtimeError ? `${lhr.runtimeError.code}: ${lhr.runtimeError.message}` : undefined,
     }
   } finally {
     chrome.kill()
