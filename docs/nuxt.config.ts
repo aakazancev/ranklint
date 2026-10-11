@@ -44,6 +44,9 @@ export default defineNuxtConfig({
     zeroRuntime: false,
     fontSubsets: ['latin', 'cyrillic'],
   },
+  image: {
+    provider: 'none',
+  },
   nitro: {
     prerender: {
       routes: changelogRoutes,

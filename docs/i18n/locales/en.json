@@ -164,11 +164,26 @@
       },
       "alerts": {
         "title": "Alerts and history",
-        "text": "A Slack or Telegram message on every new error; the report history lives on GitHub or GitLab Pages."
+        "text": "A Slack or Telegram message on every new error; the report history and the dashboard live on GitHub or GitLab Pages."
       }
     },
+    "dashboard": {
+      "eyebrow": "08 — dashboard",
+      "title": "Every monitor run publishes a dashboard",
+      "lead": "Add one step after the monitor and every scheduled run publishes a static site to GitHub or GitLab Pages. The team sees errors by page, trends and history without opening a terminal.",
+      "frameTitle": "Dashboard of the last run",
+      "alt": "ranklint dashboard for example.com: 39 errors and 13 warnings in the last run, new issues since the previous run, the error trend and Lighthouse scores by page",
+      "insideTitle": "What the team sees",
+      "b1": "A checklist for every page: what to fix, how, and a link to the rule docs",
+      "b2": "Fix once: issues that repeat across a section or the whole site, usually one template",
+      "b3": "Error trends, Lighthouse scores by page and CrUX once the key is set",
+      "b4": "Every run archived with its full report, new and fixed issues marked",
+      "brandTitle": "One command, your brand",
+      "brandNote": "Your logo, name and accent color instead of ours. --run-url adds a Run audit button that opens your CI pipeline.",
+      "cta": "How to set up the dashboard"
+    },
     "seotext": {
-      "eyebrow": "08 — in depth",
+      "eyebrow": "09 — in depth",
       "title": "What is an SEO linter",
       "lead": "An SEO linter reads the HTML your site actually returns and reports the things that cost you traffic: a missing title, a canonical pointing at a redirect, a heading level that jumps from h1 to h3, a hreflang pair that only links one way. It is the same idea as ESLint, applied to the markup search engines read instead of the JavaScript you ship.",
       "quote": "The exit code makes the decision instead of a person.",
@@ -194,7 +209,7 @@
       }
     },
     "faq": {
-      "eyebrow": "09 — questions",
+      "eyebrow": "10 — questions",
       "title": "What people usually ask",
       "lighthouse": {
         "q": "How is this different from Lighthouse?",

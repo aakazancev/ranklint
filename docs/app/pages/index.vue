@@ -28,6 +28,7 @@ defineOgImage('Landing', {
       <CiSection />
       <StackSection />
       <MonitorSection />
+      <DashboardSection />
       <SeoTextSection />
       <FaqSection />
       <CtaSection />

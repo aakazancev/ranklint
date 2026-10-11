@@ -38,7 +38,7 @@ describe.each(locales)('landing messages (%s)', (locale) => {
   const landing = messages(locale).landing as unknown as Record<string, unknown>
 
   it('carries every section the page renders', () => {
-    const sections = ['nav', 'hero', 'facts', 'pillars', 'demo', 'devtools', 'rules', 'ci', 'stack', 'monitor', 'seotext', 'faq', 'cta', 'footer']
+    const sections = ['nav', 'hero', 'facts', 'pillars', 'demo', 'devtools', 'rules', 'ci', 'stack', 'monitor', 'dashboard', 'seotext', 'faq', 'cta', 'footer']
     expect(sections.filter(key => !(key in landing))).toEqual([])
   })
 })
