@@ -38,6 +38,21 @@ describe('collectLighthouse', () => {
     expect(results[0]?.lcpElement?.type).toBe('image')
     expect(results[0]?.lcpElement?.suggestion).toContain('fetchpriority')
   })
+
+  it('reports every run through onRun in order', async () => {
+    const runner: LighthouseRunner = async url => ({ metrics: { performance: url.endsWith('/a') ? 50 : 90 } })
+    const events: string[] = []
+    await collectLighthouse(['https://x.com/a', 'https://x.com/b', 'https://x.com/c'], { runs: 2, maxUrls: 2 }, runner, (e) => {
+      expect(e.ms).toBeGreaterThanOrEqual(0)
+      events.push(`${e.page}/${e.pages} ${e.run}/${e.runs} ${e.metrics.performance} ${e.url}`)
+    })
+    expect(events).toEqual([
+      '1/2 1/2 50 https://x.com/a',
+      '1/2 2/2 50 https://x.com/a',
+      '2/2 1/2 90 https://x.com/b',
+      '2/2 2/2 90 https://x.com/b',
+    ])
+  })
 })
 
 describe('checkThresholds', () => {

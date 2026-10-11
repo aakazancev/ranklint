@@ -77,6 +77,7 @@ export async function runMonitor(opts: RunMonitorOptions): Promise<MonitorResult
       const { inspectUrls } = await import('./gsc')
       const property = opts.gscProperty ?? process.env.RANKLINT_GSC_PROPERTY ?? config.site.url
       const urls = (report.pages ?? []).slice(0, 10).map(path => new URL(path, config.site.url).toString())
+      process.stderr.write(`[ranklint] Search Console: inspecting ${urls.length} urls\n`)
       report.searchConsole = await inspectUrls(property, urls, gscToken, opts.gscApiUrl)
     } catch (e) {
       console.warn(`[ranklint] Search Console inspection failed: ${e instanceof Error ? e.message : String(e)}`)

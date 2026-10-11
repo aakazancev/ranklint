@@ -87,6 +87,28 @@ describe('runAudit', () => {
     expect(measured).toEqual(['https://site.test/landing', 'https://site.test/'])
   })
 
+  it('logs progress for checks and every lighthouse run', async () => {
+    const fetcher = fakeFetcher({ '/': '<html><head><title>Home</title></head><body></body></html>' })
+    const stderr = vi.spyOn(process.stderr, 'write').mockImplementation(() => true)
+    let log: string
+    try {
+      await runAudit({
+        url: 'https://site.test/',
+        cwd: '/tmp',
+        fetcher,
+        lighthouseRunner: async () => ({ metrics: { performance: 47 } }),
+        config: { site: { url: 'https://site.test' }, lighthouse: { enabled: true, runs: 2, urls: ['/'] } },
+      })
+      log = stderr.mock.calls.map(c => String(c[0])).join('')
+    } finally {
+      stderr.mockRestore()
+    }
+    expect(log).toMatch(/\[ranklint\] checks done: \d+ issues in \d+(\.\d+)?s\n/)
+    expect(log).toContain('[ranklint] lighthouse: 1 pages\n')
+    expect(log).toMatch(/\[ranklint\] lighthouse 1\/1 run 1\/2 \d+ms perf 47 https:\/\/site\.test\/\n/)
+    expect(log).toMatch(/\[ranklint\] lighthouse 1\/1 run 2\/2 \d+ms perf 47 https:\/\/site\.test\/\n/)
+  })
+
   it('filters sitemap samples through robots.txt but always crawls entry', async () => {
     const pages = {
       '/': '<html></html>',
@@ -117,21 +139,16 @@ describe('runAudit', () => {
       '/en/flow/1': '<html></html>',
       '/robots.txt': 'User-agent: *\nDisallow: /*/flow/*',
     }
-    const writes: string[] = []
-    const original = process.stderr.write.bind(process.stderr)
-    process.stderr.write = ((chunk: string) => {
-      writes.push(String(chunk))
-      return true
-    }) as typeof process.stderr.write
+    const stderr = vi.spyOn(process.stderr, 'write').mockImplementation(() => true)
     try {
       const respected = await runAudit({ url: 'https://site.test/', cwd: '/tmp', fetcher: fakeFetcher(pages), config: { site: { url: 'https://site.test' } } })
       expect(respected.pages).toEqual(['/', '/a'])
       expect(respected.crawlStats.disallowed).toBe(1)
-      expect(writes.join('')).toContain('1 disallowed by robots.txt')
+      expect(stderr.mock.calls.map(c => String(c[0])).join('')).toContain('1 disallowed by robots.txt')
       const ignored = await runAudit({ url: 'https://site.test/', cwd: '/tmp', fetcher: fakeFetcher(pages), config: { site: { url: 'https://site.test' }, crawl: { respectRobots: false } } })
       expect(ignored.pages.sort()).toEqual(['/', '/a', '/en/flow/1'])
     } finally {
-      process.stderr.write = original
+      stderr.mockRestore()
     }
   })
 })

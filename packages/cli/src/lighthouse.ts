@@ -8,6 +8,16 @@ export interface LighthouseRunRaw {
 
 export type LighthouseRunner = (url: string, opts: { formFactor: 'mobile' | 'desktop' }) => Promise<LighthouseRunRaw>
 
+export interface LighthouseRunEvent {
+  url: string
+  page: number
+  pages: number
+  run: number
+  runs: number
+  ms: number
+  metrics: LighthouseMetrics
+}
+
 export interface LighthouseConfig {
   runs?: number
   aggregation?: LighthouseAggregation
@@ -53,15 +63,20 @@ export async function collectLighthouse(
   urls: string[],
   config: LighthouseConfig,
   runner: LighthouseRunner,
+  onRun?: (event: LighthouseRunEvent) => void,
 ): Promise<LighthouseResult[]> {
   const runs = config.runs ?? 5
   const aggregation = config.aggregation ?? 'median'
   const formFactor = config.formFactor ?? 'mobile'
   const results: LighthouseResult[] = []
-  for (const url of urls.slice(0, config.maxUrls ?? urls.length)) {
+  const targets = urls.slice(0, config.maxUrls ?? urls.length)
+  for (const [index, url] of targets.entries()) {
     const raws: LighthouseRunRaw[] = []
     for (let i = 0; i < runs; i++) {
-      raws.push(await runner(url, { formFactor }))
+      const started = Date.now()
+      const raw = await runner(url, { formFactor })
+      raws.push(raw)
+      onRun?.({ url, page: index + 1, pages: targets.length, run: i + 1, runs, ms: Date.now() - started, metrics: raw.metrics })
     }
     const metrics: LighthouseMetrics = {}
     const keys = new Set(raws.flatMap(r => Object.keys(r.metrics))) as Set<keyof LighthouseMetrics>

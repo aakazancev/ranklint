@@ -89,6 +89,7 @@ export async function runAudit(opts: RunAuditOptions): Promise<Report> {
         })
       }
     }
+    const checksStarted = Date.now()
     const report = await runChecks({
       snapshots: crawlResult.snapshots,
       checks,
@@ -100,12 +101,16 @@ export async function runAudit(opts: RunAuditOptions): Promise<Report> {
       truncated: crawlResult.truncated,
     })
     report.crawlBudget = analyzeCrawlBudget(crawlResult.snapshots)
+    process.stderr.write(`[ranklint] checks done: ${report.issues.length} issues in ${((Date.now() - checksStarted) / 1000).toFixed(1)}s\n`)
     if (config.lighthouse?.enabled) {
       const { realLighthouseRunner } = await import('./real-lighthouse')
       const runner = opts.lighthouseRunner ?? realLighthouseRunner
       const crawled = crawlResult.snapshots.filter(s => s.statusCode === 200).map(s => s.url)
       const urls = lighthouseTargets(opts.url, config.lighthouse, crawled)
-      report.lighthouse = await collectLighthouse(urls, config.lighthouse, runner)
+      process.stderr.write(`[ranklint] lighthouse: ${urls.length} pages\n`)
+      report.lighthouse = await collectLighthouse(urls, config.lighthouse, runner, e => process.stderr.write(
+        `[ranklint] lighthouse ${e.page}/${e.pages} run ${e.run}/${e.runs} ${e.ms}ms${e.metrics.performance === undefined ? '' : ` perf ${e.metrics.performance}`} ${e.url}\n`,
+      ))
       report.issues.push(...checkThresholds(report.lighthouse, config.lighthouse.thresholds))
     }
     return report

@@ -5,7 +5,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import type { PageFetcher } from '@ranklint/core'
 import { FsReportStorage } from '@ranklint/core'
-import { afterAll, beforeAll, describe, expect, it } from 'vitest'
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
 import { fetchCruxField } from '../src/crux'
 import { notify } from '../src/notify'
 import { runMonitor } from '../src/run-monitor'
@@ -193,6 +193,7 @@ describe('runMonitor with a gsc service account key file', () => {
       private_key: privateKey.export({ type: 'pkcs8', format: 'pem' }).toString(),
     }))
 
+    const stderr = vi.spyOn(process.stderr, 'write').mockImplementation(() => true)
     const result = await runMonitor({
       url: 'https://site.test/',
       fetcher: fetcherFor(cleanPage),
@@ -204,7 +205,11 @@ describe('runMonitor with a gsc service account key file', () => {
       gscApiUrl: `${base}/inspect`,
       gscProperty: 'https://site.test',
     })
+    const log = stderr.mock.calls.map(c => String(c[0])).join('')
+    stderr.mockRestore()
     await new Promise<void>(r => server.close(() => r()))
+
+    expect(log).toContain('[ranklint] Search Console: inspecting 1 urls\n')
 
     expect(auths[0]).toBe('Bearer sa-token')
     expect(result.report.searchConsole?.inspected[0]).toMatchObject({ verdict: 'PASS' })
